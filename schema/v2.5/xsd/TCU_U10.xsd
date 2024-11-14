@@ -1,0 +1,39 @@
+<?xml version = "1.0" ?>
+<!--
+    v2.xml Message Definitions Version v25  - TCU_U10
+    Copyright (c) 1999-2004, Health Level Seven. All rights reserved.
+-->
+<xsd:schema
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="urn:hl7-org:v2xml"
+  targetNamespace="urn:hl7-org:v2xml">
+
+
+  <!-- include segment definitions for version v25 -->
+  <xsd:include schemaLocation="segments.xsd"/>
+
+<!--
+    MESSAGE TCU_U10
+-->
+  <!-- .. groups used in message TCU_U10 -->
+  <xsd:complexType name="TCU_U10.TEST_CONFIGURATION.CONTENT">
+    <xsd:sequence>
+      <xsd:element ref="SPM" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="TCC" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="TCU_U10.TEST_CONFIGURATION" type="TCU_U10.TEST_CONFIGURATION.CONTENT"/>
+
+  <!-- .. message definition TCU_U10 -->
+  <xsd:complexType name="TCU_U10.CONTENT">
+    <xsd:sequence>
+      <xsd:element ref="MSH" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="SFT" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="EQU" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="TCU_U10.TEST_CONFIGURATION" minOccurs="1" maxOccurs="unbounded" />
+      <xsd:element ref="ROL" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="TCU_U10" type="TCU_U10.CONTENT"/>
+
+</xsd:schema>

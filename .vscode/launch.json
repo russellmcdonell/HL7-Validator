@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "hl7Validator Example01",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input", "-O", "output", "-i", "example01.hl7", "-R", "reports", "-L", "logs", "-l", "example01.log", "-S", "schema/v2.4", "-v", "2" ]
+        },
+        {
+            "name": "hl7Validator Example02",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input", "-O", "output", "-i", "example02.hl7", "-R", "reports", "-L", "logs", "-l", "example02.log", "-S", "schema/v2.4", "-v", "2" ]
+        },
+        {
+            "name": "hl7Validator Example03",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input", "-O", "output", "-i", "example03.hl7", "-R", "reports", "-L", "logs", "-l", "example03.log", "-S", "schema/v2.4", "-v", "2" ]
+        },
+        {
+            "name": "hl7Validator Example04",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input", "-O", "output", "-i", "example04.hl7", "-R", "reports", "-L", "logs", "-l", "example04.log", "-S", "schema/v2.4", "-v", "2" ]
+        }
+    ]
+}

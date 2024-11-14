@@ -1,0 +1,4901 @@
+Type	Table	Name	Value	Description
+User		Administrative Sex		
+	0001		A	Ambiguous
+	0001		F	Female
+	0001		M	Male
+	0001		N	Not applicable
+	0001		O	Other
+	0001		U	Unknown
+User		Marital Status		
+	0002		A	Separated
+	0002		B	Unmarried
+	0002		C	Common law
+	0002		D	Divorced
+	0002		E	Legally Separated
+	0002		G	Living together
+	0002		I	Interlocutory
+	0002		M	Married
+	0002		N	Annulled
+	0002		O	Other
+	0002		P	Domestic partner
+	0002		R	Registered domestic partner
+	0002		S	Single
+	0002		T	Unreported
+	0002		U	Unknown
+	0002		W	Widowed
+HL7		Event type		
+	0003		A01	ADT/ACK - Admit/visit notification
+	0003		A02	ADT/ACK - Transfer a patient
+	0003		A03	ADT/ACK -  Discharge/end visit
+	0003		A04	ADT/ACK -  Register a patient
+	0003		A05	ADT/ACK -  Pre-admit a patient
+	0003		A06	ADT/ACK -  Change an outpatient to an inpatient
+	0003		A07	ADT/ACK -  Change an inpatient to an outpatient
+	0003		A08	ADT/ACK -  Update patient information
+	0003		A09	ADT/ACK -  Patient departing - tracking
+	0003		A10	ADT/ACK -  Patient arriving - tracking
+	0003		A11	ADT/ACK -  Cancel admit/visit notification
+	0003		A12	ADT/ACK -  Cancel transfer
+	0003		A13	ADT/ACK -  Cancel discharge/end visit
+	0003		A14	ADT/ACK -  Pending admit
+	0003		A15	ADT/ACK -  Pending transfer
+	0003		A16	ADT/ACK -  Pending discharge
+	0003		A17	ADT/ACK -  Swap patients
+	0003		A18	ADT/ACK -  Merge patient information (for backward compatibility only)
+	0003		A19	QRY/ADR -  Patient query
+	0003		A20	ADT/ACK -  Bed status update
+	0003		A21	ADT/ACK -  Patient goes on a _leave of absence_
+	0003		A22	ADT/ACK -  Patient returns from a _leave of absence_
+	0003		A23	ADT/ACK -  Delete a patient record
+	0003		A24	ADT/ACK -  Link patient information
+	0003		A25	ADT/ACK -  Cancel pending discharge
+	0003		A26	ADT/ACK -  Cancel pending transfer
+	0003		A27	ADT/ACK -  Cancel pending admit
+	0003		A28	ADT/ACK -  Add person information
+	0003		A29	ADT/ACK -  Delete person information
+	0003		A30	ADT/ACK -  Merge person information (for backward compatibility only)
+	0003		A31	ADT/ACK -  Update person information
+	0003		A32	ADT/ACK -  Cancel patient arriving - tracking
+	0003		A33	ADT/ACK -  Cancel patient departing - tracking
+	0003		A34	ADT/ACK -  Merge patient information - patient ID only (for backward compatibility only)
+	0003		A35	ADT/ACK -  Merge patient information - account number only (for backward compatibility only)
+	0003		A36	ADT/ACK -  Merge patient information - patient ID and account number (for backward compatibility only)
+	0003		A37	ADT/ACK -  Unlink patient information
+	0003		A38	ADT/ACK - Cancel pre-admit
+	0003		A39	ADT/ACK - Merge person _ patient ID (for backward compatibility only)
+	0003		A40	ADT/ACK - Merge patient _ patient identifier list
+	0003		A41	ADT/ACK - Merge account - patient account number
+	0003		A42	ADT/ACK - Merge visit - visit number
+	0003		A43	ADT/ACK - Move patient information _ patient identifier list
+	0003		A44	ADT/ACK - Move account information - patient account number
+	0003		A45	ADT/ACK - Move visit information - visit number
+	0003		A46	ADT/ACK - Change patient ID (for backward compatibility only)
+	0003		A47	ADT/ACK - Change patient identifier list
+	0003		A48	ADT/ACK - Change alternate patient ID (for backward compatibility only)
+	0003		A49	ADT/ACK - Change patient account number
+	0003		A50	ADT/ACK - Change visit number
+	0003		A51	ADT/ACK - Change alternate visit ID
+	0003		A52	ADT/ACK _ Cancel leave of absence for a patient
+	0003		A53	ADT/ACK _ Cancel patient returns from a leave of absence
+	0003		A54	ADT/ACK - Change attending doctor
+	0003		A55	ADT/ACK _ Cancel change attending doctor
+	0003		A60	ADT/ACK _ Update allergy information
+	0003		A61	ADT/ACK _ Change consulting doctor
+	0003		A62	ADT/ACK _ Cancel change consulting doctor
+	0003		B01	PMU/ACK _ Add personnel record
+	0003		B02	PMU/ACK _ Update personnel record
+	0003		B03	PMU/ACK _ Delete personnel re cord
+	0003		B04	PMU/ACK _ Active practicing person
+	0003		B05	PMU/ACK _ Deactivate practicing person
+	0003		B06	PMU/ACK _ Terminate practicing person
+	0003		B07	PMU/ACK _ Grant Certificate/Permission
+	0003		B08	PMU/ACK _ Revoke Certificate/Permission
+	0003		C01	CRM - Register a patient on a clinical trial
+	0003		C02	CRM - Cancel a patient registration on clinical trial (for clerical mistakes only)
+	0003		C03	CRM - Correct/update registration information
+	0003		C04	CRM - Patient has gone off a clinical trial
+	0003		C05	CRM - Patient enters phase of clinical trial
+	0003		C06	CRM - Cancel patient entering a phase (clerical mistake)
+	0003		C07	CRM - Correct/update phase information
+	0003		C08	CRM - Patient has gone off phase of clinical trial
+	0003		C09	CSU - Automated time intervals for reporting, like monthly
+	0003		C10	CSU - Patient completes the clinical trial
+	0003		C11	CSU - Patient completes a phase of the clinical trial
+	0003		C12	CSU - Update/correction of patient order/result information
+	0003		CNQ	Cancel Query
+	0003		I01	RQI/RPI - Request for insurance information
+	0003		I02	RQI/RPL - Request/receipt of patient selection display list
+	0003		I03	RQI/RPR - Request/receipt of patient selection list
+	0003		I04	RQD/RPI - Request for patient demographic data
+	0003		I05	RQC/RCI - Request for patient clinical information
+	0003		I06	RQC/RCL - Request/receipt of clinical data listing
+	0003		I07	PIN/ACK - Unsolicited insurance information
+	0003		I08	RQA/RPA - Request for treatment authorization information
+	0003		I09	RQA/RPA - Request for modification to an authorization
+	0003		I10	RQA/RPA - Request for resubmission of an authorization
+	0003		I11	RQA/RPA - Request for cancellation of an authorization
+	0003		I12	REF/RRI - Patient referral
+	0003		I13	REF/RRI - Modify patient referral
+	0003		I14	REF/RRI - Cancel patient referral
+	0003		I15	REF/RRI - Request patient referral status
+	0003		J01	QCN/ACK _ Cancel query/acknowledge message
+	0003		J02	QSX/ACK _ Cancel subscription/acknowledge message
+	0003		K11	RSP - Segment pattern response in response to QBP^Q11
+	0003		K13	RTB - Tabular response in response to QBP^Q13
+	0003		K15	RDY - Display response in response to QBP^Q15
+	0003		K21	RSP _ Get person demographics response
+	0003		K22	RSP _ Find candidates response
+	0003		K23	RSP _ Get corresponding identifiers response
+	0003		K24	RSP _ Allocate identifiers response
+	0003		K25	RSP - Personnel Information by Segment Response
+	0003		M01	MFN/MFK - Master file not otherwise specified (for backward compatibility only)
+	0003		M02	MFN/MFK - Master file _ staff practitioner
+	0003		M03	MFN/MFK - Master file - test/observation (for backward compatibility only)
+	0003		M04	MFN/MFK - Master files charge description
+	0003		M05	MFN/MFK - Patient location master file
+	0003		M06	MFN/MFK - Clinical study with phases and schedules master file
+	0003		M07	MFN/MFK - Clinical study without phases but with schedules master file
+	0003		M08	MFN/MFK - Test/observation (numeric) master file
+	0003		M09	MFN/MFK - Test/observation (categorical) master file
+	0003		M10	MFN/MFK - Test /observation batteries master file
+	0003		M11	MFN/MFK - Test/calculated observations master file
+	0003		M12	MFN/MFK _ Master file notification message
+	0003		M13	MFN/MFK - Master file notification - general
+	0003		M14	MFN/MFK - Master file notification _ site defined
+	0003		M15	MFN/MFK _ Inventory item master file notification
+	0003		N01	NMQ/NMR - Application management query message
+	0003		N02	NMD/ACK - Application management data message (unsolicited)
+	0003		O01	ORM - Order message (also RDE, RDS, RGV, RAS)
+	0003		O02	ORR - Order response (also RRE, RRD, RRG, RRA)
+	0003		O03	OMD _ Diet order
+	0003		O04	ORD _ Diet order acknowledgment
+	0003		O05	OMS _ Stock requisition order
+	0003		O06	ORS _ Stock requisition acknowledgment
+	0003		O07	OMN _ Non-stock requisition order
+	0003		O08	ORN _ Non-stock requisition acknowledgment
+	0003		O09	OMP _ Pharmacy/treatment order
+	0003		O10	ORP _ Pharmacy/treatment order acknowledgment
+	0003		O11	RDE _ Pharmacy/treatment encoded order
+	0003		O12	RRE _ Pharmacy/treatment encoded order acknowledgment
+	0003		O13	RDS _ Pharmacy/treatment dispense
+	0003		O14	RRD _ Pharmacy/treatment dispense acknowledgment
+	0003		O15	RGV _ Pharmacy/treatment give
+	0003		O16	RRG _ Pharmacy/treatment give acknowledgment
+	0003		O17	RAS _ Pharmacy/treatment administration
+	0003		O18	RRA _ Pharmacy/treatment administration acknowledgment
+	0003		O19	OMG _ General clinical order
+	0003		O20	ORG/ORL _ General clinical order response
+	0003		O21	OML - Laboratory order
+	0003		O22	ORL - General laboratory order response message to any OML
+	0003		O23	OMI _ Imaging order
+	0003		O24	ORI _ Imaging order response message to any OMI
+	0003		O25	RDE - Pharmacy/treatment refill authorization request
+	0003		O26	RRE - Pharmacy/Treatment Refill Authorization Acknowledgement
+	0003		O27	OMB _ Blood product order
+	0003		O28	ORB _ Blood product order acknowledgment
+	0003		O29	BPS _ Blood product dispense status
+	0003		O30	BRP _ Blood product dispense status acknowledgment
+	0003		O31	BTS _ Blood product transfusion/disposition
+	0003		O32	BRT _ Blood product transfusion/disposition acknowledgment
+	0003		O33	OML _ Laboratory order for multiple orders related to a single specimen
+	0003		O34	ORL _ Laboratory order response message to a multiple order related to single specimen OML
+	0003		O35	OML _ Laboratory order for multiple orders related to a single container of a specimen
+	0003		O36	ORL - Laboratory order response message to a single container of a specimen OML
+	0003		P01	BAR/ACK - Add patient accounts
+	0003		P02	BAR/ACK - Purge patient accounts
+	0003		P03	DFT/ACK - Post detail financial transaction
+	0003		P04	QRY/DSP _ Generate bill and A/R statements
+	0003		P05	BAR/ACK _ Update account
+	0003		P06	BAR/ACK - End account
+	0003		P07	PEX - Unsolicited initial individual product experience report
+	0003		P08	PEX - Unsolicited update individual product experience report
+	0003		P09	SUR - Summary product experience report
+	0003		P10	BAR/ACK _Transmit Ambulatory Payment  Classification(APC)
+	0003		P11	DFT/ACK - Post Detail Financial Transactions - New
+	0003		P12	BAR/ACK - Update Diagnosis/Procedure
+	0003		PC1	PPR - PC/ problem add
+	0003		PC2	PPR - PC/ problem update
+	0003		PC3	PPR - PC/ problem delete
+	0003		PC4	QRY - PC/ problem query
+	0003		PC5	PRR - PC/ problem response
+	0003		PC6	PGL - PC/ goal add
+	0003		PC7	PGL - PC/ goal update
+	0003		PC8	PGL - PC/ goal delete
+	0003		PC9	QRY - PC/ goal query
+	0003		PCA	PPV - PC/ goal response
+	0003		PCB	PPP - PC/ pathway (problem-oriented) add
+	0003		PCC	PPP - PC/ pathway (problem-oriented) update
+	0003		PCD	PPP - PC/ pathway (problem-oriented) delete
+	0003		PCE	QRY - PC/ pathway (problem-oriented) query
+	0003		PCF	PTR - PC/ pathway (problem-oriented) query response
+	0003		PCG	PPG - PC/ pathway (goal-oriented) add
+	0003		PCH	PPG - PC/ pathway (goal-oriented) update
+	0003		PCJ	PPG - PC/ pathway (goal-oriented) delete
+	0003		PCK	QRY - PC/ pathway (goal-oriented) query
+	0003		PCL	PPT - PC/ pathway (goal-oriented) query response
+	0003		Q01	QRY/DSR - Query sent for immediate response
+	0003		Q02	QRY/QCK - Query sent for deferred response
+	0003		Q03	DSR/ACK - Deferred response to a query
+	0003		Q04	EQQ _ Embedded query language query
+	0003		Q05	UDM/ACK - Unsolicited display update message
+	0003		Q06	OSQ/OSR - Query for order status
+	0003		Q07	VQQ _ Virtual table query
+	0003		Q08	SPQ _ Stored procedure request
+	0003		Q09	RQQ _ event replay query
+	0003		Q11	QBP - Query by parameter requesting an RSP segment pattern response
+	0003		Q13	QBP - Query by parameter requesting an  RTB - tabular response
+	0003		Q15	QBP - Query by parameter requesting an RDY display response
+	0003		Q16	QSB _ Create subscription
+	0003		Q17	QVR _ Query for previous events
+	0003		Q21	QBP _ Get person demographics
+	0003		Q22	QBP _ Find candidates
+	0003		Q23	QBP _ Get corresponding identifiers
+	0003		Q24	QBP _ Allocate identifiers
+	0003		Q25	QBP - Personnel Information by Segment Query
+	0003		Q26	ROR - Pharmacy/treatment order response
+	0003		Q27	RAR - Pharmacy/treatment administration information
+	0003		Q28	RDR - Pharmacy/treatment dispense information
+	0003		Q29	RER - Pharmacy/treatment encoded order information
+	0003		Q30	RGR - Pharmacy/treatment dose information
+	0003		R01	ORU/ACK - Unsolicited transmission of an observation message
+	0003		R02	QRY - Query for results of observation
+	0003		R03	QRY/DSR Display-oriented results, query/unsol. update (for backward compatibility only) (Replaced by Q05)
+	0003		R04	ORF - Response to query; transmission of requested observation
+	0003		R07	EDR - Enhanced Display Response
+	0003		R08	TBR - Tabular Data Response
+	0003		R09	ERP - Event Replay Response
+	0003		R21	OUL _ Unsolicited laboratory observation
+	0003		R22	OUL _ Unsolicited Specimen Oriented Observation Message
+	0003		R23	OUL _ Unsolicited Specimen Container Oriented Observation Message
+	0003		R24	OUL _ Unsolicited Order Oriented Observation Message
+	0003		R30	ORU _ Unsolicited Point-Of-Care Observation Message Without Existing Order _ Place An Order
+	0003		R31	ORU _ Unsolicited New Point-Of-Care Observation Message _ Search For An Order
+	0003		R32	ORU _ Unsolicited Pre-Ordered Point-Of-Care Observation
+	0003		ROR	ROR - Pharmacy prescription order query response
+	0003		S01	SRM/SRR - Request new appointment booking
+	0003		S02	SRM/SRR - Request appointment rescheduling
+	0003		S03	SRM/SRR - Request appointment modification
+	0003		S04	SRM/SRR - Request appointment cancellation
+	0003		S05	SRM/SRR - Request appointment discontinuation
+	0003		S06	SRM/SRR - Request appointment deletion
+	0003		S07	SRM/SRR - Request addition of service/resource on appointment
+	0003		S08	SRM/SRR - Request modification of service/resource on appointment
+	0003		S09	SRM/SRR - Request cancellation of service/resource on appointment
+	0003		S10	SRM/SRR - Request discontinuation of service/resource on appointment
+	0003		S11	SRM/SRR - Request deletion of service/resource on appointment
+	0003		S12	SIU/ACK - Notification of new appointment booking
+	0003		S13	SIU/ACK - Notification of appointment rescheduling
+	0003		S14	SIU/ACK - Notification of appointment modification
+	0003		S15	SIU/ACK - Notification of appointment cancellation
+	0003		S16	SIU/ACK - Notification of appointment discontinuation
+	0003		S17	SIU/ACK - Notification of appointment deletion
+	0003		S18	SIU/ACK - Notification of addition of service/resource on appointment
+	0003		S19	SIU/ACK - Notification of modification of service/resource on appointment
+	0003		S20	SIU/ACK - Notification of cancellation of service/resource on appointment
+	0003		S21	SIU/ACK - Notification of discontinuation of service/resource on appointment
+	0003		S22	SIU/ACK - Notification of deletion of service/resource on appointment
+	0003		S23	SIU/ACK - Notification of blocked schedule time slot(s)
+	0003		S24	SIU/ACK - Notification of opened (_unblocked_) schedule time slot(s)
+	0003		S25	SQM/SQR - Schedule query message and response
+	0003		S26	SIU/ACK Notification that patient did not show up for schedule appointment
+	0003		T01	MDM/ACK - Original document notification
+	0003		T02	MDM/ACK - Original document notification and content
+	0003		T03	MDM/ACK - Document status change notification
+	0003		T04	MDM/ACK - Document status change notification and content
+	0003		T05	MDM/ACK - Document addendum notification
+	0003		T06	MDM/ACK - Document addendum notification and content
+	0003		T07	MDM/ACK - Document edit notification
+	0003		T08	MDM/ACK - Document edit notification and content
+	0003		T09	MDM/ACK - Document replacement notification
+	0003		T10	MDM/ACK - Document replacement notification and content
+	0003		T11	MDM/ACK - Document cancel notification
+	0003		T12	QRY/DOC - Document query
+	0003		U01	ESU/ACK _ Automated equipment status update
+	0003		U02	ESR/ACK _ Automated equipment status request
+	0003		U03	SSU/ACK - Specimen status update
+	0003		U04	SSR/ACK - specimen status request
+	0003		U05	INU/ACK  - Automated equipment inventory update
+	0003		U06	INR/ACK _ Automated equipment inventory request
+	0003		U07	EAC/ACK _ Automated equipment command
+	0003		U08	EAR/ACK _ Automated equipment response
+	0003		U09	EAN/ACK _ Automated equipment notification
+	0003		U10	TCU/ACK _ Automated equipment test code settings update
+	0003		U11	TCR/ACK _ Automated equipment test code settings request
+	0003		U12	LSU/ACK _ Automated equipment log/service update
+	0003		U13	LSR/ACK _ Automated equipment log/service request
+	0003		V01	VXQ - Query for vaccination record
+	0003		V02	VXX - Response to vaccination query returning multiple PID matches
+	0003		V03	VXR - Vaccination record response
+	0003		V04	VXU - Unsolicited vaccination record update
+	0003		Varies	MFQ/MFR - Master files query (use event same as asking for e.g., M05 - location)
+	0003		W01	ORU - Waveform result, unsolicited transmission of requested information
+	0003		W02	QRF - Waveform result, response to query
+User		Patient Class		
+	0004		B	Obstetrics
+	0004		C	Commercial Account
+	0004		E	Emergency
+	0004		I	Inpatient
+	0004		N	Not Applicable
+	0004		O	Outpatient
+	0004		P	Preadmit
+	0004		R	Recurring patient
+	0004		U	Unknown
+User		Race		
+	0005		...	see chapter 3
+	0005		1002-5	American Indian or Alaska Native
+	0005		2028-9	Asian
+	0005		2054-5	Black or African American
+	0005		2076-8	Native Hawaiian or Other Pacific Islander
+	0005		2106-3	White
+	0005		2131-1	Other Race
+User		Religion		
+	0006		ABC	Christian: American Baptist Church
+	0006		AGN	Agnostic
+	0006		AME	Christian: African Methodist Episcopal Zion
+	0006		AMT	Christian: African Methodist Episcopal
+	0006		ANG	Christian: Anglican
+	0006		AOG	Christian: Assembly of God
+	0006		ATH	Atheist
+	0006		BAH	Baha'i
+	0006		BAP	Christian: Baptist
+	0006		BMA	Buddhist: Mahayana
+	0006		BOT	Buddhist: Other
+	0006		BTA	Buddhist: Tantrayana
+	0006		BTH	Buddhist: Theravada
+	0006		BUD	Buddhist
+	0006		CAT	Christian: Roman Catholic
+	0006		CFR	Chinese Folk Religionist
+	0006		CHR	Christian
+	0006		CHS	Christian: Christian Science
+	0006		CMA	Christian: Christian Missionary Alliance
+	0006		CNF	Confucian
+	0006		COC	Christian: Church of Christ
+	0006		COG	Christian: Church of God
+	0006		COI	Christian: Church of God in Christ
+	0006		COL	Christian: Congregational
+	0006		COM	Christian: Community
+	0006		COP	Christian: Other Pentecostal
+	0006		COT	Christian: Other
+	0006		CRR	Christian: Christian Reformed
+	0006		EOT	Christian: Eastern Orthodox
+	0006		EPI	Christian: Episcopalian
+	0006		ERL	Ethnic Religionist
+	0006		EVC	Christian: Evangelical Church
+	0006		FRQ	Christian: Friends
+	0006		FWB	Christian: Free Will Baptist
+	0006		GRE	Christian: Greek Orthodox
+	0006		HIN	Hindu
+	0006		HOT	Hindu: Other
+	0006		HSH	Hindu: Shaivites
+	0006		HVA	Hindu: Vaishnavites
+	0006		JAI	Jain
+	0006		JCO	Jewish: Conservative
+	0006		JEW	Jewish
+	0006		JOR	Jewish: Orthodox
+	0006		JOT	Jewish: Other
+	0006		JRC	Jewish: Reconstructionist
+	0006		JRF	Jewish: Reform
+	0006		JRN	Jewish: Renewal
+	0006		JWN	Christian: Jehovah's Witness
+	0006		LMS	Christian: Lutheran Missouri Synod
+	0006		LUT	Christian: Lutheran
+	0006		MEN	Christian: Mennonite
+	0006		MET	Christian: Methodist
+	0006		MOM	Christian: Latter-day Saints
+	0006		MOS	Muslim
+	0006		MOT	Muslim: Other
+	0006		MSH	Muslim: Shiite
+	0006		MSU	Muslim: Sunni
+	0006		NAM	Native American
+	0006		NAZ	Christian: Church of the Nazarene
+	0006		NOE	Nonreligious
+	0006		NRL	New Religionist
+	0006		ORT	Christian: Orthodox
+	0006		OTH	Other
+	0006		PEN	Christian: Pentecostal
+	0006		PRC	Christian: Other Protestant
+	0006		PRE	Christian: Presbyterian
+	0006		PRO	Christian: Protestant
+	0006		QUA	Christian: Friends
+	0006		REC	Christian: Reformed Church
+	0006		REO	Christian: Reorganized Church of Jesus Christ-LDS
+	0006		SAA	Christian: Salvation Army
+	0006		SEV	Christian: Seventh Day Adventist
+	0006		SHN	Shintoist
+	0006		SIK	Sikh
+	0006		SOU	Christian: Southern Baptist
+	0006		SPI	Spiritist
+	0006		UCC	Christian: United Church of Christ
+	0006		UMD	Christian: United Methodist
+	0006		UNI	Christian: Unitarian
+	0006		UNU	Christian: Unitarian Universalist
+	0006		VAR	Unknown
+	0006		WES	Christian: Wesleyan
+	0006		WMC	Christian: Wesleyan Methodist
+User		Admission Type		
+	0007		A	Accident
+	0007		C	Elective
+	0007		E	Emergency
+	0007		L	Labor and Delivery
+	0007		N	Newborn (Birth in healthcare facility)
+	0007		R	Routine
+	0007		U	Urgent
+HL7		Acknowledgment code		
+	0008		AA	Original mode: Application Accept - Enhanced mode: Application acknowledgment: Accept
+	0008		AE	Original mode: Application Error - Enhanced mode: Application acknowledgment: Error
+	0008		AR	Original mode: Application Reject - Enhanced mode: Application acknowledgment: Reject
+	0008		CA	Enhanced mode: Accept acknowledgment: Commit Accept
+	0008		CE	Enhanced mode: Accept acknowledgment: Commit Error
+	0008		CR	Enhanced mode: Accept acknowledgment: Commit Reject
+User		Ambulatory Status		
+	0009		A0	No functional limitations
+	0009		A1	Ambulates with assistive device
+	0009		A2	Wheelchair/stretcher bound
+	0009		A3	Comatose; non-responsive
+	0009		A4	Disoriented
+	0009		A5	Vision impaired
+	0009		A6	Hearing impaired
+	0009		A7	Speech impaired
+	0009		A8	Non-English speaking
+	0009		A9	Functional level unknown
+	0009		B1	Oxygen therapy
+	0009		B2	Special equipment (tubes, IVs, catheters)
+	0009		B3	Amputee
+	0009		B4	Mastectomy
+	0009		B5	Paraplegic
+	0009		B6	Pregnant
+User		Transaction Type		
+	0017		AJ	Adjustment
+	0017		CD	Credit
+	0017		CG	Charge
+	0017		CO	Co-payment
+	0017		PY	Payment
+User		Admit Source		
+	0023		1	Physician referral
+	0023		2	Clinic referral
+	0023		3	HMO referral
+	0023		4	Transfer from a hospital
+	0023		5	Transfer from a skilled nursing facility
+	0023		6	Transfer from another health care facility
+	0023		7	Emergency room
+	0023		8	Court/law enforcement
+	0023		9	Information not available
+HL7		Priority		
+	0027		A	As soon as possible (a priority lower than stat)
+	0027		P	Preoperative (to be done prior to surgery)
+	0027		R	Routine
+	0027		S	Stat (do immediately)
+	0027		T	Timing critical (do as near as possible to requested time)
+HL7		Order status		
+	0038		A	Some, but not all, results available
+	0038		CA	Order was canceled
+	0038		CM	Order is completed
+	0038		DC	Order was discontinued
+	0038		ER	Error, order not found
+	0038		HD	Order is on hold
+	0038		IP	In process, unspecified
+	0038		RP	Order has been replaced
+	0038		SC	In process, scheduled
+HL7		What subject filter		
+	0048		ADV	Advice/diagnosis
+	0048		ANU	Nursing unit lookup (returns patients in beds, excluding empty beds)
+	0048		APA	Account number query, return matching visit
+	0048		APM	Medical record number query, returns visits for a medical record number
+	0048		APN	Patient name lookup
+	0048		APP	Physician lookup
+	0048		ARN	Nursing unit lookup (returns patients in beds, including empty beds)
+	0048		CAN	Cancel.  Used to cancel a query
+	0048		DEM	Demographics
+	0048		FIN	Financial
+	0048		GID	Generate new identifier
+	0048		GOL	Goals
+	0048		MRI	Most recent inpatient
+	0048		MRO	Most recent outpatient
+	0048		NCK	Network clock
+	0048		NSC	Network status change
+	0048		NST	Network statistic
+	0048		ORD	Order
+	0048		OTH	Other
+	0048		PRB	Problems
+	0048		PRO	Procedure
+	0048		RAR	Pharmacy administration information
+	0048		RDR	Pharmacy dispense information
+	0048		RER	Pharmacy encoded order information
+	0048		RES	Result
+	0048		RGR	Pharmacy give information
+	0048		ROR	Pharmacy prescription information
+	0048		SAL	All schedule related information, including open slots, booked slots, blocked slots
+	0048		SBK	Booked slots on the identified schedule
+	0048		SBL	Blocked slots on the identified schedule
+	0048		SOF	First open slot on the identified schedule after the start date/tiem
+	0048		SOP	Open slots on the identified schedule between the begin and end of the start date/time range
+	0048		SSA	Time slots available for a single appointment
+	0048		SSR	Time slots available for a recurring appointment
+	0048		STA	Status
+	0048		VXI	Vaccine Information
+	0048		XID	Get cross-referenced identifiers
+User		Diagnosis Type		
+	0052		A	Admitting
+	0052		F	Final
+	0052		W	Working
+HL7		Check digit scheme		
+	0061		ISO	ISO 7064: 1983
+	0061		M10	Mod 10 algorithm
+	0061		M11	Mod 11 algorithm
+	0061		NPI	Check digit algorithm in the US National Provider Identifier
+User		Event reason		
+	0062		01	Patient request
+	0062		02	Physician/health practitioner order
+	0062		03	Census management
+	0062		O	Other
+	0062		U	Unknown
+User		Relationship		
+	0063		ASC	Associate
+	0063		BRO	Brother
+	0063		CGV	Care giver
+	0063		CHD	Child
+	0063		DEP	Handicapped dependent
+	0063		DOM	Life partner
+	0063		EMC	Emergency contact
+	0063		EME	Employee
+	0063		EMR	Employer
+	0063		EXF	Extended family
+	0063		FCH	Foster child
+	0063		FND	Friend
+	0063		FTH	Father
+	0063		GCH	Grandchild
+	0063		GRD	Guardian
+	0063		GRP	Grandparent
+	0063		MGR	Manager
+	0063		MTH	Mother
+	0063		NCH	Natural child
+	0063		NON	None
+	0063		OAD	Other adult
+	0063		OTH	Other
+	0063		OWN	Owner
+	0063		PAR	Parent
+	0063		SCH	Stepchild
+	0063		SEL	Self
+	0063		SIB	Sibling
+	0063		SIS	Sister
+	0063		SPO	Spouse
+	0063		TRA	Trainer
+	0063		UNK	Unknown
+	0063		WRD	Ward of court
+HL7		Specimen Action Code		
+	0065		A	Add ordered tests to the existing specimen
+	0065		G	Generated order; reflex order
+	0065		L	Lab to obtain specimen from patient
+	0065		O	Specimen obtained by service other than Lab
+	0065		P	Pending specimen; Order sent prior to delivery
+	0065		R	Revised order
+	0065		S	Schedule the tests specified below
+User		Employment Status		
+	0066		1	Full time employed
+	0066		2	Part time employed
+	0066		3	Unemployed
+	0066		4	Self-employed,
+	0066		5	Retired
+	0066		6	On active military duty
+	0066		9	Unknown
+	0066		C	Contract, per diem
+	0066		L	Leave of absence (e.g. Family leave, sabbatical, etc.)
+	0066		O	Other
+	0066		T	Temporarily unemployed
+User		Hospital Service		
+	0069		CAR	Cardiac Service
+	0069		MED	Medical Service
+	0069		PUL	Pulmonary Service
+	0069		SUR	Surgical Service
+	0069		URO	Urology Service
+HL7		Specimen Source Codes		
+	0070		ABS	Abscess
+	0070		ACNE	Tissue, Acne
+	0070		ACNFLD	Fluid, Acne
+	0070		AIRS	Air Sample
+	0070		ALL	Allograft
+	0070		AMN	Amniotic fluid
+	0070		AMP	Amputation
+	0070		ANGI	Catheter Tip, Angio
+	0070		ARTC	Catheter Tip, Arterial
+	0070		ASERU	Serum, Acute
+	0070		ASP	Aspirate
+	0070		ATTE	Environmental, Autoclave Ampule
+	0070		AUTOC	Environment, Attest
+	0070		AUTP	Autopsy
+	0070		BBL	Blood bag
+	0070		BCYST	Cyst, Baker's
+	0070		BDY	Whole body
+	0070		BIFL	Bile fluid
+	0070		BITE	Bite
+	0070		BLD	Whole blood
+	0070		BLDA	Blood  arterial
+	0070		BLDC	Blood  capillary
+	0070		BLDCO	Cord blood
+	0070		BLDV	Blood  venous
+	0070		BLEB	Bleb
+	0070		BLIST	Blister
+	0070		BOIL	Boil
+	0070		BON	Bone
+	0070		BOWL	Bowel contents
+	0070		BPH	Basophils
+	0070		BPU	Blood product unit
+	0070		BRN	Burn
+	0070		BRO	Bronchial
+	0070		BRSH	Brush
+	0070		BRTH	Breath (use EXHLD)
+	0070		BRUS	Brushing
+	0070		BUB	Bubo
+	0070		BULLA	Bulla/Bullae
+	0070		BX	Biopsy
+	0070		CALC	Calculus (=Stone)
+	0070		CARBU	Carbuncle
+	0070		CAT	Catheter
+	0070		CBITE	Bite, Cat
+	0070		CDM	Cardiac muscle
+	0070		CLIPP	Clippings
+	0070		CNJT	Conjunctiva
+	0070		CNL	Cannula
+	0070		COL	Colostrum
+	0070		CONE	Biospy, Cone
+	0070		CSCR	Scratch, Cat
+	0070		CSERU	Serum, Convalescent
+	0070		CSF	Cerebral spinal fluid
+	0070		CSITE	Catheter Insertion Site
+	0070		CSMY	Fluid,  Cystostomy Tube
+	0070		CST	Fluid, Cyst
+	0070		CSVR	Blood, Cell Saver
+	0070		CTP	Catheter tip
+	0070		CUR	Curettage
+	0070		CVM	Cervical mucus
+	0070		CVPS	Site, CVP
+	0070		CVPT	Catheter Tip, CVP
+	0070		CVX	Cervix
+	0070		CYN	Nodule, Cystic
+	0070		CYST	Cyst
+	0070		DBITE	Bite, Dog
+	0070		DCS	Sputum, Deep Cough
+	0070		DEC	Ulcer, Decubitus
+	0070		DEION	Environmental, Water  (Deionized)
+	0070		DIA	Dialysate
+	0070		DIAF	Dialysis fluid
+	0070		DISCHG	Discharge
+	0070		DIV	Diverticulum
+	0070		DOSE	Dose med or substance
+	0070		DRN	Drain
+	0070		DRNG	Drainage, Tube
+	0070		DRNGP	Drainage, Penrose
+	0070		DUFL	Duodenal fluid
+	0070		EAR	Ear
+	0070		EARW	Ear wax (cerumen)
+	0070		EBRUSH	Brush, Esophageal
+	0070		EEYE	Environmental, Eye Wash
+	0070		EFF	Environmental, Effluent
+	0070		EFFUS	Effusion
+	0070		EFOD	Environmental, Food
+	0070		EISO	Environmental, Isolette
+	0070		ELT	Electrode
+	0070		ENDC	Endocardium
+	0070		ENDM	Endometrium
+	0070		ENVIR	Environmental, Unidentified Substance
+	0070		EOS	Eosinophils
+	0070		EOTH	Environmental, Other Substance
+	0070		ESOI	Environmental, Soil
+	0070		ESOS	Environmental, Solution (Sterile)
+	0070		ETA	Aspirate,  Endotrach
+	0070		ETTP	Catheter Tip, Endotracheal
+	0070		ETTUB	Tube, Endotracheal
+	0070		EWHI	Environmental, Whirlpool
+	0070		EXG	Exhaled gas (=breath)
+	0070		EXS	Shunt, External
+	0070		EXUDTE	Exudate
+	0070		EYE	Eye
+	0070		FAW	Environmental, Water  (Well)
+	0070		FBLOOD	Blood, Fetal
+	0070		FGA	Fluid,  Abdomen
+	0070		FIB	Fibroblasts
+	0070		FIST	Fistula
+	0070		FLD	Fluid, Other
+	0070		FLT	Filter
+	0070		FLU	Body fluid, unsp
+	0070		FLUID	Fluid
+	0070		FOLEY	Catheter Tip, Foley
+	0070		FRS	Fluid, Respiratory
+	0070		FSCLP	Scalp, Fetal
+	0070		FUR	Furuncle
+	0070		GAS	Gas
+	0070		GASA	Aspirate, Gastric
+	0070		GASAN	Antrum, Gastric
+	0070		GASBR	Brushing, Gastric
+	0070		GASD	Drainage, Gastric
+	0070		GAST	Gastric fluid/contents
+	0070		GEN	Genital
+	0070		GENC	Genital cervix
+	0070		GENL	Genital lochia
+	0070		GENV	Genital vaginal
+	0070		GRAFT	Graft
+	0070		GRANU	Granuloma
+	0070		GROSH	Catheter, Groshong
+	0070		GSOL	Solution, Gastrostomy
+	0070		GSPEC	Biopsy, Gastric
+	0070		GT	Tube, Gastric
+	0070		GTUBE	Drainage Tube, Drainage (Gastrostomy)
+	0070		HAR	Hair
+	0070		HBITE	Bite, Human
+	0070		HBLUD	Blood, Autopsy
+	0070		HEMAQ	Catheter Tip, Hemaquit
+	0070		HEMO	Catheter Tip, Hemovac
+	0070		HERNI	Tissue, Herniated
+	0070		HEV	Drain, Hemovac
+	0070		HIC	Catheter, Hickman
+	0070		HYDC	Fluid, Hydrocele
+	0070		IBITE	Bite, Insect
+	0070		ICYST	Cyst, Inclusion
+	0070		IDC	Catheter Tip, Indwelling
+	0070		IHG	Inhaled Gas
+	0070		ILEO	Drainage, Ileostomy
+	0070		ILLEG	Source of Specimen Is Illegible
+	0070		IMP	Implant
+	0070		INCI	Site, Incision/Surgical
+	0070		INFIL	Infiltrate
+	0070		INS	Insect
+	0070		INTRD	Catheter Tip, Introducer
+	0070		ISLT	Isolate
+	0070		IT	Intubation tube
+	0070		IUD	Intrauterine Device
+	0070		IVCAT	Catheter Tip, IV
+	0070		IVFLD	Fluid, IV
+	0070		IVTIP	Tubing Tip, IV
+	0070		JEJU	Drainage, Jejunal
+	0070		JNTFLD	Fluid, Joint
+	0070		JP	Drainage, Jackson Pratt
+	0070		KELOI	Lavage
+	0070		KIDFLD	Fluid, Kidney
+	0070		LAM	Lamella
+	0070		LAVG	Lavage, Bronhial
+	0070		LAVGG	Lavage, Gastric
+	0070		LAVGP	Lavage, Peritoneal
+	0070		LAVPG	Lavage, Pre-Bronch
+	0070		LENS1	Contact Lens
+	0070		LENS2	Contact Lens Case
+	0070		LESN	Lesion
+	0070		LIQ	Liquid NOS
+	0070		LIQO	Liquid, Other
+	0070		LN	Line
+	0070		LNA	Line arterial
+	0070		LNV	Line venous
+	0070		LSAC	Fluid, Lumbar Sac
+	0070		LYM	Lymphocytes
+	0070		MAC	Macrophages
+	0070		MAHUR	Catheter Tip, Makurkour
+	0070		MAR	Marrow
+	0070		MASS	Mass
+	0070		MBLD	Menstrual blood
+	0070		MEC	Meconium
+	0070		MILK	Breast milk
+	0070		MLK	Milk
+	0070		MUCOS	Mucosa
+	0070		MUCUS	Mucus
+	0070		NAIL	Nail
+	0070		NASDR	Drainage, Nasal
+	0070		NEDL	Needle
+	0070		NEPH	Site, Nephrostomy
+	0070		NGASP	Aspirate, Nasogastric
+	0070		NGAST	Drainage, Nasogastric
+	0070		NGS	Site, Naso/Gastric
+	0070		NODUL	Nodule(s)
+	0070		NOS	Nose (nasal passage)
+	0070		NSECR	Secretion, Nasal
+	0070		ORH	Other
+	0070		ORL	Lesion, Oral
+	0070		OTH	Source, Other
+	0070		PACEM	Pacemaker
+	0070		PAFL	Pancreatic fluid
+	0070		PAT	Patient
+	0070		PCFL	Fluid, Pericardial
+	0070		PDSIT	Site, Peritoneal Dialysis
+	0070		PDTS	Site, Peritoneal Dialysis Tunnel
+	0070		PELVA	Abscess, Pelvic
+	0070		PENIL	Lesion, Penile
+	0070		PERIA	Abscess, Perianal
+	0070		PILOC	Cyst, Pilonidal
+	0070		PINS	Site, Pin
+	0070		PIS	Site, Pacemaker Insetion
+	0070		PLAN	Plant Material
+	0070		PLAS	Plasma
+	0070		PLB	Plasma bag
+	0070		PLC	Placenta
+	0070		PLEVS	Serum, Peak Level
+	0070		PLR	Pleural fluid (thoracentesis fld)
+	0070		PMN	Polymorphonuclear neutrophils
+	0070		PND	Drainage, Penile
+	0070		POL	Polyps
+	0070		POPGS	Graft Site, Popliteal
+	0070		POPLG	Graft, Popliteal
+	0070		POPLV	Site, Popliteal Vein
+	0070		PORTA	Catheter, Porta
+	0070		PPP	Platelet poor plasma
+	0070		PROST	Prosthetic Device
+	0070		PRP	Platelet rich plasma
+	0070		PRT	Peritoneal fluid /ascites
+	0070		PSC	Pseudocyst
+	0070		PUNCT	Wound, Puncture
+	0070		PUS	Pus
+	0070		PUSFR	Pustule
+	0070		PUST	Pus
+	0070		QC3	Quality Control
+	0070		RANDU	Urine, Random
+	0070		RBC	Erythrocytes
+	0070		RBITE	Bite, Reptile
+	0070		RECT	Drainage, Rectal
+	0070		RECTA	Abscess, Rectal
+	0070		RENALC	Cyst, Renal
+	0070		RENC	Fluid, Renal Cyst
+	0070		RES	Respiratory
+	0070		RT	Route of medicine
+	0070		SAL	Saliva
+	0070		SCAR	Tissue, Keloid (Scar)
+	0070		SCLV	Catheter Tip, Subclavian
+	0070		SCROA	Abscess, Scrotal
+	0070		SECRE	Secretion(s)
+	0070		SER	Serum
+	0070		SHU	Site, Shunt
+	0070		SHUNF	Fluid, Shunt
+	0070		SHUNT	Shunt
+	0070		SITE	Site
+	0070		SKBP	Biopsy, Skin
+	0070		SKM	Skeletal muscle
+	0070		SKN	Skin
+	0070		SMM	Mass, Sub-Mandibular
+	0070		SMN	Seminal fluid
+	0070		SNV	Synovial fluid (Joint fluid)
+	0070		SPRM	Spermatozoa
+	0070		SPRP	Catheter Tip, Suprapubic
+	0070		SPRPB	Cathether Tip, Suprapubic
+	0070		SPS	Environmental, Spore Strip
+	0070		SPT	Sputum
+	0070		SPTC	Sputum - coughed
+	0070		SPTT	Sputum - tracheal aspirate
+	0070		SPUT1	Sputum, Simulated
+	0070		SPUTIN	Sputum, Inducted
+	0070		SPUTSP	Sputum, Spontaneous
+	0070		STER	Environmental, Sterrad
+	0070		STL	Stool = Fecal
+	0070		STON	Stone (use CALC)
+	0070		STONE	Stone, Kidney
+	0070		SUBMA	Abscess, Submandibular
+	0070		SUBMX	Abscess, Submaxillary
+	0070		SUMP	Drainage, Sump
+	0070		SUP	Suprapubic Tap
+	0070		SUTUR	Suture
+	0070		SWGZ	Catheter Tip, Swan Gantz
+	0070		SWT	Sweat
+	0070		TASP	Aspirate, Tracheal
+	0070		TEAR	Tears
+	0070		THRB	Thrombocyte (platelet)
+	0070		THRT	Throat
+	0070		TISG	Tissue gall bladder
+	0070		TISPL	Tissue placenta
+	0070		TISS	Tissue
+	0070		TISU	Tissue ulcer
+	0070		TLC	Cathether Tip, Triple Lumen
+	0070		TLGI	Tissue large intestine
+	0070		TLNG	Tissue lung
+	0070		TRAC	Site, Tracheostomy
+	0070		TRANS	Transudate
+	0070		TSERU	Serum, Trough
+	0070		TSMI	Tissue small intestine
+	0070		TSTES	Abscess, Testicular
+	0070		TTRA	Aspirate, Transtracheal
+	0070		TUB	Tube NOS
+	0070		TUBES	Tubes
+	0070		TUMOR	Tumor
+	0070		TZANC	Smear, Tzanck
+	0070		UDENT	Source, Unidentified
+	0070		ULC	Ulcer
+	0070		UMB	Umbilical blood
+	0070		UMED	Unknown medicine
+	0070		UR	Urine
+	0070		URC	Urine clean catch
+	0070		URINB	Urine, Bladder Washings
+	0070		URINC	Urine, Catheterized
+	0070		URINM	Urine, Midstream
+	0070		URINN	Urine, Nephrostomy
+	0070		URINP	Urine, Pedibag
+	0070		URNS	Urine sediment
+	0070		URT	Urine catheter
+	0070		URTH	Urethra
+	0070		USCOP	Urine, Cystoscopy
+	0070		USPEC	Source, Unspecified
+	0070		USUB	Unknown substance
+	0070		VASTIP	Catheter Tip, Vas
+	0070		VENT	Catheter Tip, Ventricular
+	0070		VITF	Vitreous Fluid
+	0070		VOM	Vomitus
+	0070		WASH	Wash
+	0070		WASI	Washing, e.g. bronchial washing
+	0070		WAT	Water
+	0070		WB	Blood, Whole
+	0070		WBC	Leukocytes
+	0070		WEN	Wen
+	0070		WICK	Wick
+	0070		WND	Wound
+	0070		WNDA	Wound abscess
+	0070		WNDD	Wound drainage
+	0070		WNDE	Wound exudate
+	0070		WORM	Worm
+	0070		WRT	Wart
+	0070		WWA	Environmental, Water
+	0070		WWO	Environmental, Water (Ocean)
+	0070		WWT	Environmental, Water  (Tap)
+	0070		XXX	To be specified in another part of the message
+HL7		Diagnostic Service Section ID		
+	0074		AU	Audiology
+	0074		BG	Blood Gases
+	0074		BLB	Blood Bank
+	0074		CH	Chemistry
+	0074		CP	Cytopathology
+	0074		CT	CAT Scan
+	0074		CTH	Cardiac Catheterization
+	0074		CUS	Cardiac Ultrasound
+	0074		EC	Electrocardiac (e.g., EKG,  EEC, Holter)
+	0074		EN	Electroneuro (EEG, EMG,EP,PSG)
+	0074		HM	Hematology
+	0074		ICU	Bedside ICU Monitoring
+	0074		IMM	Immunology
+	0074		LAB	Laboratory
+	0074		MB	Microbiology
+	0074		MCB	Mycobacteriology
+	0074		MYC	Mycology
+	0074		NMR	Nuclear Magnetic Resonance
+	0074		NMS	Nuclear Medicine Scan
+	0074		NRS	Nursing Service Measures
+	0074		OSL	Outside Lab
+	0074		OT	Occupational Therapy
+	0074		OTH	Other
+	0074		OUS	OB Ultrasound
+	0074		PF	Pulmonary Function
+	0074		PHR	Pharmacy
+	0074		PHY	Physician (Hx. Dx, admission note, etc.)
+	0074		PT	Physical Therapy
+	0074		RAD	Radiology
+	0074		RC	Respiratory Care (therapy)
+	0074		RT	Radiation Therapy
+	0074		RUS	Radiology Ultrasound
+	0074		RX	Radiograph
+	0074		SP	Surgical Pathology
+	0074		SR	Serology
+	0074		TX	Toxicology
+	0074		VR	Virology
+	0074		VUS	Vascular Ultrasound
+	0074		XRC	Cineradiograph
+HL7		Message type		
+	0076		ACK	General acknowledgment message
+	0076		ADR	ADT response
+	0076		ADT	ADT message
+	0076		BAR	Add/change billing account
+	0076		BPS	Blood product dispense status message
+	0076		BRP	Blood product dispense status acknowledgement message
+	0076		BRT	Blood product transfusion/disposition acknowledgement message
+	0076		BTS	Blood product transfusion/disposition message
+	0076		CRM	Clinical study registration message
+	0076		CSU	Unsolicited study data message
+	0076		DFT	Detail financial transactions
+	0076		DOC	Document response
+	0076		DSR	Display response
+	0076		EAC	Automated equipment command message
+	0076		EAN	Automated equipment notification message
+	0076		EAR	Automated equipment response message
+	0076		EDR	Enhanced display response
+	0076		EQQ	Embedded query language query
+	0076		ERP	Event replay response
+	0076		ESR	Automated equipment status update acknowledgment message
+	0076		ESU	Automated equipment status update message
+	0076		INR	Automated equipment inventory request message
+	0076		INU	Automated equipment inventory update message
+	0076		LSR	Automated equipment log/service request message
+	0076		LSU	Automated equipment log/service update message
+	0076		MCF	Delayed Acknowledgment (Retained for backward compatibility only)
+	0076		MDM	Medical document management
+	0076		MFD	Master files delayed application acknowledgment
+	0076		MFK	Master files application acknowledgment
+	0076		MFN	Master files notification
+	0076		MFQ	Master files query
+	0076		MFR	Master files response
+	0076		NMD	Application management data message
+	0076		NMQ	Application management query message
+	0076		NMR	Application management response message
+	0076		OMB	Blood product order message
+	0076		OMD	Dietary order
+	0076		OMG	General clinical order message
+	0076		OMI	Imaging order
+	0076		OML	Laboratory order message
+	0076		OMN	Non-stock requisition order message
+	0076		OMP	Pharmacy/treatment order message
+	0076		OMS	Stock requisition order message
+	0076		ORB	Blood product order acknowledgement message
+	0076		ORD	Dietary order acknowledgment message
+	0076		ORF	Query for results of observation
+	0076		ORG	General clinical order acknowledgment message
+	0076		ORI	Imaging order acknowledgement message
+	0076		ORL	Laboratory acknowledgment message (unsolicited)
+	0076		ORM	Pharmacy/treatment order message
+	0076		ORN	Non-stock requisition - General order acknowledgment message
+	0076		ORP	Pharmacy/treatment order acknowledgment message
+	0076		ORR	General order response message response to any ORM
+	0076		ORS	Stock requisition - Order acknowledgment message
+	0076		ORU	Unsolicited transmission of an observation message
+	0076		OSQ	Query response for order status
+	0076		OSR	Query response for order status
+	0076		OUL	Unsolicited laboratory observation message
+	0076		PEX	Product experience message
+	0076		PGL	Patient goal message
+	0076		PIN	Patient insurance information
+	0076		PMU	Add personnel record
+	0076		PPG	Patient pathway message (goal-oriented)
+	0076		PPP	Patient pathway message (problem-oriented)
+	0076		PPR	Patient problem message
+	0076		PPT	Patient pathway goal-oriented response
+	0076		PPV	Patient goal response
+	0076		PRR	Patient problem response
+	0076		PTR	Patient pathway problem-oriented response
+	0076		QBP	Query by parameter
+	0076		QCK	Deferred query
+	0076		QCN	Cancel query
+	0076		QRY	Query, original mode
+	0076		QSB	Create subscription
+	0076		QSX	Cancel subscription/acknowledge message
+	0076		QVR	Query for previous events
+	0076		RAR	Pharmacy/treatment administration information
+	0076		RAS	Pharmacy/treatment administration message
+	0076		RCI	Return clinical information
+	0076		RCL	Return clinical list
+	0076		RDE	Pharmacy/treatment encoded order message
+	0076		RDR	Pharmacy/treatment dispense information
+	0076		RDS	Pharmacy/treatment dispense message
+	0076		RDY	Display based response
+	0076		REF	Patient referral
+	0076		RER	Pharmacy/treatment encoded order information
+	0076		RGR	Pharmacy/treatment dose information
+	0076		RGV	Pharmacy/treatment give message
+	0076		ROR	Pharmacy/treatment order response
+	0076		RPA	Return patient authorization
+	0076		RPI	Return patient information
+	0076		RPL	Return patient display list
+	0076		RPR	Return patient list
+	0076		RQA	Request patient authorization
+	0076		RQC	Request clinical information
+	0076		RQI	Request patient information
+	0076		RQP	Request patient demographics
+	0076		RQQ	Event replay query
+	0076		RRA	Pharmacy/treatment administration acknowledgment message
+	0076		RRD	Pharmacy/treatment dispense acknowledgment message
+	0076		RRE	Pharmacy/treatment encoded order acknowledgment message
+	0076		RRG	Pharmacy/treatment give acknowledgment message
+	0076		RRI	Return referral information
+	0076		RSP	Segment pattern response
+	0076		RTB	Tabular response
+	0076		SIU	Schedule information unsolicited
+	0076		SPQ	Stored procedure request
+	0076		SQM	Schedule query message
+	0076		SQR	Schedule query response
+	0076		SRM	Schedule request message
+	0076		SRR	Scheduled request response
+	0076		SSR	Specimen status request message
+	0076		SSU	Specimen status update message
+	0076		SUR	Summary product experience report
+	0076		TBR	Tabular data response
+	0076		TCR	Automated equipment test code settings request message
+	0076		TCU	Automated equipment test code settings update message
+	0076		UDM	Unsolicited display update message
+	0076		VQQ	Virtual table query
+	0076		VXQ	Query for vaccination record
+	0076		VXR	Vaccination record response
+	0076		VXU	Unsolicited vaccination record update
+	0076		VXX	Response for vaccination query with multiple PID matches
+User		Abnormal flags		
+	0078		<	Below absolute low-off instrument scale
+	0078		>	Above absolute high-off instrument scale
+	0078		A	Abnormal (applies to non-numeric results)
+	0078		AA	Very abnormal (applies to non-numeric units, analogous to panic limits for numeric units)
+	0078		B	Better--use when direction not relevant
+	0078		D	Significant change down
+	0078		H	Above high normal
+	0078		HH	Above upper panic limits
+	0078		I	Intermediate. Indicates for microbiology susceptibilities only.
+	0078		L	Below low normal
+	0078		LL	Below lower panic limits
+	0078		MS	Moderately susceptible. Indicates for microbiology susceptibilities only.
+	0078		N	Normal (applies to non-numeric results)
+	0078		null	No range defined, or normal ranges don't apply
+	0078		R	Resistant. Indicates for microbiology susceptibilities only.
+	0078		S	Susceptible. Indicates for microbiology susceptibilities only.
+	0078		U	Significant change up
+	0078		VS	Very susceptible. Indicates for microbiology susceptibilities only.
+	0078		W	Worse--use when direction not relevant
+HL7		Nature of Abnormal Testing		
+	0080		A	An age-based population
+	0080		B	Breed
+	0080		N	None - generic normal range
+	0080		R	A race-based population
+	0080		S	A sex-based population
+	0080		SP	Species
+	0080		ST	Strain
+User		Outlier Type		
+	0083		C	Outlier cost
+	0083		D	Outlier days
+HL7		Observation result status codes interpretation		
+	0085		C	Record coming over is a correction and thus replaces a final result
+	0085		D	Deletes the OBX record
+	0085		F	Final results; Can only be changed with a corrected result.
+	0085		I	Specimen in lab; results pending
+	0085		N	Not asked; used to affirmatively document that the observation identified in the OBX was not sought when the universal service ID in OBR-4 implies that it would be sought.
+	0085		O	Order detail description only (no result)
+	0085		P	Preliminary results
+	0085		R	Results entered -- not verified
+	0085		S	Partial results
+	0085		U	Results status change to final without retransmitting results already sent as _preliminary._  E.g., radiology changes status from preliminary to final
+	0085		W	Post original as wrong, e.g., transmitted for wrong patient
+	0085		X	Results cannot be obtained for this observation
+HL7		Query priority		
+	0091		D	Deferred
+	0091		I	Immediate
+User		Re-Admission Indicator		
+	0092		R	Re-admission
+User		Release Information		
+	0093		_	user-defined codes
+	0093		N	No
+	0093		Y	Yes
+User		Type of Agreement		
+	0098		M	Maternity
+	0098		S	Standard
+	0098		U	Unified
+HL7		Invocation event		
+	0100		D	On discharge
+	0100		O	On receipt of order
+	0100		R	At time service is completed
+	0100		S	At time service is started
+	0100		T	At a designated date/time
+HL7		Processing ID		
+	0103		D	Debugging
+	0103		P	Production
+	0103		T	Training
+HL7		Version ID		
+	0104		2.0	Release 2.0
+	0104		2.0D	Demo 2.0
+	0104		2.1	Release 2. 1
+	0104		2.2	Release 2.2
+	0104		2.3	Release 2.3
+	0104		2.3.1	Release 2.3.1
+	0104		2.4	Release 2.4
+	0104		2.5	Release 2.5
+HL7		Source of comment		
+	0105		L	Ancillary (filler) department is source of comment
+	0105		O	Other system is source of comment
+	0105		P	Orderer (placer) is source of comment
+HL7		Query/response format code		
+	0106		D	Response is in display format
+	0106		R	Response is in record-oriented format
+	0106		T	Response is in tabular format
+HL7		Deferred response type		
+	0107		B	Before the Date/Time specified
+	0107		L	Later than the Date/Time specified
+HL7		Query results level		
+	0108		O	Order plus order status
+	0108		R	Results without bulk text
+	0108		S	Status only
+	0108		T	Full results
+HL7		Report priority		
+	0109		R	Routine
+	0109		S	Stat
+User		Discharge Disposition		
+	0112		01	Discharged to home or self care (routine discharge)
+	0112		02	Discharged/transferred to another short term general hospital for inpatient care
+	0112		03	Discharged/transferred to skilled nursing facility (SNF)
+	0112		04	Discharged/transferred to an intermediate care facility (ICF)
+	0112		05	Discharged/transferred to another type of institution for inpatient care or referred for outpatient services to another institution
+	0112		06	Discharged/transferred to home under care of organized home health service organization
+	0112		07	Left against medical advice or discontinued care
+	0112		08	Discharged/transferred to home under care of Home IV provider
+	0112		09	Admitted as an inpatient to this hospital
+	0112		10 _19	Discharge to be defined at state level, if necessary
+	0112		20	Expired (i.e. dead)
+	0112		21 ... 29	Expired to be defined at state level, if necessary
+	0112		30	Still patient or expected to return for outpatient services (i.e. still a patient)
+	0112		31 _ 39	Still patient to be defined at state level, if necessary  (i.e. still a patient)
+	0112		40	Expired (i.e. died) at home
+	0112		41	Expired (i.e. died) in a medical facility; e.g., hospital, SNF, ICF, or free standing hospice
+	0112		42	Expired (i.e. died)  - place unknown
+User		Bed Status		
+	0116		C	Closed
+	0116		H	Housekeeping
+	0116		I	Isolated
+	0116		K	Contaminated
+	0116		O	Occupied
+	0116		U	Unoccupied
+HL7		Order control codes		
+	0119		AF	Order/service refill request approval
+	0119		CA	Cancel order/service request
+	0119		CH	Child order/service
+	0119		CN	Combined result
+	0119		CR	Canceled as requested
+	0119		DC	Discontinue order/service request
+	0119		DE	Data errors
+	0119		DF	Order/service refill request denied
+	0119		DR	Discontinued as requested
+	0119		FU	Order/service refilled, unsolicited
+	0119		HD	Hold order request
+	0119		HR	On hold as requested
+	0119		LI	Link order/service to patient care problem or goal
+	0119		NA	Number assigned
+	0119		NW	New order/service
+	0119		OC	Order/service canceled
+	0119		OD	Order/service discontinued
+	0119		OE	Order/service released
+	0119		OF	Order/service refilled as requested
+	0119		OH	Order/service held
+	0119		OK	Order/service accepted & OK
+	0119		OP	Notification of order for outside dispense
+	0119		OR	Released as requested
+	0119		PA	Parent order/service
+	0119		PR	Previous Results with new order/service
+	0119		PY	Notification of replacement order for outside dispense
+	0119		RE	Observations/Performed Service to follow
+	0119		RF	Refill order/service request
+	0119		RL	Release previous hold
+	0119		RO	Replacement order
+	0119		RP	Order/service replace request
+	0119		RQ	Replaced as requested
+	0119		RR	Request received
+	0119		RU	Replaced unsolicited
+	0119		SC	Status changed
+	0119		SN	Send order/service number
+	0119		SR	Response to send order/service status request
+	0119		SS	Send order/service status request
+	0119		UA	Unable to accept order/service
+	0119		UC	Unable to cancel
+	0119		UD	Unable to discontinue
+	0119		UF	Unable to refill
+	0119		UH	Unable to put on hold
+	0119		UM	Unable to replace
+	0119		UN	Unlink order/service from patient care problem or goal
+	0119		UR	Unable to release
+	0119		UX	Unable to change
+	0119		XO	Change order/service request
+	0119		XR	Changed as requested
+	0119		XX	Order/service changed, unsol.
+HL7		Response flag		
+	0121		D	Same as R, also other associated segments
+	0121		E	Report exceptions only
+	0121		F	Same as D, plus confirmations explicitly
+	0121		N	Only the MSA segment is returned
+	0121		R	Same as E, also Replacement and Parent-Child
+HL7		Charge type		
+	0122		CH	Charge
+	0122		CO	Contract
+	0122		CR	Credit
+	0122		DP	Department
+	0122		GR	Grant
+	0122		NC	No Charge
+	0122		PC	Professional
+	0122		RS	Research
+HL7		Result Status		
+	0123		A	Some, but not all, results available
+	0123		C	Correction to results
+	0123		F	Final results; results stored and verified.  Can only be changed with a corrected result.
+	0123		I	No results available; specimen received, procedure incomplete
+	0123		O	Order received; specimen not yet received
+	0123		P	Preliminary: A verified early result is available, final results not yet obtained
+	0123		R	Results stored; not yet verified
+	0123		S	No results available; procedure scheduled, but not done
+	0123		X	No results available; Order canceled.
+	0123		Y	No order on record for this test.  (Used only on queries)
+	0123		Z	No record of this patient. (Used only on queries)
+HL7		Transportation Mode		
+	0124		CART	Cart - patient travels on cart or gurney
+	0124		PORT	The examining device goes to patient's location
+	0124		WALK	Patient walks to diagnostic service
+	0124		WHLC	Wheelchair
+HL7		Value type		
+	0125		AD	Address
+	0125		CE	Coded Entry
+	0125		CF	Coded Element With Formatted Values
+	0125		CK	Composite ID With Check Digit
+	0125		CN	Composite ID And Name
+	0125		CP	Composite Price
+	0125		CX	Extended Composite ID With Check Digit
+	0125		DT	Date
+	0125		ED	Encapsulated Data
+	0125		FT	Formatted Text (Display)
+	0125		MO	Money
+	0125		NM	Numeric
+	0125		PN	Person Name
+	0125		RP	Reference Pointer
+	0125		SN	Structured Numeric
+	0125		ST	String Data.
+	0125		TM	Time
+	0125		TN	Telephone Number
+	0125		TS	Time Stamp (Date & Time)
+	0125		TX	Text Data (Display)
+	0125		XAD	Extended Address
+	0125		XCN	Extended Composite Name And Number For Persons
+	0125		XON	Extended Composite Name And Number For Organizations
+	0125		XPN	Extended Person Name
+	0125		XTN	Extended Telecommunications Number
+HL7		Quantity limited request		
+	0126		CH	Characters
+	0126		LI	Lines
+	0126		PG	Pages
+	0126		RD	Records
+	0126		ZO	Locally defined
+User		Allergen Type		
+	0127		AA	Animal Allergy
+	0127		DA	Drug allergy
+	0127		EA	Environmental Allergy
+	0127		FA	Food allergy
+	0127		LA	Pollen Allergy
+	0127		MA	Miscellaneous allergy
+	0127		MC	Miscellaneous contraindication
+	0127		PA	Plant Allergy
+User		Allergy Severity		
+	0128		MI	Mild
+	0128		MO	Moderate
+	0128		SV	Severe
+	0128		U	Unknown
+User		Visit User Code		
+	0130		HO	Home
+	0130		MO	Mobile Unit
+	0130		PH	Phone
+	0130		TE	Teaching
+User		Contact Role		
+	0131		C	Emergency Contact
+	0131		E	Employer
+	0131		F	Federal Agency
+	0131		I	Insurance Company
+	0131		N	Next-of-Kin
+	0131		O	Other
+	0131		S	State Agency
+	0131		U	Unknown
+User		Procedure Practitioner Identifier Code Type		
+	0133		AN	Anesthesiologist/Anesthetist
+	0133		AS	Assistant Surgeon
+	0133		CM	Certified Nurse Midwife
+	0133		NP	Nurse Practitioner
+	0133		PR	Procedure MD/ Surgeon
+	0133		PS	Primary Surgeon
+	0133		RD	Radiologist
+	0133		RS	Resident
+	0133		SN	Scrub Nurse
+User		Assignment of Benefits		
+	0135		M	Modified assignment
+	0135		N	No
+	0135		Y	Yes
+HL7		Yes/no indicator		
+	0136		N	No
+	0136		Y	Yes
+User		Mail Claim Party		
+	0137		E	Employer
+	0137		G	Guarantor
+	0137		I	Insurance company
+	0137		O	Other
+	0137		P	Patient
+User		Military Service		
+	0140		AUSA	Australian Army
+	0140		AUSAF	Australian Air Force
+	0140		AUSN	Australian Navy
+	0140		NATO	North Atlantic Treaty Organization
+	0140		NOAA	National Oceanic and Atmospheric Administration
+	0140		USA	US Army
+	0140		USAF	US Air Force
+	0140		USCG	US Coast Guard
+	0140		USMC	US Marine Corps
+	0140		USN	US Navy
+	0140		USPHS	US Public Health Service
+User		Military Rank/Grade		
+	0141		E1... E9	Enlisted
+	0141		O1 ... O9	Officers
+	0141		W1 ... W4	Warrant Officers
+User		Military Status		
+	0142		ACT	Active duty
+	0142		DEC	Deceased
+	0142		RET	Retired
+User		Eligibility Source		
+	0144		1	Insurance company
+	0144		2	Employer
+	0144		3	Insured presented policy
+	0144		4	Insured presented card
+	0144		5	Signed statement on file
+	0144		6	Verbal information
+	0144		7	None
+User		Room type		
+	0145		2ICU	Second intensive care unit
+	0145		2PRI	Second private room
+	0145		2SPR	Second semi-private room
+	0145		ICU	Intensive care unit
+	0145		PRI	Private room
+	0145		SPR	Semi-private room
+User		Amount type		
+	0146		DF	Differential
+	0146		LM	Limit
+	0146		PC	Percentage
+	0146		RT	Rate
+	0146		UL	Unlimited
+User		Policy type		
+	0147		2ANC	Second ancillary
+	0147		2MMD	Second major medical
+	0147		3MMD	Third major medical
+	0147		ANC	Ancillary
+	0147		MMD	Major medical
+HL7		Money or percentage indicator		
+	0148		AT	Currency amount
+	0148		PC	Percentage
+User		Day type		
+	0149		AP	Approved
+	0149		DE	Denied
+	0149		PE	Pending
+User		Certification patient type		
+	0150		ER	Emergency
+	0150		IPE	Inpatient elective
+	0150		OPE	Outpatient elective
+	0150		UR	Urgent
+HL7		Accept/application acknowledgment conditions		
+	0155		AL	Always
+	0155		ER	Error/reject conditions only
+	0155		NE	Never
+	0155		SU	Successful completion only
+HL7		Which date/time qualifier		
+	0156		ANY	Any date/time within a range
+	0156		COL	Collection date/time, equivalent to film or sample collection date/time
+	0156		ORD	Order date/time
+	0156		RCT	Specimen receipt date/time, receipt of specimen in filling ancillary (Lab)
+	0156		REP	Report date/time, report date/time at filing ancillary (i.e., Lab)
+	0156		SCHED	Schedule date/time
+HL7		Which date/time status qualifier		
+	0157		ANY	Any status
+	0157		CFN	Current final value, whether final or corrected
+	0157		COR	Corrected only (no final with corrections)
+	0157		FIN	Final only (no corrections)
+	0157		PRE	Preliminary
+	0157		REP	Report completion date/time
+HL7		Date/time selection qualifier		
+	0158		1ST	First value within range
+	0158		ALL	All values within the range
+	0158		LST	Last value within the range
+	0158		REV	All values within the range returned in reverse chronological order (This is the default if not otherwise specified.)
+HL7		Diet Code Specification Type		
+	0159		D	Diet
+	0159		P	Preference
+	0159		S	Supplement
+HL7		Tray Type		
+	0160		EARLY	Early tray
+	0160		GUEST	Guest tray
+	0160		LATE	Late tray
+	0160		MSG	Tray message only
+	0160		NO	No tray
+HL7		Allow Substitution		
+	0161		G	Allow generic substitutions.
+	0161		N	Substitutions are NOT authorized.  (This is the default - null.)
+	0161		T	Allow therapeutic substitutions
+HL7		Route of Administration		
+	0162		AP	Apply Externally
+	0162		B	Buccal
+	0162		DT	Dental
+	0162		EP	Epidural
+	0162		ET	Endotrachial Tube*
+	0162		GTT	Gastrostomy Tube
+	0162		GU	GU Irrigant
+	0162		IA	Intra-arterial
+	0162		IB	Intrabursal
+	0162		IC	Intracardiac
+	0162		ICV	Intracervical (uterus)
+	0162		ID	Intradermal
+	0162		IH	Inhalation
+	0162		IHA	Intrahepatic Artery
+	0162		IM	Intramuscular
+	0162		IMR	Immerse (Soak) Body Part
+	0162		IN	Intranasal
+	0162		IO	Intraocular
+	0162		IP	Intraperitoneal
+	0162		IS	Intrasynovial
+	0162		IT	Intrathecal
+	0162		IU	Intrauterine
+	0162		IV	Intravenous
+	0162		MM	Mucous Membrane
+	0162		MTH	Mouth/Throat
+	0162		NG	Nasogastric
+	0162		NP	Nasal Prongs*
+	0162		NS	Nasal
+	0162		NT	Nasotrachial Tube
+	0162		OP	Ophthalmic
+	0162		OT	Otic
+	0162		OTH	Other/Miscellaneous
+	0162		PF	Perfusion
+	0162		PO	Oral
+	0162		PR	Rectal
+	0162		RM	Rebreather Mask*
+	0162		SC	Subcutaneous
+	0162		SD	Soaked Dressing
+	0162		SL	Sublingual
+	0162		TD	Transdermal
+	0162		TL	Translingual
+	0162		TP	Topical
+	0162		TRA	Tracheostomy*
+	0162		UR	Urethral
+	0162		VG	Vaginal
+	0162		VM	Ventimask
+	0162		WND	Wound
+HL7		Body site		
+	0163		BE	Bilateral Ears
+	0163		BN	Bilateral Nares
+	0163		BU	Buttock
+	0163		CT	Chest Tube
+	0163		LA	Left Arm
+	0163		LAC	Left Anterior Chest
+	0163		LACF	Left Antecubital Fossa
+	0163		LD	Left Deltoid
+	0163		LE	Left Ear
+	0163		LEJ	Left External Jugular
+	0163		LF	Left Foot
+	0163		LG	Left Gluteus Medius
+	0163		LH	Left Hand
+	0163		LIJ	Left Internal Jugular
+	0163		LLAQ	Left Lower Abd Quadrant
+	0163		LLFA	Left Lower Forearm
+	0163		LMFA	Left Mid Forearm
+	0163		LN	Left Naris
+	0163		LPC	Left Posterior Chest
+	0163		LSC	Left Subclavian
+	0163		LT	Left Thigh
+	0163		LUA	Left Upper Arm
+	0163		LUAQ	Left Upper Abd Quadrant
+	0163		LUFA	Left Upper Forearm
+	0163		LVG	Left Ventragluteal
+	0163		LVL	Left Vastus Lateralis
+	0163		NB	Nebulized
+	0163		OD	Right Eye
+	0163		OS	Left Eye
+	0163		OU	Bilateral Eyes
+	0163		PA	Perianal
+	0163		PERIN	Perineal
+	0163		RA	Right Arm
+	0163		RAC	Right Anterior Chest
+	0163		RACF	Right Antecubital Fossa
+	0163		RD	Right Deltoid
+	0163		RE	Right Ear
+	0163		REJ	Right External Jugular
+	0163		RF	Right Foot
+	0163		RG	Right Gluteus Medius
+	0163		RH	Right Hand
+	0163		RIJ	Right Internal Jugular
+	0163		RLAQ	Rt Lower Abd Quadrant
+	0163		RLFA	Right Lower Forearm
+	0163		RMFA	Right Mid Forearm
+	0163		RN	Right Naris
+	0163		RPC	Right Posterior Chest
+	0163		RSC	Right Subclavian
+	0163		RT	Right Thigh
+	0163		RUA	Right Upper Arm
+	0163		RUAQ	Right Upper Abd Quadrant
+	0163		RUFA	Right Upper Forearm
+	0163		RVG	Right Ventragluteal
+	0163		RVL	Right Vastus Lateralis
+HL7		Administration Device		
+	0164		AP	Applicator
+	0164		BT	Buretrol
+	0164		HL	Heparin Lock
+	0164		IPPB	IPPB
+	0164		IVP	IV Pump
+	0164		IVS	IV Soluset
+	0164		MI	Metered Inhaler
+	0164		NEB	Nebulizer
+	0164		PCA	PCA Pump
+HL7		Administration Method		
+	0165		CH	Chew
+	0165		DI	Dissolve
+	0165		DU	Dust
+	0165		IF	Infiltrate
+	0165		IR	Irrigate
+	0165		IS	Insert
+	0165		IVP	IV Push
+	0165		IVPB	IV Piggyback
+	0165		NB	Nebulized
+	0165		PF	Perfuse
+	0165		PT	Pain
+	0165		SH	Shampoo
+	0165		SO	Soak
+	0165		WA	Wash
+	0165		WI	Wipe
+HL7		RX Component Type		
+	0166		A	Additive
+	0166		B	Base
+HL7		Substitution Status		
+	0167		0	No product selection indicated
+	0167		1	Substitution not allowed by prescriber
+	0167		2	Substitution allowed - patient requested product dispensed
+	0167		3	Substitution allowed - pharmacist selected product dispensed
+	0167		4	Substitution allowed - generic drug not in stock
+	0167		5	Substitution allowed - brand drug dispensed as a generic
+	0167		7	Substitution not allowed - brand drug mandated by law
+	0167		8	Substitution allowed - generic drug not available in marketplace
+	0167		G	A generic substitution was dispensed.
+	0167		N	No substitute was dispensed.  This is equivalent to the default (null) value.
+	0167		T	A therapeutic substitution was dispensed.
+HL7		Processing priority		
+	0168		A	As soon as possible (a priority lower than stat)
+	0168		B	Do at bedside or portable (may be used with other codes)
+	0168		C	Measure continuously (e.g., arterial line blood pressure)
+	0168		P	Preoperative (to be done prior to surgery)
+	0168		R	Routine
+	0168		S	Stat (do immediately)
+	0168		T	Timing critical (do as near as possible to requested time)
+HL7		Reporting priority		
+	0169		C	Call back results
+	0169		R	Rush reporting
+HL7		Derived specimen		
+	0170		C	Child Observation
+	0170		N	Not Applicable
+	0170		P	Parent Observation
+User		Coordination of Benefits		
+	0173		CO	Coordination
+	0173		IN	Independent
+User		Nature of Service/Test/Observation		
+	0174		A	Atomic service/test/observation (test code or treatment code)
+	0174		C	Single observation calculated via a rule or formula from other independent observations (e.g., Alveolar--arterial ratio, cardiac output)
+	0174		F	Functional procedure that may consist of one or more interrelated measures (e.g., glucose tolerance test, creatinine clearance), usually done at different times and/or on different specimens
+	0174		P	Profile or battery consisting of many independent atomic observations (e.g., SMA12, electrolytes), usually done at one instrument on one specimen
+	0174		S	Superset--a set of batteries or procedures ordered under a single code unit but processed as separate batteries (e.g., routines = CBC, UA, electrolytes)
+HL7		Master file identifier code		
+	0175		CDM	Charge description master file
+	0175		CLN	Clinic master file
+	0175		CMA	Clinical study with phases and scheduled master file
+	0175		CMB	Clinical study without phases but with scheduled master file
+	0175		INV	Inventory master file
+	0175		LOC	Location master file
+	0175		OMA	Numerical observation master file
+	0175		OMB	Categorical observation master file
+	0175		OMC	Observation batteries master file
+	0175		OMD	Calculated observations master file
+	0175		OME	Other Observation/Service Item master file
+	0175		PRA	Practitioner master file
+	0175		STF	Staff master file
+User		Confidentiality code		
+	0177		AID	AIDS patient
+	0177		EMP	Employee
+	0177		ETH	Alcohol/drug treatment patient
+	0177		HIV	HIV(+) patient
+	0177		PSY	Psychiatric patient
+	0177		R	Restricted
+	0177		U	Usual control
+	0177		UWM	Unwed mother
+	0177		V	Very restricted
+	0177		VIP	Very important person or celebrity
+HL7		File level event code		
+	0178		REP	Replace current version of this master file with the version contained in this message
+	0178		UPD	Change file records as defined in the record-level event codes for each record that follows
+HL7		Response level		
+	0179		AL	Always.  All MFA segments (whether denoting errors or not) must be returned via the application-level acknowledgment message
+	0179		ER	Error/Reject conditions only.  Only MFA segments denoting errors must be returned via the application-level acknowledgment for this message
+	0179		NE	Never.  No application-level response needed
+	0179		SU	Success.  Only MFA segments denoting success must be returned via the application-level acknowledgment for this message
+HL7		Record-level event code		
+	0180		MAC	Reactivate deactivated record
+	0180		MAD	Add record to master file
+	0180		MDC	Deactivate: discontinue using record in master file, but do not delete from database
+	0180		MDL	Delete record from master file
+	0180		MUP	Update record for master file
+User		MFN record-level error return		
+	0181		S	Successful posting of the record defined by the MFE segment
+	0181		U	Unsuccessful posting of the record defined by the MFE segment
+User		Staff type		
+	0182		...	No suggested values defined
+HL7		Active/Inactive		
+	0183		A	Active Staff
+	0183		I	Inactive Staff
+User		Department		
+	0184		...	No suggested values defined
+HL7		Preferred method of contact		
+	0185		B	Beeper Number
+	0185		C	Cellular Phone Number
+	0185		E	E-Mail Address (for backward compatibility)
+	0185		F	FAX Number
+	0185		H	Home Phone Number
+	0185		O	Office Phone Number
+HL7		Provider billing		
+	0187		I	Institution bills for provider
+	0187		P	Provider does own billing
+User		Ethnic Group		
+	0189		...	see chapter 3
+	0189		H	Hispanic or Latino
+	0189		N	Not Hispanic or Latino
+	0189		U	Unknown
+HL7		Address type		
+	0190		B	Firm/Business
+	0190		BA	Bad address
+	0190		BDL	Birth delivery location (address where birth occurred)
+	0190		BR	Residence at birth (home address at time of birth)
+	0190		C	Current Or Temporary
+	0190		F	Country Of Origin
+	0190		H	Home
+	0190		L	Legal Address
+	0190		M	Mailing
+	0190		N	Birth (nee) (birth address, not otherwise specified)
+	0190		O	Office
+	0190		P	Permanent
+	0190		RH	Registry home. Refers to the information system, typically managed by a public health agency, that stores patient information such as immunization histories or cancer data, regardless of where the patient obtains services.
+HL7		Type of referenced data		
+	0191		AP	Other application data, typically uninterpreted binary data (HL7 V2.3 and later)
+	0191		AU	Audio data (HL7 V2.3 and later)
+	0191		FT	Formatted text (HL7 V2.2 only)
+	0191		IM	Image data (HL7 V2.3 and later)
+	0191		multipart	MIME multipart package
+	0191		NS	Non-scanned image (HL7 V2.2 only)
+	0191		SD	Scanned document (HL7 V2.2 only)
+	0191		SI	Scanned image (HL7 V2.2 only)
+	0191		TEXT	Machine readable text document (HL7 V2.3.1 and later)
+	0191		TX	Machine readable text document (HL7 V2.2 only)
+User		Amount class		
+	0193		AT	Amount
+	0193		LM	Limit
+	0193		PC	Percentage
+	0193		UL	Unlimited
+HL7		Name type		
+	0200		A	Alias Name
+	0200		B	Name at Birth
+	0200		C	Adopted Name
+	0200		D	Display Name
+	0200		I	Licensing Name
+	0200		L	Legal Name
+	0200		M	Maiden Name
+	0200		N	Nickname /_Call me_ Name/Street Name
+	0200		P	Name of Partner/Spouse (retained for backward compatibility only)
+	0200		R	Registered Name (animals only)
+	0200		S	Coded Pseudo-Name to ensure anonymity
+	0200		T	Indigenous/Tribal/Community Name
+	0200		U	Unspecified
+HL7		Telecommunication use code		
+	0201		ASN	Answering Service Number
+	0201		BPN	Beeper Number
+	0201		EMR	Emergency Number
+	0201		NET	Network (email) Address
+	0201		ORN	Other Residence Number
+	0201		PRN	Primary Residence Number
+	0201		VHN	Vacation Home Number
+	0201		WPN	Work Number
+HL7		Telecommunication equipment type		
+	0202		BP	Beeper
+	0202		CP	Cellular Phone
+	0202		FX	Fax
+	0202		Internet	Internet Address: Use Only If Telecommunication Use Code Is NET
+	0202		MD	Modem
+	0202		PH	Telephone
+	0202		TDD	Telecommunications Device for the Deaf
+	0202		TTY	Teletypewriter
+	0202		X.400	X.400 email address: Use Only If Telecommunication Use Code Is NET
+HL7		Identifier type		
+	0203		AM	American Express
+	0203		AN	Account number
+	0203		ANC	Account number Creditor
+	0203		AND	Account number debitor
+	0203		ANON	Anonymous identifier
+	0203		ANT	Temporary Account Number
+	0203		APRN	Advanced Practice Registered Nurse number
+	0203		BA	Bank Account Number
+	0203		BC	Bank Card Number
+	0203		BR	Birth registry number
+	0203		BRN	Breed Registry Number
+	0203		CC	Cost Center number
+	0203		CY	County number
+	0203		DDS	Dentist license number
+	0203		DEA	Drug Enforcement Administration registration number
+	0203		DFN	Drug Furnishing or prescriptive authority Number
+	0203		DI	Diner_s Club card
+	0203		DL	Driver_s license number
+	0203		DN	Doctor number
+	0203		DO	Osteopathic License number
+	0203		DPM	Podiatrist license number
+	0203		DR	Donor Registration Number
+	0203		DS	Discover Card
+	0203		EI	Employee number
+	0203		EN	Employer number
+	0203		FI	Facility ID
+	0203		GI	Guarantor internal identifier
+	0203		GL	General ledger number
+	0203		GN	Guarantor external  identifier
+	0203		HC	Health Card Number
+	0203		IND	Indigenous/Aboriginal
+	0203		JHN	Jurisdictional health number (Canada)
+	0203		LI	Labor and industries number
+	0203		LN	License number
+	0203		LR	Local Registry ID
+	0203		MA	Patient Medicaid number
+	0203		MB	Member Number
+	0203		MC	Patient's Medicare number
+	0203		MCD	Practitioner Medicaid number
+	0203		MCN	Microchip Number
+	0203		MCR	Practitioner Medicare number
+	0203		MD	Medical License number
+	0203		MI	Military ID number
+	0203		MR	Medical record number
+	0203		MRT	Temporary Medical Record Number
+	0203		MS	MasterCard
+	0203		NE	National employer identifier
+	0203		NH	National Health Plan Identifier
+	0203		NI	National unique individual identifier
+	0203		NII	National Insurance Organization Identifier
+	0203		NIIP	National Insurance Payor Identifier (Payor)
+	0203		NNxxx	National Person Identifier where the xxx is the ISO table 3166 3-character (alphabetic) country code
+	0203		NP	Nurse practitioner number
+	0203		NPI	National provider identifier
+	0203		OD	Optometrist license number
+	0203		PA	Physician Assistant number
+	0203		PCN	Penitentiary/correctional institution Number
+	0203		PE	Living Subject Enterprise Number
+	0203		PEN	Pension Number
+	0203		PI	Patient internal identifier
+	0203		PN	Person number
+	0203		PNT	Temporary Living Subject Number
+	0203		PPN	Passport number
+	0203		PRC	Permanent Resident Card Number
+	0203		PRN	Provider number
+	0203		PT	Patient external identifier
+	0203		QA	QA number
+	0203		RI	Resource identifier
+	0203		RN	Registered Nurse Number
+	0203		RPH	Pharmacist license number
+	0203		RR	Railroad Retirement number
+	0203		RRI	Regional registry ID
+	0203		SL	State license
+	0203		SN	Subscriber Number
+	0203		SR	State registry ID
+	0203		SS	Social Security number
+	0203		TAX	Tax ID number
+	0203		TN	Treaty Number/ (Canada)
+	0203		U	Unspecified identifier
+	0203		UPIN	Medicare/CMS (formerly HCFA)_s Universal Physician Identification numbers
+	0203		VN	Visit number
+	0203		VS	VISA
+	0203		WC	WIC identifier
+	0203		WCN	Workers_ Comp Number
+	0203		XX	Organization identifier
+User		Organizational name type		
+	0204		A	Alias name
+	0204		D	Display name
+	0204		L	Legal name
+	0204		SL	Stock exchange listing name
+HL7		Price type		
+	0205		AP	administrative price or handling fee
+	0205		DC	direct unit cost
+	0205		IC	indirect unit cost
+	0205		PF	professional fee for performing provider
+	0205		TF	technology fee for use of equipment
+	0205		TP	total price
+	0205		UP	unit price, may be based on length of procedure or service
+HL7		Segment action code		
+	0206		A	Add/Insert
+	0206		D	Delete
+	0206		U	Update
+HL7		Processing mode		
+	0207		A	Archive
+	0207		I	Initial load
+	0207		Not present	Not present (the default, meaning current  processing)
+	0207		R	Restore from archive
+	0207		T	Current processing, transmitted at intervals (scheduled or on demand)
+HL7		Query Response Status		
+	0208		AE	Application error
+	0208		AR	Application reject
+	0208		NF	No data found, no errors
+	0208		OK	Data found, no errors (this is the default)
+HL7		Relational operator		
+	0209		CT	Contains
+	0209		EQ	Equal
+	0209		GE	Greater than or equal
+	0209		GN	Generic
+	0209		GT	Greater than
+	0209		LE	Less than or equal
+	0209		LT	Less than
+	0209		NE	Not Equal
+HL7		Relational conjunction		
+	0210		AND	Default
+	0210		OR	
+HL7		Alternate character sets		
+	0211		8859/1	The printable characters from the ISO 8859/1 Character set
+	0211		8859/2	The printable characters from the ISO 8859/2 Character set
+	0211		8859/3	The printable characters from the ISO 8859/3 Character set
+	0211		8859/4	The printable characters from the ISO 8859/4 Character set
+	0211		8859/5	The printable characters from the ISO 8859/5 Character set
+	0211		8859/6	The printable characters from the ISO 8859/6 Character set
+	0211		8859/7	The printable characters from the ISO 8859/7 Character set
+	0211		8859/8	The printable characters from the ISO 8859/8 Character set
+	0211		8859/9	The printable characters from the ISO 8859/9 Character set
+	0211		ASCII	The printable 7-bit ASCII character set.
+	0211		BIG-5	Code for Taiwanese Character Set (BIG-5)
+	0211		CNS 11643-1992	Code for Taiwanese Character Set (CNS 11643-1992)
+	0211		GB 18030-2000	Code for Chinese Character Set (GB 18030-2000)
+	0211		ISO IR14	Code for Information Exchange (one byte)(JIS X 0201-1976).
+	0211		ISO IR159	Code of the supplementary Japanese Graphic Character set for information interchange (JIS X 0212-1990).
+	0211		ISO IR87	Code for the Japanese Graphic Character set for information interchange (JIS X 0208-1990),
+	0211		KS X 1001	Code for Korean Character Set (KS X 1001)
+	0211		UNICODE	The world wide character standard from ISO/IEC 10646-1-1993
+	0211		UNICODE UTF-16	UCS Transformation Format, 16-bit form
+	0211		UNICODE UTF-32	UCS Transformation Format, 32-bit form
+	0211		UNICODE UTF-8	UCS Transformation Format, 8-bit form
+User		Purge Status Code		
+	0213		D	The visit is marked for deletion and the user cannot enter new data against it.
+	0213		I	The visit is marked inactive and the user cannot enter new data against it.
+	0213		P	Marked for purge.  User is no longer able to update the visit.
+User		Special Program Code		
+	0214		CH	Child Health Assistance
+	0214		ES	Elective Surgery Program
+	0214		FP	Family Planning
+	0214		O	Other
+	0214		U	Unknown
+User		Publicity Code		
+	0215		F	Family only
+	0215		N	No Publicity
+	0215		O	Other
+	0215		U	Unknown
+User		Patient Status Code		
+	0216		AI	Active Inpatient
+	0216		DI	Discharged Inpatient
+User		Visit Priority Code		
+	0217		1	Emergency
+	0217		2	Urgent
+	0217		3	Elective
+User		Living Arrangement		
+	0220		A	Alone
+	0220		F	Family
+	0220		I	Institution
+	0220		R	Relative
+	0220		S	Spouse Only
+	0220		U	Unknown
+User		Living Dependency		
+	0223		C	Small Children Dependent
+	0223		M	Medical Supervision Required
+	0223		O	Other
+	0223		S	Spouse Dependent
+	0223		U	Unknown
+HL7		Transport Arranged		
+	0224		A	Arranged
+	0224		N	Not Arranged
+	0224		U	Unknown
+HL7		Escort Required		
+	0225		N	Not Required
+	0225		R	Required
+	0225		U	Unknown
+HL7		Manufacturers of Vaccines (code=MVX)		
+	0227		AB	Abbott Laboratories
+	0227		AD	Adams Laboratories, Inc.
+	0227		ALP	Alpha Therapeutic Corporation
+	0227		AR	Armour
+	0227		AVB	Aventis Behring L.L.C.
+	0227		AVI	Aviron
+	0227		BA	Baxter Healthcare Coporation]
+	0227		BAH	Baxter Health Corporation
+	0227		BAY	Bayer Corporation
+	0227		BP	Berna Products
+	0227		BPC	Berna Products Corporation
+	0227		CEN	Centeon L.L.C.
+	0227		CHI	Chiron Corporation
+	0227		CMP	Celltech Medeva Pharmaceuticals
+	0227		CON	Connaught
+	0227		EVN	Evans Medical Limited
+	0227		GRE	Greer Laboratories, Inc.
+	0227		IAG	Immuno International AG
+	0227		IM	Merieux
+	0227		IUS	Immuno-U.S., Inc.
+	0227		JPN	The Research Foundation for Microbial Diseases of Osaka University
+	0227		KGC	Korea Green Cross Corporation
+	0227		LED	Lederle
+	0227		MA	Massachusetts Public Health Biologic Laboratories
+	0227		MBL	Massachusetts Biologic Laboratories
+	0227		MED	MedImmune, Inc.
+	0227		MIL	Miles
+	0227		MIP	Bioport Corporation
+	0227		MSD	Merck & Co., Inc.
+	0227		NAB	NABI
+	0227		NAV	North American Vaccine, Inc.
+	0227		NOV	Novartis Pharmaceutical Corporation
+	0227		NYB	New York Blood Center
+	0227		ORT	Ortho-Clinical Diagnostics.
+	0227		OTC	Organon Teknika Corporation
+	0227		OTH	Other manufacturer
+	0227		PD	Parkedale Pharmaceuticals
+	0227		PMC	Aventis Pasteur Inc.
+	0227		PRX	Praxis Biologics
+	0227		PWJ	PowerJect Pharamaceuticals
+	0227		SCL	Sclavo, Inc.
+	0227		SI	Swiss Serum and Vaccine Inst.
+	0227		SKB	GlaxoSmithKline
+	0227		UNK	Unknown manufacturer
+	0227		USA	United States Army Medical Research and Material Command
+	0227		WA	Wyeth-Ayerst
+	0227		WAL	Wyeth-Ayerst
+User		Diagnosis Classification		
+	0228		C	Consultation
+	0228		D	Diagnosis
+	0228		I	Invasive procedure not classified elsewhere (I.V., catheter, etc.)
+	0228		M	Medication (antibiotic)
+	0228		O	Other
+	0228		R	Radiological scheduling (not using ICDA codes)
+	0228		S	Sign and symptom
+	0228		T	Tissue diagnosis
+User		DRG Payor		
+	0229		C	Champus
+	0229		G	Managed Care Organization
+	0229		M	Medicare
+User		Procedure Functional Type		
+	0230		A	Anesthesia
+	0230		D	Diagnostic procedure
+	0230		I	Invasive procedure not classified elsewhere (e.g., IV, catheter, etc.)
+	0230		P	Procedure for treatment (therapeutic, including operations)
+User		Student Status		
+	0231		F	Full-time student
+	0231		N	Not a student
+	0231		P	Part-time student
+User		Insurance Company Contact Reason		
+	0232		01	Medicare claim status
+	0232		02	Medicaid claim status
+	0232		03	Name/address change
+HL7		Report timing		
+	0234		10D	10 day report
+	0234		15D	15 day report
+	0234		30D	30 day report
+	0234		3D	3 day report
+	0234		7D	7 day report
+	0234		AD	Additional information
+	0234		CO	Correction
+	0234		DE	Device evaluation
+	0234		PD	Periodic
+	0234		RQ	Requested information
+HL7		Report source		
+	0235		C	Clinical trial
+	0235		D	Database/registry/poison control center
+	0235		E	Distributor
+	0235		H	Health professional
+	0235		L	Literature
+	0235		M	Manufacturer/marketing authority holder
+	0235		N	Non-healthcare professional
+	0235		O	Other
+	0235		P	Patient
+	0235		R	Regulatory agency
+HL7		Event Reported To		
+	0236		D	Distributor
+	0236		L	Local facility/user facility
+	0236		M	Manufacturer
+	0236		R	Regulatory agency
+HL7		Event Qualification		
+	0237		A	Abuse
+	0237		B	Unexpected beneficial effect
+	0237		D	Dependency
+	0237		I	Interaction
+	0237		L	Lack of expect therapeutic effect
+	0237		M	Misuse
+	0237		O	Overdose
+	0237		W	Drug withdrawal
+HL7		Event Seriousness		
+	0238		N	No
+	0238		S	Significant
+	0238		Y	Yes
+HL7		Event Expected		
+	0239		N	No
+	0239		U	Unknown
+	0239		Y	Yes
+HL7		Event Consequence		
+	0240		C	Congenital anomaly/birth defect
+	0240		D	Death
+	0240		H	Caused hospitalized
+	0240		I	Incapacity which is significant, persistent or permanent
+	0240		J	Disability which is significant, persistent or permanent
+	0240		L	Life threatening
+	0240		O	Other
+	0240		P	Prolonged hospitalization
+	0240		R	Required intervention to prevent permanent impairment/damage
+HL7		Patient Outcome		
+	0241		D	Died
+	0241		F	Fully recovered
+	0241		N	Not recovering/unchanged
+	0241		R	Recovering
+	0241		S	Sequelae
+	0241		U	Unknown
+	0241		W	Worsening
+HL7		Primary Observer's Qualification		
+	0242		C	Health care consumer/patient
+	0242		H	Other health professional
+	0242		L	Lawyer/attorney
+	0242		M	Mid-level professional (nurse, nurse practitioner, physician's assistant)
+	0242		O	Other non-health professional
+	0242		P	Physician (osteopath, homeopath)
+	0242		R	Pharmacist
+HL7		Identity May Be Divulged		
+	0243		N	No
+	0243		NA	Not applicable
+	0243		Y	Yes
+HL7		Status of Evaluation		
+	0247		A	Evaluation anticipated, but not yet begun
+	0247		C	Product received in condition which made analysis impossible
+	0247		D	Product discarded -- unable to follow up
+	0247		I	Product remains implanted -- unable to follow up
+	0247		K	Problem already known, no evaluation necessary
+	0247		O	Other
+	0247		P	Evaluation in progress
+	0247		Q	Product under quarantine -- unable to follow up
+	0247		R	Product under recall/corrective action
+	0247		U	Product unavailable for follow up investigation
+	0247		X	Product not made by company
+	0247		Y	Evaluation completed
+HL7		Product source		
+	0248		A	Actual product involved in incident was evaluated
+	0248		L	A product from the same lot as the actual product involved was evaluated
+	0248		N	A product from a controlled/non-related inventory was evaluated
+	0248		R	A product from a reserve sample was evaluated
+HL7		Relatedness Assessment		
+	0250		H	Highly probable
+	0250		I	Improbable
+	0250		M	Moderately probable
+	0250		N	Not related
+	0250		S	Somewhat probable
+HL7		Action Taken in Response to the Event		
+	0251		DI	Product dose or frequency of use increased
+	0251		DR	Product dose or frequency of use reduced
+	0251		N	None
+	0251		OT	Other
+	0251		WP	Product withdrawn permanently
+	0251		WT	Product withdrawn temporarily
+HL7		Causality Observations		
+	0252		AW	Abatement of event after product withdrawn
+	0252		BE	Event recurred after product reintroduced
+	0252		DR	Dose response observed
+	0252		EX	Alternative explanations for the event available
+	0252		IN	Event occurred after product introduced
+	0252		LI	Literature reports association of product with event
+	0252		OE	Occurrence of event was confirmed by objective evidence
+	0252		OT	Other
+	0252		PL	Effect observed when patient receives placebo
+	0252		SE	Similar events in past for this patient
+	0252		TC	Toxic levels of product documented in blood or body fluids
+HL7		Indirect exposure mechanism		
+	0253		B	Breast milk
+	0253		F	Father
+	0253		O	Other
+	0253		P	Transplacental
+	0253		X	Blood product
+HL7		Kind of quantity		
+	0254		ABS	Absorbance
+	0254		ACNC	Concentration, Arbitrary Substance
+	0254		ACT	*Activity
+	0254		APER	Appearance
+	0254		ARB	*Arbitrary
+	0254		AREA	Area
+	0254		ASPECT	Aspect
+	0254		CACT	*Catalytic Activity
+	0254		CCNT	*Catalytic Content
+	0254		CCRTO	Catalytic Concentration Ratio
+	0254		CFR	*Catalytic Fraction
+	0254		CLAS	Class
+	0254		CNC	*Catalytic Concentration
+	0254		CNST	*Constant
+	0254		COEF	*Coefficient
+	0254		COLOR	Color
+	0254		CONS	Consistency
+	0254		CRAT	*Catalytic Rate
+	0254		CRTO	Catalytic Ratio
+	0254		DEN	Density
+	0254		DEV	Device
+	0254		DIFF	*Difference
+	0254		ELAS	Elasticity
+	0254		ELPOT	Electrical Potential (Voltage)
+	0254		ELRAT	Electrical current (amperage)
+	0254		ELRES	Electrical Resistance
+	0254		ENGR	Energy
+	0254		ENT	*Entitic
+	0254		ENTCAT	*Entitic Catalytic Activity
+	0254		ENTNUM	*Entitic Number
+	0254		ENTSUB	*Entitic Substance of Amount
+	0254		ENTVOL	*Entitic Volume
+	0254		EQL	Equilibrium
+	0254		FORCE	Mechanical force
+	0254		FREQ	Frequency
+	0254		IMP	Impression/ interpretation of study
+	0254		KINV	*Kinematic Viscosity
+	0254		LEN	Length
+	0254		LINC	*Length Increment
+	0254		LIQ	*Liquefaction
+	0254		MASS	*Mass
+	0254		MCNC	*Mass Concentration
+	0254		MCNT	Mass Content
+	0254		MCRTO	*Mass Concentration Ratio
+	0254		MFR	*Mass Fraction
+	0254		MGFLUX	Magnetic flux
+	0254		MINC	*Mass Increment
+	0254		MORPH	Morphology
+	0254		MOTIL	Motility
+	0254		MRAT	*Mass Rate
+	0254		MRTO	*Mass Ratio
+	0254		NCNC	*Number Concentration
+	0254		NCNT	*Number Content
+	0254		NFR	*Number Fraction
+	0254		NRTO	*Number Ratio
+	0254		NUM	*Number
+	0254		OD	Optical density
+	0254		OSMOL	*Osmolality
+	0254		PRES	*Pressure (Partial)
+	0254		PRID	Presence/Identity/Existence
+	0254		PWR	Power (wattage)
+	0254		RANGE	*Ranges
+	0254		RATIO	*Ratios
+	0254		RCRLTM	*Reciprocal Relative Time
+	0254		RDEN	*Relative Density
+	0254		REL	*Relative
+	0254		RLMCNC	*Relative Mass Concentration
+	0254		RLSCNC	*Relative Substance Concentration
+	0254		RLTM	*Relative Time
+	0254		SATFR	*Saturation Fraction
+	0254		SCNC	*Substance Concentration
+	0254		SCNCIN	*Substance Concentration Increment
+	0254		SCNT	*Substance Content
+	0254		SCNTR	*Substance Content Rate
+	0254		SCRTO	*Substance Concentration Ratio
+	0254		SFR	*Substance Fraction
+	0254		SHAPE	Shape
+	0254		SMELL	Smell
+	0254		SRAT	*Substance Rate
+	0254		SRTO	*Substance Ratio
+	0254		SUB	*Substance Amount
+	0254		SUSC	*Susceptibility
+	0254		TASTE	Taste
+	0254		TEMP	*Temperature
+	0254		TEMPDF	*Temperature Difference
+	0254		TEMPIN	*Temperature Increment
+	0254		THRMCNC	*Threshold Mass Concentration
+	0254		THRSCNC	*Threshold Substance Concentration
+	0254		TIME	*Time (e.g. seconds)
+	0254		TITR	*Dilution Factor (Titer)
+	0254		TMDF	*Time Difference
+	0254		TMSTP	*Time Stamp -- Date and Time
+	0254		TRTO	*Time Ratio
+	0254		TYPE	*Type
+	0254		VCNT	*Volume Content
+	0254		VEL	*Velocity
+	0254		VELRT	*Velocity Ratio
+	0254		VFR	*Volume Fraction
+	0254		VISC	*Viscosity
+	0254		VOL	*Volume
+	0254		VRAT	*Volume Rate
+	0254		VRTO	*Volume Ratio
+User		Duration categories		
+	0255		*	(asterisk) Life of the "unit."  Used for blood products.
+	0255		12H	12 hours
+	0255		1H	1 hour
+	0255		1L	1 months (30 days)
+	0255		1W	1 week
+	0255		2.5H	2½ hours
+	0255		24H	24 hours
+	0255		2D	2 days
+	0255		2H	2 hours
+	0255		2L	2 months
+	0255		2W	2 weeks
+	0255		30M	30 minutes
+	0255		3D	3 days
+	0255		3H	3 hours
+	0255		3L	3 months
+	0255		3W	3 weeks
+	0255		4D	4 days
+	0255		4H	4 hours
+	0255		4W	4 weeks
+	0255		5D	5 days
+	0255		5H	5 hours
+	0255		6D	6 days
+	0255		6H	6 hours
+	0255		7H	7 hours
+	0255		8H	8 hours
+	0255		PT	To identify measures at a point in time.  This is a synonym for "spot" or "random" as applied to urine measurements.
+HL7		Time delay post challenge		
+	0256		10D	10 days
+	0256		10M	10 minutes post challenge
+	0256		12H	12 hours post challenge
+	0256		15M	15 minutes post challenge
+	0256		1H	1 hour post challenge
+	0256		1L	1 month (30 days) post challenge
+	0256		1M	1 minute post challenge
+	0256		1W	1 week
+	0256		2.5H	2 1/2 hours post challenge
+	0256		20M	20 minutes post challenge
+	0256		24H	24 hours post challenge
+	0256		25M	25 minutes post challenge
+	0256		2D	2 days
+	0256		2H	2 hours post challenge
+	0256		2L	2 months (60 days) post challenge
+	0256		2M	2 minutes post challenge
+	0256		2W	2 weeks
+	0256		30M	30 minutes post challenge
+	0256		3D	3 days
+	0256		3H	3 hours post challenge
+	0256		3L	3 months (90 days) post challenge
+	0256		3M	3 minutes post challenge
+	0256		3W	3 weeks
+	0256		4D	4 days
+	0256		4H	4 hours post challenge
+	0256		4M	4 minutes post challenge
+	0256		4W	4 weeks
+	0256		5D	5 days
+	0256		5H	5  hours post challenge
+	0256		5M	5 minutes post challenge
+	0256		6D	6 days
+	0256		6H	6 hours post challenge
+	0256		6M	6 minutes post challenge
+	0256		7D	7 days
+	0256		7H	7 hours post challenge
+	0256		7M	7 minutes post challenge
+	0256		8H	8 hours post challenge
+	0256		8H SHIFT	8 hours aligned on nursing shifts
+	0256		8M	8 minutes post challenge
+	0256		9M	9 minutes post challenge
+	0256		BS	Baseline (time just before the challenge)
+	0256		PEAK	The time post drug dose at which the highest drug level is reached (differs by drug)
+	0256		RANDOM	Time from the challenge, or dose not specified. (random)
+	0256		TROUGH	The time post drug dose at which the lowest drug level is reached (varies with drug)
+HL7		Nature of challenge		
+	0257		CFST	Fasting (no calorie intake) for the period specified in the time component of the term, e.g., 1H POST CFST
+	0257		EXCZ	Exercise undertaken as challenge (can be quantified)
+	0257		FFST	No fluid intake for the period specified in the time component of the term
+HL7		Relationship modifier		
+	0258		BPU	Blood product unit
+	0258		CONTROL	Control
+	0258		DONOR	Donor
+	0258		PATIENT	Patient
+User		Modality		
+	0259		AS	Angioscopy
+	0259		BS	Biomagnetic imaging
+	0259		CD	Color flow Doppler
+	0259		CP	Colposcopy
+	0259		CR	Computed radiography
+	0259		CS	Cystoscopy
+	0259		CT	Computed tomography
+	0259		DD	Duplex Doppler
+	0259		DG	Diapanography
+	0259		DM	Digital microscopy
+	0259		EC	Echocardiography
+	0259		ES	Endoscopy
+	0259		FA	Fluorescein angiography
+	0259		FS	Fundoscopy
+	0259		LP	Laparoscopy
+	0259		LS	Laser surface scan
+	0259		MA	Magnetic resonance angiography
+	0259		MS	Magnetic resonance spectroscopy
+	0259		NM	Nuclear Medicine (radioisotope study)
+	0259		OT	Other
+	0259		PT	Positron emission tomography (PET)
+	0259		RF	Radio fluoroscopy
+	0259		ST	Single photon emission computed tomography (SPECT)
+	0259		TG	Thermography
+	0259		US	Ultrasound
+	0259		XA	X-ray Angiography
+User		Patient location type		
+	0260		B	Bed
+	0260		C	Clinic
+	0260		D	Department
+	0260		E	Exam Room
+	0260		L	Other Location
+	0260		N	Nursing Unit
+	0260		O	Operating Room
+	0260		R	Room
+User		Location Equipment		
+	0261		EEG	Electro-Encephalogram
+	0261		EKG	Electro-Cardiogram
+	0261		INF	Infusion pump
+	0261		IVP	IV pump
+	0261		OXY	Oxygen
+	0261		SUC	Suction
+	0261		VEN	Ventilator
+	0261		VIT	Vital signs monitor
+User		Privacy Level		
+	0262		F	Isolation
+	0262		J	Private room - medically justified
+	0262		P	Private room
+	0262		Q	Private room - due to overflow
+	0262		S	Semi-private room
+	0262		W	Ward
+User		Level of Care		
+	0263		A	Ambulatory
+	0263		C	Critical care
+	0263		E	Emergency
+	0263		F	Isolation
+	0263		N	Intensive care
+	0263		R	Routine
+	0263		S	Surgery
+User		Specialty Type		
+	0265		ALC	Allergy
+	0265		AMB	Ambulatory
+	0265		CAN	Cancer
+	0265		CAR	Coronary/cardiac care
+	0265		CCR	Critical care
+	0265		CHI	Chiropractic
+	0265		EDI	Education
+	0265		EMR	Emergency
+	0265		FPC	Family planning
+	0265		INT	Intensive care
+	0265		ISO	Isolation
+	0265		NAT	Naturopathic
+	0265		NBI	Newborn, nursery, infants
+	0265		OBG	Obstetrics, gynecology
+	0265		OBS	Observation
+	0265		OTH	Other specialty
+	0265		PED	Pediatrics
+	0265		PHY	General/family practice
+	0265		PIN	Pediatric/neonatal intensive care
+	0265		PPS	Pediatric psychiatric
+	0265		PRE	Pediatric rehabilitation
+	0265		PSI	Psychiatric intensive care
+	0265		PSY	Psychiatric
+	0265		REH	Rehabilitation
+	0265		SUR	Surgery
+	0265		WIC	Walk-in clinic
+HL7		Days of the week		
+	0267		FRI	Friday
+	0267		MON	Monday
+	0267		SAT	Saturday
+	0267		SUN	Sunday
+	0267		THU	Thursday
+	0267		TUE	Tuesday
+	0267		WED	Wednesday
+User		Override		
+	0268		A	Override allowed
+	0268		R	Override required
+	0268		X	Override not allowed
+User		Charge On Indicator		
+	0269		O	Charge on Order
+	0269		R	Charge on Result
+User		Document Type		
+	0270		AR	Autopsy report
+	0270		CD	Cardiodiagnostics
+	0270		CN	Consultation
+	0270		DI	Diagnostic imaging
+	0270		DS	Discharge summary
+	0270		ED	Emergency department report
+	0270		HP	History and physical examination
+	0270		OP	Operative report
+	0270		PC	Psychiatric consultation
+	0270		PH	Psychiatric history and physical examination
+	0270		PN	Procedure note
+	0270		PR	Progress note
+	0270		SP	Surgical pathology
+	0270		TS	Transfer summary
+HL7		Document completion status		
+	0271		AU	Authenticated
+	0271		DI	Dictated
+	0271		DO	Documented
+	0271		IN	Incomplete
+	0271		IP	In Progress
+	0271		LA	Legally authenticated
+	0271		PA	Pre-authenticated
+HL7		Document Confidentiality Status		
+	0272		R	Restricted
+	0272		U	Usual control
+	0272		V	Very restricted
+HL7		Document Availability Status		
+	0273		AV	Available for patient care
+	0273		CA	Deleted
+	0273		OB	Obsolete
+	0273		UN	Unavailable for patient care
+HL7		Document Storage Status		
+	0275		AA	Active and archived
+	0275		AC	Active
+	0275		AR	Archived (not active)
+	0275		PU	Purged
+User		Appointment reason codes		
+	0276		CHECKUP	A routine check-up, such as an annual physical
+	0276		EMERGENCY	Emergency appointment
+	0276		FOLLOWUP	A follow up visit from a previous appointment
+	0276		ROUTINE	Routine appointment - default if not valued
+	0276		WALKIN	A previously unscheduled walk-in visit
+User		Appointment Type Codes		
+	0277		Complete	A request to add a completed appointment, used to maintain records of completed appointments that did not appear in the schedule (e.g., STAT, walk-in, etc.)
+	0277		Normal	Routine schedule request type - default if not valued
+	0277		Tentative	A request for a tentative (e.g., "penciled in") appointment
+User		Filler status codes		
+	0278		Blocked	The indicated time slot(s) is(are) blocked
+	0278		Booked	The indicated appointment is booked
+	0278		Cancelled	The indicated appointment was stopped from occurring (canceled prior to starting)
+	0278		Complete	The indicated appointment has completed normally (was not discontinued, canceled, or deleted)
+	0278		Dc	The indicated appointment was discontinued (DC'ed while in progress, discontinued parent appointment, or discontinued child appointment)
+	0278		Deleted	The indicated appointment was deleted from the filler application
+	0278		Noshow	The patient did not show up for the appointment
+	0278		Overbook	The appointment has been confirmed; however it is confirmed in an overbooked state
+	0278		Pending	Appointment has not yet been confirmed
+	0278		Started	The indicated appointment has begun and is currently in progress
+	0278		Waitlist	Appointment has been placed on a waiting list for a particular slot, or set of slots
+User		Allow Substitution Codes		
+	0279		Confirm	Contact the Placer Contact Person prior to making any substitutions of this resource
+	0279		No	Substitution of this resource is not allowed
+	0279		Notify	Notify the Placer Contact Person, through normal institutional procedures, that a substitution of this resource has been made
+	0279		Yes	Substitution of this resource is allowed
+User		Referral priority		
+	0280		A	ASAP
+	0280		R	Routine
+	0280		S	STAT
+User		Referral type		
+	0281		Hom	Home Care
+	0281		Lab	Laboratory
+	0281		Med	Medical
+	0281		Psy	Psychiatric
+	0281		Rad	Radiology
+	0281		Skn	Skilled Nursing
+User		Referral disposition		
+	0282		AM	Assume Management
+	0282		RP	Return Patient After Evaluation
+	0282		SO	Second Opinion
+	0282		WR	Send Written Report
+User		Referral status		
+	0283		A	Accepted
+	0283		E	Expired
+	0283		P	Pending
+	0283		R	Rejected
+User		Referral category		
+	0284		A	Ambulatory
+	0284		E	Emergency
+	0284		I	Inpatient
+	0284		O	Outpatient
+User		Provider role		
+	0286		CP	Consulting Provider
+	0286		PP	Primary Care Provider
+	0286		RP	Referring Provider
+	0286		RT	Referred to Provider
+HL7		Problem/goal action code		
+	0287		AD	ADD
+	0287		CO	CORRECT
+	0287		DE	DELETE
+	0287		LI	LINK
+	0287		UC	UNCHANGED *
+	0287		UN	UNLINK
+	0287		UP	UPDATE
+HL7		Subtype of referenced data		
+	0291		BASIC	ISDN PCM audio data
+	0291		DICOM	Digital Imaging and Communications in Medicine
+	0291		FAX	Facsimile data
+	0291		GIF	Graphics Interchange Format
+	0291		HTML	Hypertext Markup Language
+	0291		JOT	Electronic ink data (Jot 1.0 standard)
+	0291		JPEG	Joint Photographic Experts Group
+	0291		Octet-stream	Uninterpreted binary data
+	0291		PICT	PICT format image data
+	0291		PostScript	PostScript program
+	0291		RTF	Rich Text Format
+	0291		SGML	Standard Generalized Markup Language (HL7 V2.3.1 and later)
+	0291		TIFF	TIFF image data
+	0291		x-hl7-cda-level-one	HL7 Clinical Document Architecture Level One document
+	0291		XML	Extensible Markup Language (HL7 V2.3.1 and later)
+HL7		Vaccines administered (code = CVX)(parenteral, unless oral is noted)		
+	0292		01	DTP
+	0292		02	OPV
+	0292		03	MMR
+	0292		04	M/R
+	0292		05	measles
+	0292		06	rubella
+	0292		07	mumps
+	0292		08	Hep B, adolescent or pediatric
+	0292		09	Td (adult)
+	0292		10	IPV
+	0292		100	pneumococcal conjugate
+	0292		101	typhoid, ViCPs
+	0292		102	DTP-Hib-Hep B
+	0292		103	meningococcal C conjugate
+	0292		104	Hep A-Hep B
+	0292		105	smallpox, diluted
+	0292		106	DTaP, 5 pertussis antigens
+	0292		107	DTaP, NOS
+	0292		108	meningococcal, NOS
+	0292		109	pneumococcal, NOS
+	0292		11	pertussis
+	0292		12	diphtheria antitoxin
+	0292		13	TIG
+	0292		14	IG, NOS
+	0292		15	influenza, split (incl. purified surface antigen)
+	0292		16	influenza, whole
+	0292		17	Hib, NOS
+	0292		18	rabies, intramuscular injection
+	0292		19	BCG
+	0292		20	DTaP
+	0292		21	Varicella
+	0292		22	DTP-Hib
+	0292		23	plague
+	0292		24	anthrax
+	0292		25	typhoid, oral
+	0292		26	cholera
+	0292		27	botulinum antitoxin
+	0292		28	DT (pediatric)
+	0292		29	CMVIG
+	0292		30	HBIG
+	0292		31	Hep A, pediatric, NOS
+	0292		32	meningococcal
+	0292		33	pneumococcal
+	0292		34	RIG
+	0292		35	tetanus toxoid
+	0292		36	VZIG
+	0292		37	yellow fever
+	0292		38	rubella/mumps
+	0292		39	Japanese encephalitis
+	0292		40	rabies, intradermal injection
+	0292		41	typhoid, parenteral
+	0292		42	Hep B, adolescent/high risk infant2
+	0292		43	Hep B, adult4
+	0292		44	Hep B, dialysis
+	0292		45	Hep B, NOS
+	0292		46	Hib (PRP-D)
+	0292		47	Hib (HbOC)
+	0292		48	Hib (PRP-T)
+	0292		49	Hib (PRP-OMP)
+	0292		50	DTaP-Hib 
+	0292		51	Hib-Hep B
+	0292		52	Hep A, adult
+	0292		53	typhoid, parenteral, AKD (U.S. military)
+	0292		54	adenovirus, type 4
+	0292		55	adenovirus, type 7
+	0292		56	dengue fever
+	0292		57	hantavirus
+	0292		58	Hep C
+	0292		59	Hep E
+	0292		60	herpes simplex 2
+	0292		61	HIV
+	0292		62	HPV
+	0292		63	Junin virus
+	0292		64	leishmaniasis
+	0292		65	leprosy
+	0292		66	Lyme disease
+	0292		67	malaria
+	0292		68	melanoma
+	0292		69	parainfluenza-3
+	0292		70	Q fever
+	0292		71	RSV-IGIV 
+	0292		72	rheumatic fever
+	0292		73	Rift Valley fever
+	0292		74	rotavirus
+	0292		75	smallpox
+	0292		76	Staphylococcus bacterio lysate
+	0292		77	tick-borne encephalitis
+	0292		78	tularemia vaccine
+	0292		79	vaccinia immune globulin
+	0292		80	VEE, live
+	0292		81	VEE, inactivated
+	0292		82	adenovirus, NOS1
+	0292		83	Hep A, ped/adol, 2 dose
+	0292		84	Hep A, ped/adol, 3 dose
+	0292		85	Hep A, NOS
+	0292		86	IG
+	0292		87	IGIV
+	0292		88	influenza, NOS
+	0292		89	polio, NOS
+	0292		90	rabies, NOS
+	0292		91	typhoid, NOS
+	0292		92	VEE, NOS
+	0292		93	RSV-MAb
+	0292		94	MMRV
+	0292		95	TST-OT tine test
+	0292		96	TST-PPD intradermal
+	0292		97	TST-PPD tine test
+	0292		98	TST, NOS
+	0292		99	RESERVED _ do not use
+	0292		998	no vaccine administered
+	0292		999	Unknown
+User		Time selection criteria parameter class codes		
+	0294		Fri	An indicator that Friday is or is not preferred for the day on which the appointment will occur.
+	0294		Mon	An indicator that Monday is or is not preferred for the day on which the appointment will occur.
+	0294		Prefend	An indicator that there is a preferred end time for the appointment request, service or resource.
+	0294		Prefstart	An indicator that there is a preferred start time for the appointment request, service or resource.
+	0294		Sat	An indicator that Saturday is or is not preferred for the day on which the appointment will occur.
+	0294		Sun	An indicator that Sunday is or is not preferred for the day on which the appointment will occur.
+	0294		Thu	An indicator that Thursday is or is not preferred for the day on which the appointment will occur.
+	0294		Tue	An indicator that Tuesday is or is not preferred for the day on which the appointment will occur.
+	0294		Wed	An indicator that Wednesday is or is not preferred for the day on which the appointment will occur.
+HL7		CP range type		
+	0298		F	Flat-rate. Apply the entire price to this interval, do not pro-rate the price if the full interval has not occurred/been consumed
+	0298		P	Pro-rate. Apply this price to this interval, pro-rated by whatever portion of the interval has occurred/been consumed
+HL7		Encoding		
+	0299		A	No encoding - data are displayable ASCII characters.
+	0299		Base64	Encoding as defined by MIME (Multipurpose Internet Mail Extensions) standard RFC 1521. Four consecutive ASCII characters represent three consecutive octets of binary data. Base64 utilizes a 65-character subset of US-ASCII, consisting of both the upper and
+	0299		Hex	Hexadecimal encoding - consecutive pairs of hexadecimal digits represent consecutive single octets.
+HL7		Universal ID type		
+	0301		DNS	An Internet dotted name. Either in ASCII or as integers
+	0301		GUID	Same as UUID.
+	0301		HCD	The CEN Healthcare Coding Scheme Designator. (Identifiers used in DICOM follow this assignment scheme.)
+	0301		HL7	Reserved for future HL7 registration schemes
+	0301		ISO	An International Standards Organization Object Identifier
+	0301		L,M,N	These are reserved for locally defined coding schemes.
+	0301		Random	Usually a base64 encoded string of random bits.
+	0301		URI	Uniform Resource Identifier
+	0301		UUID	The DCE Universal Unique Identifier
+	0301		x400	An X.400 MHS format identifier
+	0301		x500	An X.500 directory name
+User		Person location type		
+	0305		C	Clinic
+	0305		D	Department
+	0305		H	Home
+	0305		N	Nursing Unit
+	0305		O	Provider_s Office
+	0305		P	Phone
+	0305		S	SNF
+User		Coverage Type		
+	0309		B	Both hospital and physician
+	0309		H	Hospital/institutional
+	0309		P	Physician/professional
+User		Job Status		
+	0311		O	Other
+	0311		P	Permanent
+	0311		T	Temporary
+	0311		U	Unknown
+User		Living Will Code		
+	0315		F	Yes, patient has a living will but it is not on file
+	0315		I	No, patient does not have a living will but information was provided
+	0315		N	No, patient does not have a living will and no information was provided
+	0315		U	Unknown
+	0315		Y	Yes, patient has a living will
+User		Organ Donor Code		
+	0316		F	Yes, patient is a documented donor, but documentation is not on file
+	0316		I	No, patient is not a documented donor, but information was provided
+	0316		N	No, patient has not agreed to be a donor
+	0316		P	Patient leaves organ donation decision to a specific person
+	0316		R	Patient leaves organ donation decision to relatives
+	0316		U	Unknown
+	0316		Y	Yes, patient is a documented donor and documentation is on file
+User		Annotations		
+	0317		9900	Pace spike
+	0317		9901	SAS marker
+	0317		9902	Sense marker
+	0317		9903	Beat marker
+	0317		9904	etc.
+HL7		Dispense Method		
+	0321		AD	Automatic Dispensing
+	0321		F	Floor Stock
+	0321		TR	Traditional
+	0321		UD	Unit Dose
+HL7		Completion Status for valid values.		
+	0322		CP	Complete
+	0322		NA	Not Administered
+	0322		PA	Partially Administered
+	0322		RE	Refused
+HL7		Action Code		
+	0323		A	Add/Insert
+	0323		D	Delete
+	0323		U	Update
+	0323		X	No change
+User		Location characteristic ID		
+	0324		GEN	Gender of patient(s)
+	0324		IMP	Implant: can be used for radiation implant patients
+	0324		INF	Infectious disease: this location can be used for isolation
+	0324		LCR	Level of care
+	0324		LIC	Licensed
+	0324		OVR	Overflow
+	0324		PRL	Privacy level: indicating the level of private versus non-private room
+	0324		SET	Bed is set up
+	0324		SHA	Shadow: a temporary holding location that does not physically exist
+	0324		SMK	Smoking
+	0324		STF	Bed is staffed
+	0324		TEA	Teaching location
+User		Location Relationship ID		
+	0325		ALI	Location Alias(es)
+	0325		DTY	Nearest  dietary location
+	0325		LAB	Nearest  lab
+	0325		LB2	Second nearest lab
+	0325		PAR	Parent location
+	0325		RX	Nearest  pharmacy
+	0325		RX2	Second nearest pharmacy
+User		Visit Indicator		
+	0326		A	Account level (default)
+	0326		V	Visit level
+HL7		Quantity method		
+	0329		A	Actual count
+	0329		E	Estimated (see comment)
+HL7		Marketing basis		
+	0330		510E	510 (K) exempt
+	0330		510K	510 (K)
+	0330		522S	Post marketing study (522)
+	0330		PMA	Premarketing authorization
+	0330		PRE	Preamendment
+	0330		TXN	Transitional
+HL7		Facility type		
+	0331		A	Agent for a foreign manufacturer
+	0331		D	Distributor
+	0331		M	Manufacturer
+	0331		U	User
+HL7		Source type		
+	0332		A	Accept
+	0332		I	Initiate
+User		Disabled Person Code		
+	0334		AP	Associated party
+	0334		GT	Guarantor
+	0334		IN	Insured
+	0334		PT	Patient
+User		Repeat pattern		
+	0335		A	Ante (before)
+	0335		BID	twice a day at institution-specified times
+	0335		C	service is provided continuously between start time and stop time
+	0335		D	Cibus Diurnus (lunch)
+	0335		I	Inter
+	0335		M	Cibus Matutinus (breakfast)
+	0335		Meal Related Timings	<timing>C (_cum_)<meal>
+	0335		Once	one time only.
+	0335		P	Post (after)
+	0335		PRN	given as needed
+	0335		PRNxxx	where xxx is some frequency code
+	0335		Q<integer>D	every <integer> days
+	0335		Q<integer>H	every <integer> hours
+	0335		Q<integer>J<day#>	repeats on a particular day of the week,
+	0335		Q<integer>L	every <integer> months (Lunar cycle)
+	0335		Q<integer>M	every <integer> minutes
+	0335		Q<integer>S	every <integer> seconds
+	0335		Q<integer>W	every <integer> weeks
+	0335		QAM	in the morning at institution-specified time
+	0335		QHS	every day before the hour of sleep
+	0335		QID	four times a day at institution-specified times
+	0335		QOD	every other day
+	0335		QPM	in the evening at institution-specified time
+	0335		QSHIFT	during each of three eight-hour shifts at institution-specified times
+	0335		TID	three times a day at institution-specified times
+	0335		U <spec>	for future use, where <spec> is an interval specification as defined by the UNIX cron specification.
+	0335		V	Cibus Vespertinus (dinner)
+	0335		xID	_X_ times per day at institution-specified times, where X is a numeral 5 or greater.
+User		Referral reason		
+	0336		O	Provider Ordered
+	0336		P	Patient Preference
+	0336		S	Second Opinion
+	0336		W	Work Load
+HL7		Certification status		
+	0337		C	Certified
+	0337		E	Eligible
+User		Practitioner ID number type		
+	0338		CY	County number
+	0338		DEA	Drug Enforcement Agency no.
+	0338		GL	General ledger number
+	0338		L&I	Labor and industries number
+	0338		LI	Labor and industries number
+	0338		MCD	Medicaid number
+	0338		MCR	Medicare number
+	0338		QA	QA number
+	0338		SL	State license number
+	0338		TAX	Tax ID number
+	0338		TRL	Training license number
+	0338		UPIN	Unique physician ID no.
+User		Advanced Beneficiary Notice Code		
+	0339		1	Service is subject to medical necessity procedures
+	0339		2	Patient has been informed of responsibility, and agrees to pay for service
+	0339		3	Patient has been informed of responsibility, and asks that the payer be billed
+	0339		4	Advanced Beneficiary Notice has not been signed
+User		Patient_s Relationship to Insured		
+	0344		01	Patient is insured
+	0344		02	Spouse
+	0344		03	Natural child/insured financial responsibility
+	0344		04	Natural child/Insured does not have financial responsibility
+	0344		05	Step child
+	0344		06	Foster child
+	0344		07	Ward of the court
+	0344		08	Employee
+	0344		09	Unknown
+	0344		10	Handicapped dependent
+	0344		11	Organ donor
+	0344		12	Cadaver donor
+	0344		13	Grandchild
+	0344		14	Niece/nephew
+	0344		15	Injured plaintiff
+	0344		16	Sponsored dependent
+	0344		17	Minor dependent of a minor dependent
+	0344		18	Parent
+	0344		19	Grandparent
+User		State/province		
+	0347		AB	Alberta  (US and Canada)
+	0347		MI	Michigan  (US)
+HL7		CWE statuses		
+	0353		NA	Not applicable
+	0353		NASK	Not asked
+	0353		NAV	Not available
+	0353		U	Unknown
+	0353		UASK	Asked but Unknown
+HL7		Message structure		
+	0354		ACK	Varies
+	0354		ADR_A19	A19
+	0354		ADT_A01	A01, A04, A08, A13
+	0354		ADT_A02	A02
+	0354		ADT_A03	A03
+	0354		ADT_A05	A05, A14, A28, A31
+	0354		ADT_A06	A06, A07
+	0354		ADT_A09	A09, A10, A11, A12
+	0354		ADT_A15	A15
+	0354		ADT_A16	A16
+	0354		ADT_A17	A17
+	0354		ADT_A18	A18
+	0354		ADT_A20	A20
+	0354		ADT_A21	A21, A22, A23, A25, A26, A27, A29, A32, A33
+	0354		ADT_A24	A24
+	0354		ADT_A30	A30, A34, A35, A36, A46, A47, A48, A49
+	0354		ADT_A37	A37
+	0354		ADT_A38	A38
+	0354		ADT_A39	A39, A40, A41, A42
+	0354		ADT_A43	A43, A44
+	0354		ADT_A45	A45
+	0354		ADT_A50	A50, A51
+	0354		ADT_A52	A52, A53, A55
+	0354		ADT_A54	A54
+	0354		ADT_A60	A60
+	0354		ADT_A61	A61, A62
+	0354		BAR_P01	P01
+	0354		BAR_P02	P02
+	0354		BAR_P05	P05
+	0354		BAR_P06	P06
+	0354		BAR_P10	P10
+	0354		BAR_P12	P12
+	0354		BPS_O29	O29
+	0354		BRP_030	O30
+	0354		BRT_O32	O32
+	0354		BTS_O31	O31
+	0354		CRM_C01	C01, C02, C03, C04, C05, C06, C07, C08
+	0354		CSU_C09	C09, C10, C11, C12
+	0354		DFT_P03	P03
+	0354		DFT_P11	P11
+	0354		DOC_T12	T12
+	0354		DSR_P04	P04
+	0354		DSR_Q01	Q01
+	0354		DSR_Q03	Q03
+	0354		EAC_U07	U07
+	0354		EAN_U09	U09
+	0354		EAR_U08	U08
+	0354		EDR_R07	R07
+	0354		EQQ_Q04	Q04
+	0354		ERP_R09	R09
+	0354		ESR_U02	U02
+	0354		ESU_U01	U01
+	0354		INR_U06	U06
+	0354		INU_U05	U05
+	0354		LSU_U12	U12, U13
+	0354		MDM_T01	T01, T03, T05, T07, T09, T11
+	0354		MDM_T02	T02, T04, T06, T08, T10
+	0354		MFD_MFA	MFA
+	0354		MFK_M01	M01, M02, M03, M04, M05, M06, M07, M08, M09, M10, M11
+	0354		MFN_M01	M01
+	0354		MFN_M02	M02
+	0354		MFN_M03	M03
+	0354		MFN_M04	M04
+	0354		MFN_M05	M05
+	0354		MFN_M06	M06
+	0354		MFN_M07	M07
+	0354		MFN_M08	M08
+	0354		MFN_M09	M09
+	0354		MFN_M10	M10
+	0354		MFN_M11	M11
+	0354		MFN_M12	M12
+	0354		MFN_M13	M13
+	0354		MFN_M15	M15
+	0354		MFQ_M01	M01, M02, M03, M04, M05, M06
+	0354		MFR_M01	M01, M02, M03, M04, M05, M06
+	0354		NMD_N02	N02
+	0354		NMQ_N01	N01
+	0354		NMR_N01	N01
+	0354		OMB_O27	O27
+	0354		OMD_O03	O03
+	0354		OMG_O19	O19
+	0354		OMI_O23	O23
+	0354		OML_O21	O21
+	0354		OML_O33	O33
+	0354		OML_O35	O35
+	0354		OMN_O07	007
+	0354		OMP_O09	O09
+	0354		OMS_O05	O05
+	0354		ORB_O28	O28
+	0354		ORD_O04	O04
+	0354		ORF_R04	R04
+	0354		ORG_O20	O20
+	0354		ORI_O24	O24
+	0354		ORL_O22	022
+	0354		ORL_O34	O34
+	0354		ORL_O36	O36
+	0354		ORM_O01	O01
+	0354		ORN_O08	O08
+	0354		ORP_O10	O10
+	0354		ORR_O02	O02
+	0354		ORS_O06	O06
+	0354		ORU_R01	R01
+	0354		ORU_R30	R30
+	0354		ORU_R31	R31
+	0354		ORU_R32	R32
+	0354		ORU_W01	W01
+	0354		OSQ_Q06	Q06
+	0354		OSR_Q06	Q06
+	0354		OUL_R21	R21
+	0354		OUL_R22	R22
+	0354		OUL_R23	R23
+	0354		OUL_R24	R24
+	0354		PEX_P07	P07, P08
+	0354		PGL_PC6	PC6, PC7, PC8
+	0354		PMU_B01	B01, B02
+	0354		PMU_B03	B03
+	0354		PMU_B04	B04, B05, B06
+	0354		PMU_B07	B07
+	0354		PMU_B08	B08
+	0354		PPG_PCG	PCC, PCG, PCH, PCJ
+	0354		PPP_PCB	PCB, PCD
+	0354		PPR_PC1	PC1, PC2, PC3
+	0354		PPT_PCL	PCL
+	0354		PPV_PCA	PCA
+	0354		PRR_PC5	PC5
+	0354		PTR_PCF	PCF
+	0354		QBP_Q11	Q11
+	0354		QBP_Q13	Q13
+	0354		QBP_Q15	Q15
+	0354		QBP_Q21	Q21, Q22, Q23,Q24, Q25
+	0354		QCK_Q02	Q02
+	0354		QCN_J01	J01, J02
+	0354		QRF_W02	W02
+	0354		QRY_A19	A19
+	0354		QRY_P04	P04
+	0354		QRY_PC4	PC4, PC9, PCE, PCK
+	0354		QRY_Q01	Q01, Q26, Q27, Q28, Q29, Q30
+	0354		QRY_Q02	Q02
+	0354		QRY_R02	R02
+	0354		QRY_T12	T12
+	0354		QSB_Q16	Q16
+	0354		QVR_Q17	Q17
+	0354		RAR_RAR	RAR
+	0354		RAS_O17	O17
+	0354		RCI_I05	I05
+	0354		RCL_I06	I06
+	0354		RDE_O01	O01
+	0354		RDE_O11	O11, O25
+	0354		RDR_RDR	RDR
+	0354		RDS_O13	O13
+	0354		RDY_K15	K15
+	0354		REF_I12	I12, I13, I14, I15
+	0354		RER_RER	RER
+	0354		RGR_RGR	RGR
+	0354		RGV_O15	O15
+	0354		ROR_ROR	ROR
+	0354		RPA_I08	I08, I09. I10, I11
+	0354		RPI_I01	I01, I04
+	0354		RPL_I02	I02
+	0354		RPR_I03	I03
+	0354		RQA_I08	I08, I09, I10, I11
+	0354		RQC_I05	I05, I06
+	0354		RQI_I01	I01, I02, I03, I07
+	0354		RQP_I04	I04
+	0354		RQQ_Q09	Q09
+	0354		RRA_O02	O02
+	0354		RRA_O18	O18
+	0354		RRD_O14	O14
+	0354		RRE_O12	O12, O26
+	0354		RRG_O16	O16
+	0354		RRI_I12	I12, I13, I14, I15
+	0354		RSP_K11	K11
+	0354		RSP_K21	K21
+	0354		RSP_K22	K22
+	0354		RSP_K23	K23, K24
+	0354		RTB_K13	K13
+	0354		SIU_S12	S12, S13, S14, S15, S16, S17, S18, S19, S20, S21, S22, S23, S24, S26
+	0354		SPQ_Q08	Q08
+	0354		SQM_S25	S25
+	0354		SQR_S25	S25
+	0354		SRM_S01	S01, S02, S03, S04, S05, S06, S07, S08, S09, S10, S11
+	0354		SRR_S01	S01, S02, S03, S04, S05, S06, S07, S08, S09, S10, S11
+	0354		SSR_U04	U04
+	0354		SSU_U03	U03
+	0354		SUR_P09	P09
+	0354		TBR_R08	R08
+	0354		TBR_R09	R09
+	0354		TCU_U10	U10, U11
+	0354		UDM_Q05	Q05
+	0354		VQQ_Q07	Q07
+	0354		VXQ_V01	V01
+	0354		VXR_V03	V03
+	0354		VXU_V04	V04
+	0354		VXX_V02	V02
+HL7		Primary key value type		
+	0355		CE	Coded element
+	0355		PL	Person location
+HL7		Alternate character set handling scheme		
+	0356		<null>	This is the default, indicating that there is no character set switching occurring in this message.
+	0356		2.3	The character set switching mode specified in HL7 2.5, section 2.7.2, _Escape sequences supporting multiple character sets_ and section 2.A.46, "XPN _ extended person name".
+	0356		ISO 2022-1994	This standard is titled "Information Technology - Character Code Structure and Extension Technique". .
+HL7		Message error condition codes		
+	0357		0	Message accepted
+	0357		100	Segment sequence error
+	0357		101	Required field missing
+	0357		102	Data type error
+	0357		103	Table value not found
+	0357		200	Unsupported message type
+	0357		201	Unsupported event code
+	0357		202	Unsupported processing id
+	0357		203	Unsupported version id
+	0357		204	Unknown key identifier
+	0357		205	Duplicate key identifier
+	0357		206	Application record locked
+	0357		207	Application internal error
+HL7		Diagnosis Priority		
+	0359		0	Not included in diagnosis ranking
+	0359		1	The primary diagnosis
+	0359		2 _	For ranked secondary diagnoses
+User		Degree/license/certificate		
+	0360		AA	Associate of Arts
+	0360		AAS	Associate of Applied Science
+	0360		ABA	Associate of Business Administration
+	0360		AE	Associate of Engineering
+	0360		AS	Associate of Science
+	0360		BA	Bachelor of Arts
+	0360		BBA	Bachelor of Business Administration
+	0360		BE	Bachelor or Engineering
+	0360		BFA	Bachelor of Fine Arts
+	0360		BN	Bachelor of Nursing
+	0360		BS	Bachelor of Science
+	0360		BSL	Bachelor of Science _ Law
+	0360		BSN	Bachelor on Science - Nursing
+	0360		BT	Bachelor of Theology
+	0360		CANP	Certified Adult Nurse Practitioner
+	0360		CER	Certificate
+	0360		CMA	Certified Medical Assistant
+	0360		CNM	Certified Nurse Midwife
+	0360		CNP	Certified Nurse Practitioner
+	0360		CNS	Certified Nurse Specialist
+	0360		CPNP	Certified Pediatric Nurse Practitioner
+	0360		CRN	Certified Registered Nurse
+	0360		DBA	Doctor of Business Administration
+	0360		DED	Doctor of Education
+	0360		DIP	Diploma
+	0360		DO	Doctor of Osteopathy
+	0360		EMT	Emergency Medical Technician
+	0360		EMTP	Emergency Medical Technician - Paramedic
+	0360		FPNP	Family Practice Nurse Practitioner
+	0360		HS	High School Graduate
+	0360		JD	Juris Doctor
+	0360		MA	Master of Arts
+	0360		MBA	Master of Business Administration
+	0360		MCE	Master of Civil Engineering
+	0360		MD	Doctor of Medicine
+	0360		MDA	Medical Assistant
+	0360		MDI	Master of Divinity
+	0360		ME	Master of Engineering
+	0360		MED	Master of Education
+	0360		MEE	Master of Electrical Engineering
+	0360		MFA	Master of Fine Arts
+	0360		MME	Master of Mechanical Engineering
+	0360		MS	Master of Science
+	0360		MSL	Master of Science _ Law
+	0360		MSN	Master of Science _ Nursing
+	0360		MT	Master of Theology
+	0360		NG	Non-Graduate
+	0360		NP	Nurse Practitioner
+	0360		PA	Physician Assistant
+	0360		PharmD	Doctor of Pharmacy
+	0360		PHD	Doctor of Philosophy
+	0360		PHE	Doctor of Engineering
+	0360		PHS	Doctor of Science
+	0360		PN	Advanced Practice Nurse
+	0360		RMA	Registered Medical Assistant
+	0360		RPH	Registered Pharmacist
+	0360		SEC	Secretarial Certificate
+	0360		TS	Trade School Graduate
+User		Comment type		
+	0364		1R	Primary Reason
+	0364		2R	Secondary Reason
+	0364		AI	Ancillary Instructions
+	0364		DR	Duplicate/Interaction Reason
+	0364		GI	General Instructions
+	0364		GR	General Reason
+	0364		PI	Patient Instructions
+	0364		RE	Remark
+HL7		Equipment state		
+	0365		CL	Clearing
+	0365		CO	Configuring
+	0365		ES	E-stopped
+	0365		ID	Idle
+	0365		IN	Initializing
+	0365		OP	Normal Operation
+	0365		PA	Pausing
+	0365		PD	Paused
+	0365		PU	Powered Up
+HL7		Local/remote control state		
+	0366		L	Local
+	0366		R	Remote
+HL7		Alert level		
+	0367		C	Critical
+	0367		N	Normal
+	0367		S	Serious
+	0367		W	Warning
+User		Remote control command		
+	0368		AB	Abort
+	0368		CL	Clear
+	0368		CN	Clear Notification
+	0368		DI	Disable Sending Events
+	0368		EN	Enable Sending Events
+	0368		ES	Emergency _stop
+	0368		EX	Execute (command specified in field Parameters (ST) 01394)
+	0368		IN	Initialize/Initiate
+	0368		LC	Local Control Request
+	0368		LK	Lock
+	0368		LO	Load
+	0368		PA	Pause
+	0368		RC	Remote Control Request
+	0368		RE	Resume
+	0368		SA	Sampling
+	0368		SU	Setup
+	0368		TT	Transport To
+	0368		UC	Unlock
+	0368		UN	Unload
+User		Specimen Role		
+	0369		B	Blind Sample
+	0369		C	Calibrator
+	0369		E	Electronic QC, used with manufactured reference providing signals that simulate QC results
+	0369		F	Specimen used for testing proficiency of the organization performing the testing (Filler)
+	0369		G	Group (where a specimen consists of multiple individual elements that are not individually identified)
+	0369		L	Pool (aliquots of individual specimens combined to form a single specimen representing all of the components.)
+	0369		O	Specimen used for testing Operator Proficiency
+	0369		P	Patient (default if blank component value)
+	0369		Q	Control specimen
+	0369		R	Replicate (of patient sample as a control)
+	0369		V	Verifying Calibrator, used for periodic calibration checks
+HL7		Container status		
+	0370		I	Identified
+	0370		L	Left Equipment
+	0370		M	Missing
+	0370		O	In Process
+	0370		P	In Position
+	0370		R	Process Completed
+	0370		U	Unknown
+	0370		X	Container Unavailable
+HL7		Additive/Preservative		
+	0371		ACDA	ACD Solution A
+	0371		ACDB	ACD Solution B
+	0371		ACET	Acetic Acid
+	0371		AMIES	Amies transport medium
+	0371		BACTM	Bacterial Transport medium
+	0371		BF10	Buffered 10% formalin
+	0371		BOR	Borate Boric Acid
+	0371		BOUIN	Bouin's solution
+	0371		BSKM	Buffered skim milk
+	0371		C32	3.2%  Citrate
+	0371		C38	3.8% Citrate
+	0371		CARS	Carson's Modified 10% formalin
+	0371		CARY	Cary Blair Medium
+	0371		CHLTM	Chlamydia transport medium
+	0371		CTAD	CTAD (this should be spelled out if not universally understood)
+	0371		EDTK	Potassium/K EDTA
+	0371		EDTK15	Potassium/K EDTA 15%
+	0371		EDTK75	Potassium/K EDTA 7.5%
+	0371		EDTN	Sodium/Na EDTA
+	0371		ENT	Enteric bacteria transport medium
+	0371		ENT+	Enteric plus
+	0371		F10	10% Formalin
+	0371		FDP	Thrombin NIH; soybean trypsin inhibitor (Fibrin Degradation Products)
+	0371		FL10	Sodium Fluoride, 10mg
+	0371		FL100	Sodium Fluoride, 100mg
+	0371		HCL6	6N HCL
+	0371		HEPA	Ammonium heparin
+	0371		HEPL	Lithium/Li  Heparin
+	0371		HEPN	Sodium/Na  Heparin
+	0371		HNO3	Nitric Acid
+	0371		JKM	Jones Kendrick Medium
+	0371		KARN	Karnovsky's fixative
+	0371		KOX	Potassium Oxalate
+	0371		LIA	Lithium iodoacetate
+	0371		M4	M4
+	0371		M4RT	M4-RT
+	0371		M5	M5
+	0371		MICHTM	Michel's transport medium
+	0371		MMDTM	MMD transport medium
+	0371		NAF	Sodium Fluoride
+	0371		NAPS	Sodium polyanethol sulfonate 0.35% in 0.85% sodium chloride
+	0371		NONE	None
+	0371		PAGE	Pages's Saline
+	0371		PHENOL	Phenol
+	0371		PVA	PVA (polyvinylalcohol)
+	0371		RLM	Reagan Lowe Medium
+	0371		SILICA	Siliceous earth, 12 mg
+	0371		SPS	SPS(this should be spelled out if not universally understood)
+	0371		SST	Serum Separator Tube (Polymer Gel)
+	0371		STUTM	Stuart transport medium
+	0371		THROM	Thrombin
+	0371		THYMOL	Thymol
+	0371		THYO	Thyoglycollate broth
+	0371		TOLU	Toluene
+	0371		URETM	Ureaplasma transport medium
+	0371		VIRTM	Viral Transport medium
+	0371		WEST	Buffered Citrate (Westergren Sedimentation Rate)
+User		Specimen component		
+	0372		BLD	Whole blood, homogeneous
+	0372		BSEP	Whole blood, separated
+	0372		PLAS	Plasma, NOS (not otherwise specified)
+	0372		PPP	Platelet poor plasma
+	0372		PRP	Platelet rich plasma
+	0372		SED	Sediment
+	0372		SER	Serum, NOS (not otherwise specified)
+	0372		SUP	Supernatant
+HL7		Treatment		
+	0373		ACID	Acidification
+	0373		ALK	Alkalization
+	0373		DEFB	Defibrination
+	0373		FILT	Filtration
+	0373		LDLP	LDL Precipitation
+	0373		NEUT	Neutralization
+	0373		RECA	Recalification
+	0373		UFIL	Ultrafiltration
+User		System induced contaminants		
+	0374		CNTM	Present, type of contamination unspecified
+User		Artificial blood		
+	0375		FLUR	Fluorocarbons
+	0375		SFHB	Stromal free hemoglobin preparations
+HL7		Special Handling Code		
+	0376		AMB	Ambient temperature
+	0376		C37	Body temperature
+	0376		CAMB	Critical ambient temperature
+	0376		CATM	Protect from air
+	0376		CFRZ	Critical frozen temperature
+	0376		CREF	Critical refrigerated temperature
+	0376		DFRZ	Deep frozen
+	0376		DRY	Dry
+	0376		FRZ	Frozen temperature
+	0376		MTLF	Metal Free
+	0376		NTR	Liquid nitrogen
+	0376		PRTL	Protect from light
+	0376		PSA	Do not shake
+	0376		PSO	No shock
+	0376		REF	Refrigerated temperature
+	0376		UFRZ	Ultra frozen
+	0376		UPR	Upright
+User		Other environmental factors		
+	0377		A60	Opened container, indoor atmosphere, 60 minutes duration
+	0377		ATM	Opened container, atmosphere and duration unspecified
+HL7		Substance status		
+	0383		CE	Calibration Error
+	0383		CW	Calibration Warning
+	0383		EE	Expired Error
+	0383		EW	Expired Warning
+	0383		NE	Not Available Error
+	0383		NW	Not Available Warning
+	0383		OE	Other Error
+	0383		OK	OK Status
+	0383		OW	Other Warning
+	0383		QE	QC Error
+	0383		QW	QC Warning
+HL7		Substance type		
+	0384		CO	Control
+	0384		DI	Diluent
+	0384		LI	Measurable Liquid Item
+	0384		LW	Liquid Waste
+	0384		MR	Multiple Test Reagent
+	0384		OT	Other
+	0384		PT	Pretreatment
+	0384		PW	Purified Water
+	0384		RC	Reagent Calibrator
+	0384		SC	Countable Solid Item
+	0384		SR	Single Test Reagent
+	0384		SW	Solid Waste
+User		Command response		
+	0387		ER	Command cannot be completed because of error condition
+	0387		OK	Command completed successfully
+	0387		ST	Command cannot be completed because of the status of the requested equipment
+	0387		TI	Command cannot be completed within requested completion time
+	0387		UN	Command cannot be completed for unknown reasons
+HL7		Processing type		
+	0388		E	Evaluation
+	0388		P	Regular Production
+HL7		Analyte repeat status		
+	0389		D	Repeated with dilution
+	0389		F	Reflex test
+	0389		O	Original, first run
+	0389		R	Repeated without dilution
+HL7		Segment group		
+	0391		OBRG	OBR group
+	0391		ORCG	ORC group
+	0391		PIDG	PID group
+	0391		RXAG	RXA group
+	0391		RXDG	RXD group
+	0391		RXEG	RXE group
+	0391		RXOG	RXO group
+User		Match reason		
+	0392		DB	Match on Date of Birth
+	0392		NA	Match on Name (Alpha Match)
+	0392		NP	Match on Name (Phonetic Match)
+	0392		SS	Match on Social Security Number
+User		Match algorithms		
+	0393		LINKSOFT_2.01	Proprietary algorithm for LinkSoft v2.01
+	0393		MATCHWARE_1.2	Proprietary algorithm for MatchWare v1.2
+HL7		Response modality		
+	0394		B	Batch
+	0394		R	Real Time
+	0394		T	Bolus (a series of responses sent at the same time without use of batch formatting)
+HL7		Modify indicator		
+	0395		M	Modified Subscription
+	0395		N	New Subscription
+HL7		Coding system		
+	0396		99zzz or L	Local general code (where z is an alphanumeric character)
+	0396		ACR	American College of Radiology finding codes
+	0396		ANS+	HL7 set of units of measure
+	0396		ART	WHO Adverse Reaction Terms
+	0396		AS4	ASTM E1238/ E1467 Universal
+	0396		AS4E	AS4 Neurophysiology Codes
+	0396		ATC	American Type Culture Collection
+	0396		C4	CPT-4
+	0396		C5	CPT-5
+	0396		CAS	Chemical abstract codes
+	0396		CD2	CDT-2 Codes
+	0396		CDCA	CDC Analyte Codes
+	0396		CDCM	CDC Methods/Instruments Codes
+	0396		CDS	CDC Surveillance
+	0396		CE	CEN ECG diagnostic codes
+	0396		CLP	CLIP
+	0396		CPTM	CPT Modifier Code
+	0396		CST	COSTART
+	0396		CVX	CDC Vaccine Codes
+	0396		DCM	DICOM Controlled Terminology
+	0396		E	EUCLIDES
+	0396		E5	Euclides  quantity codes
+	0396		E6	Euclides Lab method codes
+	0396		E7	Euclides Lab equipment codes
+	0396		ENZC	Enzyme Codes
+	0396		FDDC	First DataBank Drug Codes
+	0396		FDDX	First DataBank Diagnostic Codes
+	0396		FDK	FDA K10
+	0396		HB	HIBCC
+	0396		HCPCS	CMS (formerly HCFA)  Common Procedure Coding System
+	0396		HCPT	Health Care Provider Taxonomy
+	0396		HHC	Home Health Care
+	0396		HI	Health Outcomes
+	0396		HL7nnnn	HL7 Defined Codes where nnnn is the HL7 table number
+	0396		HOT	Japanese Nationwide Medicine Code
+	0396		HPC	CMS (formerly HCFA )Procedure Codes (HCPCS)
+	0396		I10	ICD-10
+	0396		I10P	ICD-10  Procedure Codes
+	0396		I9	ICD9
+	0396		I9C	ICD-9CM
+	0396		IBT	ISBT
+	0396		IBTnnnn	ISBT 128 codes where nnnn  specifies a specific table within ISBT 128.
+	0396		IC2	ICHPPC-2
+	0396		ICD10AM	ICD-10 Australian modification
+	0396		ICD10CA	ICD-10 Canada
+	0396		ICDO	International Classification of Diseases for Oncology
+	0396		ICS	ICCS
+	0396		ICSD	International Classification of Sleep Disorders
+	0396		ISO+	ISO 2955.83 (units of measure) with HL7 extensions
+	0396		ISOnnnn	ISO Defined Codes where nnnn is the ISO table number
+	0396		IUPC	IUPAC/IFCC Component Codes
+	0396		IUPP	IUPAC/IFCC Property Codes
+	0396		JC10	JLAC/JSLM, nationwide laboratory code
+	0396		JC8	Japanese Chemistry
+	0396		JJ1017	Japanese Image Examination Cache
+	0396		LB	Local billing code
+	0396		LN	Logical Observation Identifier Names and Codes (LOINC®)
+	0396		MCD	Medicaid
+	0396		MCR	Medicare
+	0396		MDDX	Medispan Diagnostic Codes
+	0396		MEDC	Medical Economics Drug Codes
+	0396		MEDR	Medical Dictionary for Drug Regulatory Affairs (MEDDRA)
+	0396		MEDX	Medical Economics Diagnostic Codes
+	0396		MGPI	Medispan GPI
+	0396		MVX	CDC Vaccine Manufacturer Codes
+	0396		NDA	NANDA
+	0396		NDC	National drug codes
+	0396		NIC	Nursing Interventions Classification
+	0396		NPI	National Provider Identifier
+	0396		NUBC	National Uniform Billing Committee Code
+	0396		OHA	Omaha System
+	0396		POS	POS Codes
+	0396		RC	Read Classification
+	0396		SDM	SNOMED- DICOM Microglossary
+	0396		SNM	Systemized Nomenclature of Medicine (SNOMED)
+	0396		SNM3	SNOMED International
+	0396		SNT	SNOMED topology codes (anatomic sites)
+	0396		UC	UCDS
+	0396		UMD	MDNS
+	0396		UML	Unified Medical Language
+	0396		UPC	Universal Product Code
+	0396		UPIN	UPIN
+	0396		USPS	United States Postal Service
+	0396		W1	WHO record # drug codes (6 digit)
+	0396		W2	WHO record # drug codes (8 digit)
+	0396		W4	WHO record # code with ASTM extension
+	0396		WC	WHO ATC
+HL7		Sequencing		
+	0397		A	Ascending
+	0397		AN	Ascending, case insensitive
+	0397		D	Descending
+	0397		DN	Descending, case insensitive
+	0397		N	None
+HL7		Continuation style code		
+	0398		F	Fragmentation
+	0398		I	Interactive Continuation
+User		Government reimbursement program		
+	0401		C	Medi-Cal
+	0401		MM	Medicare
+User		School type		
+	0402		D	Dental
+	0402		G	Graduate
+	0402		M	Medical
+	0402		U	Undergraduate
+HL7		Language Ability		
+	0403		1	Read
+	0403		2	Write
+	0403		3	Speak
+	0403		4	Understand
+	0403		5	Sign
+HL7		Language Proficiency		
+	0404		1	Excellent
+	0404		2	Good
+	0404		3	Fair
+	0404		4	Poor
+	0404		5	Some (level unknown)
+	0404		6	None
+User		Organization unit type		
+	0406		1	Hospital
+	0406		2	Physician Clinic
+	0406		3	Long Term Care
+	0406		4	Acute Care
+	0406		5	Other
+	0406		H	Home
+	0406		O	Office
+User		Application change type		
+	0409		M	Migrates to different CPU
+	0409		SD	Shut down
+	0409		SU	Start up
+User		DRG Transfer Type		
+	0415		E	DRG Exempt
+	0415		N	DRG Non Exempt
+User		Procedure DRG Type		
+	0416		1	1st non-Operative
+	0416		2	2nd non-Operative
+	0416		3	Major Operative
+	0416		4	2nd Operative
+	0416		5	3rd Operative
+User		Tissue Type Code		
+	0417		0	No tissue expected
+	0417		1	Insufficient Tissue
+	0417		2	Not abnormal
+	0417		3	Abnormal-not categorized
+	0417		4	Mechanical abnormal
+	0417		5	Growth alteration
+	0417		6	Degeneration & necrosis
+	0417		7	Non-acute inflammation
+	0417		8	Non-malignant neoplasm
+	0417		9	Malignant neoplasm
+	0417		B	Basal cell carcinoma
+	0417		C	Carcinoma-unspecified type
+	0417		G	Additional tissue required
+HL7		Procedure Priority		
+	0418		0	the admitting procedure
+	0418		1	the primary procedure
+	0418		2 _	for ranked secondary procedures
+User		Severity of Illness Code		
+	0421		MI	Mild
+	0421		MO	Moderate
+	0421		SE	Severe
+User		Triage Code		
+	0422		1	Non-acute
+	0422		2	Acute
+	0422		3	Urgent
+	0422		4	Severe
+	0422		5	Dead on Arrival (DOA)
+	0422		99	Other
+User		Case Category Code		
+	0423		D	Doctor_s Office Closed
+User		Gestation Category Code		
+	0424		1	Premature / Pre-term
+	0424		2	Full Term
+	0424		3	Overdue / Post-term
+User		Newborn Code		
+	0425		1	Born in facility
+	0425		2	Transfer in
+	0425		3	Born en route
+	0425		4	Other
+	0425		5	Born at home
+User		Blood Product Code		
+	0426		CRYO	Cryoprecipitated AHF
+	0426		CRYOP	Pooled Cryoprecipitate
+	0426		FFP	Fresh Frozen Plasma
+	0426		FFPTH	Fresh Frozen Plasma - Thawed
+	0426		PC	Packed Cells
+	0426		PCA	Autologous Packed Cells
+	0426		PCNEO	Packed Cells - Neonatal
+	0426		PCW	Washed Packed Cells
+	0426		PLT	Platelet Concentrate
+	0426		PLTNEO	Reduced Volume Platelets
+	0426		PLTP	Pooled Platelets
+	0426		PLTPH	Platelet Pheresis
+	0426		PLTPHLR	Leukoreduced Platelet Pheresis
+	0426		RWB	Reconstituted Whole Blood
+	0426		WBA	Autologous Whole Blood
+User		Risk Management Incident Code		
+	0427		B	Body fluid exposure
+	0427		C	Contaminated Substance
+	0427		D	Diet Errors
+	0427		E	Equipment problem
+	0427		F	Patient fell (not from bed)
+	0427		H	Patient fell from bed
+	0427		I	Infusion error
+	0427		J	Foreign object left during surgery
+	0427		K	Sterile precaution violated
+	0427		O	Other
+	0427		P	Procedure error
+	0427		R	Pharmaceutical error
+	0427		S	Suicide Attempt
+	0427		T	Transfusion error
+User		Incident Type Code		
+	0428		O	Other
+	0428		P	Preventable
+	0428		U	User Error
+User		Production Class Code		
+	0429		BR	Breeding/genetic stock
+	0429		DA	Dairy
+	0429		DR	Draft
+	0429		DU	Dual Purpose
+	0429		LY	Layer, Includes Multiplier flocks
+	0429		MT	Meat
+	0429		NA	Not Applicable
+	0429		OT	Other
+	0429		PL	Pleasure
+	0429		RA	Racing
+	0429		SH	Show
+	0429		U	Unknown
+User		Mode of Arrival Code		
+	0430		A	Ambulance
+	0430		C	Car
+	0430		F	On foot
+	0430		H	Helicopter
+	0430		O	Other
+	0430		P	Public Transport
+	0430		U	Unknown
+User		Recreational Drug Use Code		
+	0431		A	Alcohol
+	0431		C	Tobacco - chewed
+	0431		K	Kava
+	0431		M	Marijuana
+	0431		O	Other
+	0431		T	Tobacco - smoked
+	0431		U	Unknown
+User		Admission Level of Care Code		
+	0432		AC	Acute
+	0432		CH	Chronic
+	0432		CO	Comatose
+	0432		CR	Critical
+	0432		IM	Improved
+	0432		MO	Moribund
+User		Precaution Code		
+	0433		A	Aggressive
+	0433		B	Blind
+	0433		C	Confused
+	0433		D	Deaf
+	0433		I	On IV
+	0433		N	_No-code_ (i.e. Do not resuscitate)
+	0433		O	Other
+	0433		P	Paraplegic
+	0433		U	Unknown
+User		Patient Condition Code		
+	0434		A	Satisfactory
+	0434		C	Critical
+	0434		O	Other
+	0434		P	Poor
+	0434		S	Stable
+	0434		U	Unknown
+User		Advance Directive Code		
+	0435		DNR	Do not resuscitate
+User		Sensitivity to Causative Agent Code		
+	0436		AD	Adverse Reaction (Not otherwise classified)
+	0436		AL	Allergy
+	0436		CT	Contraindication
+	0436		IN	Intolerance
+User		Alert Device Code		
+	0437		B	Bracelet
+	0437		N	Necklace
+	0437		W	Wallet Card
+User		Allergy Clinical Status		
+	0438		C	Confirmed or verified
+	0438		D	Doubt raised
+	0438		E	Erroneous
+	0438		I	Confirmed but inactive
+	0438		P	Pending
+	0438		S	Suspect
+	0438		U	Unconfirmed
+HL7		Data types		
+	0440		AD	Address
+	0440		AUI	Authorization information
+	0440		CCD	Charge code and date
+	0440		CCP	Channel calibration parameters
+	0440		CD	Channel definition
+	0440		CE	Coded element
+	0440		CF	Coded element with formatted values
+	0440		CK	Composite ID with check digit
+	0440		CM	Composite
+	0440		CN	Composite ID number and name
+	0440		CNE	Coded with no exceptions
+	0440		CNS	Composite ID number and name simplified
+	0440		CP	Composite price
+	0440		CQ	Composite quantity with units
+	0440		CSU	Channel sensitivity
+	0440		CWE	Coded with exceptions
+	0440		CX	Extended composite ID with check digit
+	0440		DDI	Daily deductible information
+	0440		DIN	Date and institution name
+	0440		DLD	Discharge to location and date
+	0440		DLN	Driver_s license number
+	0440		DLT	Delta
+	0440		DR	Date/time range
+	0440		DT	Date
+	0440		DTM	Date/time
+	0440		DTN	Day type and number
+	0440		ED	Encapsulated data
+	0440		EI	Entity identifier
+	0440		EIP	Entity identifier pair
+	0440		ELD	Error location and description
+	0440		ERL	Error location
+	0440		FC	Financial class
+	0440		FN	Family name
+	0440		FT	Formatted text
+	0440		GTS	General timing specification
+	0440		HD	Hierarchic designator
+	0440		ICD	Insurance certification definition
+	0440		ID	Coded values for HL7 tables
+	0440		IS	Coded value for user-defined tables
+	0440		JCC	Job code/class
+	0440		LA1	Location with address variation 1
+	0440		LA2	Location with address variation 2
+	0440		MA	Multiplexed array
+	0440		MO	Money
+	0440		MOC	Money and charge code
+	0440		MOP	Money or percentage
+	0440		MSG	Message type
+	0440		NA	Numeric array
+	0440		NDL	Name with location and date
+	0440		NM	Numeric
+	0440		NR	Numeric range
+	0440		OCD	Occurrence code and date
+	0440		OSD	Order sequence definition
+	0440		OSP	Occurrence span code and date
+	0440		PIP	Practitioner institutional privileges
+	0440		PL	Person location
+	0440		PLN	Practitioner license or other ID number
+	0440		PN	Person name
+	0440		PPN	Performing person time stamp
+	0440		PRL	Parent result link
+	0440		PT	Processing type
+	0440		PTA	Policy type and amount
+	0440		QIP	Query input parameter list
+	0440		QSC	Query selection criteria
+	0440		RCD	Row column definition
+	0440		RFR	Reference range
+	0440		RI	Repeat interval
+	0440		RMC	Room coverage
+	0440		RP	Reference pointer
+	0440		RPT	Repeat pattern
+	0440		SAD	Street Address
+	0440		SCV	Scheduling class value pair
+	0440		SI	Sequence ID
+	0440		SN	Structured numeric
+	0440		SPD	Specialty description
+	0440		SPS	Specimen source
+	0440		SRT	Sort order
+	0440		ST	String
+	0440		TM	Time
+	0440		TN	Telephone number
+	0440		TQ	Timing/quantity
+	0440		TS	Time stamp
+	0440		TX	Text data
+	0440		UVC	UB value code and amount
+	0440		VH	Visiting hours
+	0440		VID	Version identifier
+	0440		VR	Value range
+	0440		WVI	Channel Identifier
+	0440		WVS	Waveform source
+	0440		XAD	Extended address
+	0440		XCN	Extended composite ID number and name
+	0440		XON	Extended composite name and ID number for organizations
+	0440		XPN	Extended person name
+	0440		XTN	Extended telecommunications number
+User		Immunization Registry Status		
+	0441		A	Active
+	0441		I	Inactive
+	0441		L	Inactive - Lost to follow-up (cancel contract)
+	0441		M	Inactive - Moved or gone elsewhere (cancel contract)
+	0441		O	Other
+	0441		P	Inactive - Permanently inactive (Do not reactivate or add new entries to the record)
+	0441		U	Unknown
+User		Location Service Code		
+	0442		D	Diagnostic
+	0442		E	Emergency Room Casualty
+	0442		P	Primary Care
+	0442		T	Therapeutic
+User		Provider role		
+	0443		AD	Admitting
+	0443		AT	Attending
+	0443		CP	Consulting Provider
+	0443		FHCP	Family Health Care Professional
+	0443		PP	Primary Care Provider
+	0443		RP	Referring Provider
+	0443		RT	Referred to Provider
+HL7		Name assembly order		
+	0444		F	Prefix Family Middle Given Suffix
+	0444		G	Prefix Given Middle Family Suffix
+User		Identity Reliability Code		
+	0445		AL	Patient/Person Name is an Alias
+	0445		UA	Unknown/Default Address
+	0445		UD	Unknown/Default Date of Birth
+	0445		US	Unknown/Default Social Security Number
+HL7		Event type		
+	0450		LOG	Log Event
+	0450		SER	Service Event
+User		Substance identifier		
+	0451		ALL	Used for query of all inventory items
+HL7		Health care provider type code		
+	0452		SUGGESTION	ANSI ASC X12 Health Care Provider Taxonomy, Level 1 - Type
+HL7		Health care provider classification		
+	0453		SUGGESTION	ANSI ASC X12 Health Care Provider Taxonomy, Level 2 -  Classification
+HL7		Health care provider area of specialization		
+	0454		SUGGESTION	ANSI ASC X12 Health Care Provider Taxonomy, Level 3 - specialization
+User		Type of Bill Code		
+	0455		...	No suggested values
+User		Revenue code		
+	0456		...	No suggested values
+User		Overall Claim Disposition Code		
+	0457		0	No edits present on claim
+	0457		1	Only edits present are for line item denial or rejection
+	0457		2	Multiple-day claim with one or more days denied or rejected
+	0457		3	Claim denied, rejected, suspended or returned to provider with only post payment edits
+	0457		4	Claim denied, rejected, suspended or returned to provider with only pre payment edits
+User		OCE Edit Code		
+	0458		1	Invalid diagnosis code
+	0458		10	Non-covered  service submitted for verification of denial (condition code 21 from header information on claim)
+	0458		11	Non-covered service submitted for FI review (condition code 20 from header information on claim)
+	0458		12	Questionable covered service
+	0458		13	Additional payment for service not provided by Medicare
+	0458		14	Code indicates a site of service not included in OPPS
+	0458		15	Service unit out of range for procedure
+	0458		16	Multiple bilateral procedures without modifier 50 (see Appendix A)
+	0458		17	Multiple bilateral procedures with modifier 50 (see Appendix A)
+	0458		18	Inpatient procedure
+	0458		19	Mutually exclusive procedure that is not allowed even if appropriate modifier present
+	0458		2	Diagnosis and age conflict
+	0458		20	Component of a comprehensive procedure that is not allowed even if appropriate modifier present
+	0458		21	Medical visit on same day as a type "T" or "S" procedure without modifier 25 (see Appendix B)
+	0458		22	Invalid modifier
+	0458		23	Invalid date
+	0458		24	Date out of OCE range
+	0458		25	Invalid age
+	0458		26	Invalid sex
+	0458		27	Only incidental services reported
+	0458		28	Code not recognized by Medicare; alternate code for same service available
+	0458		29	Partial hospitalization service for non-mental health diagnosis
+	0458		3	Diagnosis and sex conflict
+	0458		30	Insufficient services on day of partial hospitalization
+	0458		31	Partial hospitalization on same day as ECT or type "T" procedure
+	0458		32	Partial hospitalization claim spans 3 or less days with in-sufficient services, or ECT or significant procedure on at least one of the days
+	0458		33	Partial hospitalization claim spans more than 3 days with insufficient number of days having mental health services
+	0458		34	Partial hospitalization claim spans more than 3 days with insufficient number of days meeting partial hospitalization criteria
+	0458		35.	Only activity therapy and/or occupational therapy services provided
+	0458		36.	Extensive mental health services provided on day of ECT or significant procedure
+	0458		37	Terminated bilateral procedure or terminated procedure with units greater than one
+	0458		38.	Inconsistency between implanted device and implantation procedure
+	0458		39.	Mutually exclusive procedure that would be allowed if appropriate modifier were present
+	0458		4	Medicare secondary payer alert
+	0458		40.	Component of a comprehensive procedure that would be allowed if appropriate modifier were present
+	0458		41.	Invalid revenue code
+	0458		42.	Multiple medical visits on same day with same revenue code without condition code G0 (see Appendix B)
+	0458		5	E-code as reason for visit
+	0458		6	Invalid procedure code
+	0458		7	Procedure and age conflict
+	0458		8	Procedure and sex conflict
+	0458		9	Nov-covered service
+User		Reimbursement Action Code		
+	0459		0	OCE line item denial or rejection is not ignored
+	0459		1	OCE line item denial or rejection is ignored
+	0459		2	External line item denial. Line item is denied even if no OCE edits
+	0459		3	External line item rejection. Line item is rejected even if no OCE edits
+HL7		Denial or Rejection Code		
+	0460		0	Line item not denied or rejected
+	0460		1	Line item denied or rejected
+	0460		2	Line item is on a multiple-day claim. The line item is not denied or rejected, but occurs on a day that has been denied or rejected.
+HL7		Name/address representation		
+	0465		A	Alphabetic (i.e., Default or some single-byte)
+	0465		I	Ideographic (i.e., Kanji)
+	0465		P	Phonetic (i.e., ASCII, Katakana, Hiragana, etc.)
+HL7		Ambulatory Payment Classification Code		
+	0466		031	Dental procedures
+	0466		163	Excision/biopsy
+	0466		181	Level 1 skin repair.
+HL7		Modifier Edit Code		
+	0467		0	Modifier does NOT exist
+	0467		1	Modifier present, no errors
+	0467		2	Modifier invalid
+	0467		3	Modifier NOT approved for ASC/HOPD use
+	0467		4	Modifier approved for ASC/HOPD use, inappropriate for code
+	0467		U	Modifier edit code unknown
+HL7		Payment Adjustment Code		
+	0468		1	No payment adjustment
+	0468		2	Designated current drug or biological payment adjustment applies to APC (status indicator G)
+	0468		3	Designated new device payment adjustment applies to APC (status indicator H)
+	0468		4	Designated new drug or new biological payment adjustment applies to APC (status indicator J)
+	0468		5	Deductible not applicable (specific list of HCPCS codes)
+User		Packaging Status Code		
+	0469		0	Not packaged
+	0469		1	Packaged service (status indicator N, or no HCPCS code and certain revenue codes)
+	0469		2	Packaged as part of partial hospitalization per diem or daily mental health service per diem
+HL7		Reimbursement Type Code		
+	0470		Crnl	Corneal Tissue APC
+	0470		DME	Durable Medical Equipment
+	0470		EPO	Epotein
+	0470		Lab	Clinical Laboratory APC
+	0470		Mamm	Screening Mammography APC
+	0470		NoPay	This APC is not paid
+	0470		OPPS	Outpatient Prospective Payment System
+	0470		PartH	Partial Hospitalization APC
+	0470		Pckg	Packaged APC
+	0470		Thrpy	Therapy APC
+HL7		TQ conjunction ID		
+	0472		A	Asynchronous
+	0472		C	This is an actuation time
+	0472		S	Synchronous.
+User		Formulary Status		
+	0473		G	This observation/service is on the formulary, and has guidelines
+	0473		N	This observation/service is not on the formulary
+	0473		R	This observation/service is on the formulary, but is restricted
+	0473		Y	This observation/service is on the formulary
+User		Organization Unit Type		
+	0474		D	Department
+	0474		F	Facility
+	0474		S	Subdivision
+	0474		U	Subdepartment
+	0474		V	Division
+User		Charge Type Reason		
+	0475		01	Allergy
+	0475		02	Intolerance
+	0475		03	Treatment Failure
+	0475		04	Patient Request
+	0475		05	No Exception
+User		Controlled Substance Schedule*		
+	0477		I	Schedule I
+	0477		II	Schedule II
+	0477		III	Schedule III
+	0477		IV	Schedule IV
+	0477		V	Schedule V
+	0477		VI	Schedule VI
+HL7		Formulary Status		
+	0478		G	Pharmaceutical substance is in the formulary, but guidelines apply
+	0478		N	Pharmaceutical substance is NOT in the formulary
+	0478		R	Pharmaceutical substance is in the formulary, but restrictions apply
+	0478		Y	Pharmaceutical substance is in the formulary
+HL7		Pharmacy Order Types		
+	0480		M	Medication
+	0480		O	Other solution as medication orders
+	0480		S	IV Large Volume Solutions
+HL7		Order Type		
+	0482		I	Inpatient Order
+	0482		O	Outpatient Order
+HL7		Authorization Mode		
+	0483		EL	Electronic
+	0483		EM	E-mail
+	0483		FX	Fax
+	0483		IP	In Person
+	0483		MA	Mail
+	0483		PA	Paper
+	0483		PH	Phone
+	0483		RE	Reflexive (Automated system)
+	0483		VC	Video-conference
+	0483		VO	Voice
+User		Dispense Type		
+	0484		B	Trial Quantity Balance
+	0484		C	Compassionate Fill
+	0484		N	New/Renew - Full Fill
+	0484		P	New/Renew - Part Fill
+	0484		Q	Refill - Part Fill
+	0484		R	Refill - Full Fill
+	0484		S	Manufacturer Sample
+	0484		T	Trial Quantity
+	0484		Z	Non-Prescription Fill
+User		Extended Priority Codes		
+	0485		A	ASAP
+	0485		C	Callback
+	0485		P	Preop
+	0485		PRN	As needed
+	0485		R	Routine
+	0485		S	Stat
+	0485		T	Timing critical
+	0485		TD<integer>	
+	0485		TH<integer>	
+	0485		TL<integer>	
+	0485		TM<integer>	
+	0485		TS<integer>	
+	0485		TW<integer>	
+HL7		Specimen Collection Method		
+	0488		ANP	Plates, Anaerobic
+	0488		BAP	Plates, Blood Agar
+	0488		BCAE	Blood Culture, Aerobic Bottle
+	0488		BCAN	Blood Culture, Anaerobic Bottle
+	0488		BCPD	Blood Culture, Pediatric Bottle
+	0488		BIO	Biopsy
+	0488		CAP	Capillary Specimen
+	0488		CATH	Catheterized
+	0488		CVP	Line, CVP
+	0488		EPLA	Environmental, Plate
+	0488		ESWA	Environmental, Swab
+	0488		FNA	Aspiration, Fine Needle
+	0488		KOFFP	Plate, Cough
+	0488		LNA	Line, Arterial
+	0488		LNV	Line, Venous
+	0488		MARTL	Martin-Lewis Agar
+	0488		ML11	Mod. Martin-Lewis Agar
+	0488		MLP	Plate, Martin-Lewis
+	0488		NYP	Plate, New York City
+	0488		PACE	Pace, Gen-Probe
+	0488		PIN	Pinworm Prep
+	0488		PNA	Aterial puncture
+	0488		PRIME	Pump Prime
+	0488		PUMP	Pump Specimen
+	0488		QC5	Quality Control For Micro
+	0488		SCLP	Scalp, Fetal Vein
+	0488		SCRAPS	Scrapings
+	0488		SHA	Shaving
+	0488		SWA	Swab
+	0488		SWD	Swab, Dacron tipped
+	0488		TMAN	Transport Media, Anaerobic
+	0488		TMCH	Transport Media, Chalamydia
+	0488		TMM4	Transport Media, M4
+	0488		TMMY	Transport Media, Mycoplasma
+	0488		TMOT	Transport Media,
+	0488		TMP	Plate, Thayer-Martin
+	0488		TMPV	Transport Media, PVA
+	0488		TMSC	Transport Media, Stool Culture
+	0488		TMUP	Transport Media, Ureaplasma
+	0488		TMVI	Transport Media, Viral
+	0488		VENIP	Venipuncture
+	0488		WOOD	Swab, Wooden Shaft
+HL7		Risk Codes		
+	0489		AGG	Aggressive
+	0489		BHZ	Biohazard
+	0489		BIO	Biological
+	0489		COR	Corrosive
+	0489		ESC	Escape Risk
+	0489		EXP	Explosive
+	0489		IFL	MaterialDangerInflammable
+	0489		INF	MaterialDangerInfectious
+	0489		INJ	Injury Hazard
+	0489		POI	Poison
+	0489		RAD	Radioactive
+HL7		Specimen Reject Reason		
+	0490		EX	Expired
+	0490		QS	Quantity not sufficient
+	0490		RA	Missing patient ID number
+	0490		RB	Broken container
+	0490		RC	Clotting
+	0490		RD	Missing collection date
+	0490		RE	Missing patient name
+	0490		RH	Hemolysis
+	0490		RI	Identification problem
+	0490		RM	Labeling
+	0490		RN	Contamination
+	0490		RP	Missing phlebotomist ID
+	0490		RR	Improper storage
+	0490		RS	Name misspelling
+HL7		Specimen Quality		
+	0491		E	Excellent
+	0491		F	Fair
+	0491		G	Good
+	0491		P	Poor
+HL7		Specimen Appropriateness		
+	0492		??	Inappropriate due to _
+	0492		A	Appropriate
+	0492		I	Inappropriate
+	0492		P	Preferred
+User		Specimen Condition		
+	0493		AUT	Autolyzed
+	0493		CLOT	Clotted
+	0493		CON	Contaminated
+	0493		COOL	Cool
+	0493		FROZ	Frozen
+	0493		HEM	Hemolyzed
+	0493		LIVE	Live
+	0493		ROOM	Room temperature
+	0493		SNR	Sample not received
+HL7		Specimen Child Role		
+	0494		A	Aliquot
+	0494		C	Component
+	0494		M	Modified from original specimen
+HL7		Body Site Modifier		
+	0495		 UPP	Upper
+	0495		ANT	Anterior
+	0495		BIL	Bilateral
+	0495		DIS	Distal
+	0495		EXT	External
+	0495		L	Left
+	0495		LAT	Lateral
+	0495		LLQ	Quadrant, Left Lower
+	0495		LOW	Lower
+	0495		LUQ	Quadrant, Left Upper
+	0495		MED	Medial
+	0495		POS	Posterior
+	0495		PRO	Proximal
+	0495		R	Right
+	0495		RLQ	Quadrant, Right Lower
+	0495		RUQ	Quadrant, Right Upper
+User		Consent Type		
+	0496		001	Release of Information/MR / Authorization to Disclosure Protected Health Information
+	0496		002	Medical Procedure (invasive)
+	0496		003	Acknowledge Receipt of Privacy Notice
+	0496		004	Abortion
+	0496		005	Abortion/Laminaria
+	0496		006	Accutane _ Information
+	0496		007	Accutane _ Woman
+	0496		008	Advanced Beneficiary Notice
+	0496		009	AFP (Alpha Fetoprotein) Screening
+	0496		010	Amniocentesis (consent & refusal)
+	0496		011	Anatomical Gift (organ donation)
+	0496		012	Anesthesia - Complications
+	0496		013	Anesthesia - Questionnaire
+	0496		014	Angiogram
+	0496		015	Angioplasty
+	0496		016	Anticancer Drugs
+	0496		017	Antipsychotic Medications
+	0496		018	Arthrogram
+	0496		019	Autopsy
+	0496		020	AZT Therapy
+	0496		021	Biliary Drainage
+	0496		022	Biliary Stone Extraction
+	0496		023	Biopsy
+	0496		024	Bleeding Time Test
+	0496		025	Bronchogram
+	0496		026	Cardiac Catheterization
+	0496		027	Coronary Angiography
+	0496		028	""      "" w/o Surgery Capability
+	0496		029	Cataract Op/Implant of FDA Aprvd Lens
+	0496		030	Cataract Op/Implant of Investigational Lens
+	0496		031	Cataract Surgery
+	0496		032	Cholera Immunization
+	0496		033	Cholesterol Screening
+	0496		034	Circumcision _ Newborn
+	0496		035	Colonoscopy
+	0496		036	Contact Lenses
+	0496		037	CT Scan - Cervical & Lumbar
+	0496		038	CT Scan w/ IV Contrast Media into Vein
+	0496		039	CVS (Chorionic Villus) Sampling
+	0496		040	Cystospy
+	0496		041	Disclosure of Protected Health Information to Family/Friends
+	0496		042	D & C and Conization
+	0496		043	Dacryocystogram
+	0496		044	Diagnostic Isotope
+	0496		045	Drainage of an Abscess
+	0496		046	Drug Screening
+	0496		047	Electronic Monitoring of Labor - Refusal
+	0496		048	Endometrial Biopsy
+	0496		049	Endoscopy/Sclerosis of Esophageal Varices
+	0496		050	ERCP
+	0496		051	Exposure to reportable Communicable Disease
+	0496		052	External Version
+	0496		053	Fluorescein Angioscopy
+	0496		054	Hepatitis B - Consent/Declination
+	0496		055	Herniogram
+	0496		056	HIV Test - Consent Refusal
+	0496		057	HIV Test - Disclosure
+	0496		058	HIV Test - Prenatal
+	0496		059	Home IV Treatment Program
+	0496		060	Home Parenteral Treatment Program
+	0496		061	Hysterectomy
+	0496		062	Hysterosalpingogram
+	0496		063	Injection Slip/ Consent
+	0496		064	Intrauterine Device
+	0496		065	Intrauterine Device/Sterilization
+	0496		066	Intravascular Infusion of Streptokinase/Urokinase
+	0496		067	Intravenous Cholangiogram
+	0496		068	Intravenous Digital Angiography
+	0496		069	Iodine Administration
+	0496		070	ISG
+	0496		071	IVP
+	0496		072	Laser Photocoagulation
+	0496		073	Laser treatment
+	0496		074	Lithium Carbonate
+	0496		075	Liver Biopsy
+	0496		076	Lumbar Puncture
+	0496		077	Lymphangiogram
+	0496		078	MAO Inhibitors
+	0496		079	Med, Psych, and/or Drug/Alcohol
+	0496		080	Medical Treatment - Refusal
+	0496		081	Morning-after Pill
+	0496		082	MRI _ Adult
+	0496		083	MRI _ Pediatric
+	0496		084	Myelogram
+	0496		085	Needle Biopsy
+	0496		086	Needle Biopsy of Lung
+	0496		087	Newborn Treatment and Release
+	0496		088	Norplant Subdermal Birth Control Implant
+	0496		089	Operations, Anesthesia, Transfusions
+	0496		090	Oral Contraceptives
+	0496		091	Organ Donation
+	0496		092	Patient Permits, Consents
+	0496		093	Patient Treatment Permit, Release & Admission
+	0496		094	Penile Injections
+	0496		095	Percutaneous Nephrostomy
+	0496		096	Percutaneous Transhepatic Cholangiogram
+	0496		097	Photographs
+	0496		098	Photographs - Employee
+	0496		099	Photographs - Medical Research
+	0496		100	Photographs - news Media
+	0496		101	Psychiatric Admission - Next of Kin
+	0496		102	Psychiatric Information During Hospital Stay
+	0496		103	Public Release of Information
+	0496		104	Radiologic Procedure
+	0496		105	Refusal of Treatment
+	0496		106	Release of Body
+	0496		107	Release of Limb
+	0496		108	Rh Immune Globulin
+	0496		109	Rights of Medical Research Participants
+	0496		110	Request to Restrict Access/Disclosure to Medical Record/Protected Health Information
+	0496		111	Request for Remain Anonymous
+	0496		112	Seat Belt Exemption
+	0496		113	Sialogram
+	0496		1137	Voiding Cystogram
+	0496		114	Sigmoidoscopy
+	0496		115	Sterilization - Anesthesia & Medical Services
+	0496		116	Sterilization -Federally Funded
+	0496		117	Sterilization _ Female
+	0496		118	Sterilization - Laparoscopy/Pomeroy
+	0496		119	Sterilization - Non-Federally Funded
+	0496		120	Sterilization - Secondary
+	0496		121	Tranquilizers
+	0496		122	Transfer - Acknowledgement
+	0496		123	Transfer _ Authorization
+	0496		124	Transfer Certification - Physician
+	0496		125	Transfer/Discharge Request
+	0496		126	Transfer for Non-Medical Reasons
+	0496		127	Transfer - Interfaculty Neonatal
+	0496		128	Transfer Refusal
+	0496		129	Transfer Refusal of Further Treatment
+	0496		130	Treadmill & EKG
+	0496		131	Treadmill, Thallium-201
+	0496		132	Typhoid
+	0496		133	Use of Investigational Device
+	0496		134	Use of Investigational Drug
+	0496		135	Venogram
+	0496		136	Videotape
+HL7		Consent Mode		
+	0497		T	Telephone
+	0497		V	Verbal
+	0497		W	Written
+HL7		Consent Status		
+	0498		A	Active _ Consent has been granted
+	0498		B	Bypassed (Consent not sought)
+	0498		L	Limited _ Consent has been granted with limitations
+	0498		P	Pending _ Consent has not yet been sought
+	0498		R	Refused _ Consent has been refused
+	0498		X	Rescinded _ Consent was initially granted, but was subsequently revoked or ended.
+User		Consent Bypass Reason		
+	0499		E	Emergency
+	0499		PJ	Professional Judgment
+HL7		Consent Disclosure Level		
+	0500		F	Full Disclosure
+	0500		N	No Disclosure
+	0500		P	Partial Disclosure
+User		Consent Non-Disclosure Reason		
+	0501		E	Emergency
+	0501		PR	Patient Request
+	0501		RX	Rx Private
+User		Non-Subject Consenter Reason		
+	0502		LM	Legally mandated
+	0502		MIN	Subject is a minor
+	0502		NC	Subject is not competent to consent
+HL7		Sequence/Results Flag		
+	0503		C	Cyclical
+	0503		R	Reserved for future use
+	0503		S	Sequential
+HL7		Sequence Condition Code		
+	0504		EE	End related service request(s), end current service request.
+	0504		ES	End related service request(s), start current service request.
+	0504		SE	Start related service request(s), end current service request.
+	0504		SS	Start related service request(s), start current service request.
+HL7		Cyclic Entry/Exit Indicator		
+	0505		#	The last service request in a cyclic group.
+	0505		*	The first service request in a cyclic group
+HL7		Service Request Relationship		
+	0506		C	Compound
+	0506		E	Exclusive
+	0506		N	Nurse prerogative
+	0506		S	Simultaneous
+	0506		T	Tapering
+User		Observation Result Handling		
+	0507		F	Film-with-patient
+	0507		N	Notify provider when ready
+User		Blood Product Processing Requirements		
+	0508		AU	Autologous Unit
+	0508		CM	CMV Negative
+	0508		CS	CMV Safe
+	0508		DI	Directed Unit
+	0508		FR	Fresh unit
+	0508		HB	Hemoglobin S Negative
+	0508		HL	HLA Matched
+	0508		IG	IgA Deficient
+	0508		IR	Irradiated
+	0508		LR	Leukoreduced
+	0508		WA	Washed
+HL7		Blood Product Dispense Status		
+	0510		CR	Released into inventory for general availability
+	0510		DS	Dispensed to patient location
+	0510		PT	Presumed transfused (dispensed and not returned)
+	0510		RA	Returned unused/no longer needed
+	0510		RD	Reserved and ready to dispense
+	0510		RE	Released (no longer allocated for the patient)
+	0510		RI	Received into inventory (for specified patient)
+	0510		RL	Returned unused/keep linked to patient for possible use later
+	0510		RQ	Request to dispense blood product
+	0510		RS	Reserved (ordered and product allocated for the patient)
+	0510		WA	Wasted (product no longer viable)
+HL7		BP Observation Status Codes Interpretation		
+	0511		C	Record coming over is a correction and thus replaces a final status
+	0511		D	Deletes the BPX record
+	0511		F	Final status; Can only be changed with a corrected status
+	0511		O	Order detail description only (no status)
+	0511		P	Preliminary status
+	0511		W	Post original as wrong, e.g., transmitted for wrong patient
+HL7		Blood Product Transfusion/Disposition Status		
+	0513		RA	Returned unused/no longer needed
+	0513		RL	Returned unused/keep linked to patient for possible use later
+	0513		TR	Transfused with adverse reaction
+	0513		TX	Transfused
+	0513		WA	Wasted (product no longer viable)
+User		Transfusion Adverse Reaction		
+	0514		ABOINC	ABO Incompatible Transfusion Reaction
+	0514		ACUTHEHTR	Acute Hemolytic Transfusion Reaction
+	0514		ALLERGIC1	Allergic Reaction _ First
+	0514		ALLERGIC2	Allergic Reaction _ Recurrent
+	0514		ALLERGICR	Allergic Reaction _ Repeating
+	0514		ANAPHYLAC	Anaphylactic Reaction
+	0514		BACTCONTAM	Reaction to Bacterial Contamination
+	0514		DELAYEDHTR	Delayed Hemolytic Transfusion Reaction
+	0514		DELAYEDSTR	Delayed Serological Transfusion Reaction
+	0514		GVHD	Graft vs Host Disease _ Transfusion _ Associated
+	0514		HYPOTENS	Non-hemolytic Hypotensive Reaction
+	0514		NONHTR1	Non-Hemolytic Fever Chill Transfusion Reaction _ First
+	0514		NONHTR2	Non-Hemolytic Fever Chill Transfusion Reaction _ Recurrent
+	0514		NONHTRREC	Non-Hemolytic Fever Chill Transfusion Reaction _ Repeating
+	0514		NONIMMUNE	Non-Immune Hemolysis
+	0514		NONSPEC	Non-Specific, Non-Hemolytic Transfusion Reaction
+	0514		NORXN	No Evidence of Transfusion Reaction
+	0514		PTP	Posttransfusion Purpura
+	0514		VOLOVER	Symptoms most likely due to volume overload
+HL7		Error severity		
+	0516		E	Error
+	0516		I	Information
+	0516		W	Warning
+User		Inform person code		
+	0517		HD	Inform help desk
+	0517		NPAT	Do NOT inform patient
+	0517		PAT	Inform patient
+	0517		USR	Inform User
+User		Override type		
+	0518		EQV	Equivalence Override
+	0518		EXTN	Extension Override
+	0518		INLV	Interval Override
+User		Override reason		
+	0519		_	No suggested values
+HL7		Computation type		
+	0523		%	Indicates a percent change
+	0523		a	Absolute Change
+HL7		Sequence condition		
+	0524		C	Repeating cycle of orders
+	0524		R	Reserved for possible future use
+	0524		S	Sequence conditions
+HL7		Calendar alignment		
+	0527		DM	day of the month
+	0527		DW	day of the week (begins with Monday)
+	0527		DY	day of the year
+	0527		HD	hour of the day
+	0527		MY	month of the year
+	0527		NH	minute of the hour
+	0527		SN	second of the minute
+	0527		WY	week of the year
+HL7		Event related period		
+	0528		AC	before meal (from lat. ante cibus)
+	0528		ACD	before lunch (from lat. ante cibus diurnus)
+	0528		ACM	before breakfast (from lat. ante cibus matutinus)
+	0528		ACV	before dinner (from lat. ante cibus vespertinus)
+	0528		HS	the hour of sleep (e.g., H18-22)
+	0528		IC	between meals (from lat. inter cibus)
+	0528		ICD	between lunch and dinner
+	0528		ICM	between breakfast and lunch
+	0528		ICV	between dinner and the hour of sleep
+	0528		PC	after meal (from lat. post cibus)
+	0528		PCD	after lunch (from lat. post cibus diurnus)
+	0528		PCM	after breakfast (from lat. post cibus matutinus)
+	0528		PCV	after dinner (from lat. post cibus vespertinus)
+HL7		Precision		
+	0529		D	day
+	0529		H	hour
+	0529		L	month
+	0529		M	minute
+	0529		S	second
+	0529		Y	year
+User		Organization, agency, department			
+	0530		AE	American Express
+	0530		DEA	Drug Enforcement Agency
+	0530		DOD	Department of Defense
+	0530		MC	Master Card
+	0530		VA	Veterans Affairs
+	0530		VI	Visa
+HL7		Expanded yes/no indicator		
+	0532		ASKU	asked but unknown	
+	0532		N	No
+	0532		NA	not applicable
+	0532		NASK	not asked
+	0532		NAV	temporarily unavailable
+	0532		NI	No Information
+	0532		NP	not present
+	0532		UNK	unknown
+	0532		Y	Yes
+User		Notify Clergy Code		
+	0534		L	Last Rites only
+	0534		N	No
+	0534		O	Other
+	0534		U	Unknown
+	0534		Y	Yes
+User		Signature Code		
+	0535		C	Signed CMS-1500 claim form on file, e.g. authorization for release of any medical or other information necessary to process this claim and assignment of benefits.
+	0535		M	Signed authorization for assignment of benefits on file.
+	0535		P	Signature generated by provider because the patient was not physically present for services.
+	0535		S	Signed authorization for release of any medical or other information necessary to process this claim on file.
+User		Certificate Status		
+	0536		E	Expired
+	0536		I	Inactive
+	0536		P	Provisional
+	0536		R	Revoked
+	0536		V	Active/Valid
+User		Institution		
+	0537		...	No suggested values defined
+User		Institution Relationship Type		
+	0538		CON	Contractor
+	0538		CST	Consultant
+	0538		EMP	Employee
+	0538		VOL	Volunteer
+User		Inactive Reason Code		
+	0540		L	Leave of Absence
+	0540		R	Retired
+	0540		T	Termination
+User		Jurisdictional Breadth		
+	0547		C	County/Parish
+	0547		N	Country
+	0547		S	State/Province
+User		Signatory_s Relationship to Subject		
+	0548		1	Self
+	0548		2	Parent
+	0548		3	Next of Kin
+	0548		4	Durable Power of Attorney in Healthcare Affairs
+	0548		5	Conservator
+	0548		6	Emergent Practitioner (practitioner judging case as emergency requiring care without a consent)
+	0548		7	Non-Emergent Practitioner (i.e. medical ethics committee)
+HL7		Body Parts		
+	0550		 	External Jugular
+	0550		ACET	Acetabulum
+	0550		ACHIL	Achilles
+	0550		ADB	Abdomen
+	0550		ADE	Adenoids
+	0550		ADR	Adrenal
+	0550		AMN	Amniotic fluid
+	0550		AMS	Amniotic Sac
+	0550		ANAL	Anal
+	0550		ANKL	Ankle
+	0550		ANTEC	Antecubital
+	0550		ANTECF	Antecubital Fossa
+	0550		ANTR	Antrum
+	0550		ANUS	Anus
+	0550		AORTA	Aorta
+	0550		APDX	Appendix
+	0550		AR	Aortic Rim
+	0550		AREO	Areola
+	0550		ARM	Arm
+	0550		ARTE	Artery
+	0550		ASCIT	Ascites
+	0550		ASCT	Ascitic Fluid
+	0550		ATR	Atrium
+	0550		AURI	Auricular
+	0550		AV	Aortic Valve
+	0550		AXI	Axilla
+	0550		BACK	Back
+	0550		BARTD	Bartholin Duct
+	0550		BARTG	Bartholin Gland
+	0550		BCYS	Brain Cyst Fluid
+	0550		BDY	Body, Whole
+	0550		BID	Bile Duct
+	0550		BIFL	Bile fluid
+	0550		BLAD	Bladder
+	0550		BLD	Blood, Whole
+	0550		BLDA	Blood,  Arterial
+	0550		BLDC	Blood,  Capillary
+	0550		BLDV	Blood,  Venous
+	0550		BLOOD	Blood
+	0550		BMAR	Bone marrow
+	0550		BON	Bone
+	0550		BOWEL	Bowel
+	0550		BOWLA	Bowel, Large
+	0550		BOWSM	Bowel, Small
+	0550		BPH	Basophils
+	0550		BRA	Brachial
+	0550		BRAIN	Brain
+	0550		BRO	Bronchial
+	0550		BROCH	Bronchiole/Bronchiolar
+	0550		BRONC	Bronchus/Bronchial
+	0550		BROW	Eyebrow
+	0550		BRST	Breast
+	0550		BRSTFL	Breast fluid
+	0550		BRTGF	Bartholin Gland Fluid
+	0550		BRV	Broviac
+	0550		BUCCA	Buccal
+	0550		BURSA	Bursa
+	0550		BURSF	Bursa Fluid
+	0550		BUTT	Buttocks
+	0550		CALF	Calf
+	0550		CANAL	Canal
+	0550		CANLI	Canaliculis
+	0550		CANTH	Canthus
+	0550		CARO	Carotid
+	0550		CARP	Carpal
+	0550		CAVIT	Cavity
+	0550		CBLD	Blood, Cord
+	0550		CDM	Cardiac Muscle
+	0550		CDUCT	Common Duct
+	0550		CECUM	Cecum/Cecal
+	0550		CERVUT	Cervix/Uterus
+	0550		CHE	Cavity, Chest
+	0550		CHEEK	Cheek
+	0550		CHES	Chest
+	0550		CHEST 	Chest Tube
+	0550		CHIN	Chin
+	0550		CIRCU	Circumcision Site
+	0550		CLAVI	Clavicle/Clavicular
+	0550		CLIT	Clitoris
+	0550		CLITO	Clitoral
+	0550		CNL	Cannula
+	0550		COCCG	Coccygeal
+	0550		COCCY	Coccyx
+	0550		COLON	Colon
+	0550		COLOS	Colostomy
+	0550		CONJ	Conjunctiva
+	0550		COR	Cord
+	0550		CORAL	Coral
+	0550		CORD	Cord Blood
+	0550		CORN	Cornea
+	0550		COS	Colostomy Stoma
+	0550		CRANE	Cranium, ethmoid
+	0550		CRANF	Cranium, frontal
+	0550		CRANO	Cranium, occipital
+	0550		CRANP	Cranium, parietal
+	0550		CRANS	Cranium, sphenoid
+	0550		CRANT	Cranium, temporal
+	0550		CSF	Cerebral Spinal Fluid
+	0550		CUBIT	Cubitus
+	0550		CUFF	Cuff
+	0550		CULD	Cul De Sac
+	0550		CULDO	Culdocentesis
+	0550		CVX	Cervix
+	0550		DELT	Deltoid
+	0550		DEN	Dental Gingiva
+	0550		DENTA	Dental
+	0550		DIAF	Dialysis Fluid
+	0550		DIGIT	Digit
+	0550		DISC	Disc
+	0550		DORS	Dorsum/Dorsal
+	0550		DPH	Diaphragm
+	0550		DUFL	Duodenal Fluid
+	0550		DUODE	Duodenum/Duodenal
+	0550		DUR	Dura
+	0550		EAR	Ear
+	0550		EARBI	Ear bone, incus
+	0550		EARBM	Ear bone, malleus
+	0550		EARBS	Ear bone,stapes
+	0550		EARLO	Ear Lobe
+	0550		EC	Endocervical
+	0550		ELBOW	Elbow
+	0550		ELBOWJ	Elbow Joint
+	0550		ENDC	Endocardium
+	0550		ENDM	Endometrium
+	0550		EOLPH	endolpthamitis
+	0550		EOS	Eosinophils
+	0550		EPD	Epididymis
+	0550		EPICA	Epicardial
+	0550		EPICM	Epicardium
+	0550		EPIDU	Epidural
+	0550		EPIGL	Epiglottis
+	0550		ESO	Esophagus
+	0550		ESOPG	Esophageal
+	0550		ET	Endotracheal
+	0550		ETHMO	Ethmoid
+	0550		EUR	Endourethral
+	0550		EYE	Eye
+	0550		EYELI	Eyelid
+	0550		FACE	Face
+	0550		FALLT	Fallopian Tube
+	0550		FBINC	Facial bone, inferior nasal concha
+	0550		FBLAC	Facial bone, lacrimal
+	0550		FBMAX	Facial bone, maxilla
+	0550		FBNAS	Facial bone, nasal
+	0550		FBPAL	Facial bone, palatine
+	0550		FBVOM	Facial bone, vomer
+	0550		FBZYG	Facial bone, zygomatic
+	0550		FEMOR	Femoral
+	0550		FEMUR	Femur
+	0550		FET	Fetus
+	0550		FIBU	Fibula
+	0550		FING	Finger
+	0550		FINGN	Finger Nail
+	0550		FMH	Femoral Head
+	0550		FOL	Follicle
+	0550		FOOT	Foot
+	0550		FOREA	Forearm
+	0550		FOREH	Forehead
+	0550		FORES	Foreskin
+	0550		FOURC	Fourchette
+	0550		GB	Gall Bladder
+	0550		GEN	Genital
+	0550		GENC	Genital Cervix
+	0550		GENL	Genital Lochia
+	0550		GL	Genital Lesion
+	0550		GLAND	Gland
+	0550		GLANS	Glans
+	0550		GLUT	Gluteus
+	0550		GLUTE	Gluteal
+	0550		GLUTM	Gluteus Medius
+	0550		GROIN	Groin
+	0550		GUM	Gum
+	0550		GVU	Genital - Vulva
+	0550		HAL	Hallux
+	0550		HAND	Hand
+	0550		HAR	Hair
+	0550		HART	Heart
+	0550		HEAD	Head
+	0550		HEEL	Heel
+	0550		HEM	Hemorrhoid
+	0550		HIP	Hip
+	0550		HIPJ	Hip Joint
+	0550		HUMER	Humerus
+	0550		HV	Heart Valve
+	0550		HVB	Heart Valve, Bicuspid
+	0550		HVT	Heart Valve, Tricuspid
+	0550		HYMEN	Hymen
+	0550		ICX	Intracervical
+	0550		ILC	Ileal Conduit
+	0550		ILCON	Ilical Conduit
+	0550		ILCR	Iliac Crest
+	0550		ILE	Ileal Loop
+	0550		ILEOS	Ileostomy
+	0550		ILEUM	Ileum
+	0550		ILIAC	Iliac
+	0550		INASA	Intranasal
+	0550		INGUI	Inguinal
+	0550		INSTL	Intestine, Large
+	0550		INSTS	Intestine, Small
+	0550		INT	Intestine
+	0550		INTRO	Introitus
+	0550		INTRU	Intrauterine
+	0550		ISCHI	Ischium
+	0550		ISH	Loop, Ishial
+	0550		JAW	Jaw
+	0550		JUGI	Jugular, Internal
+	0550		KIDN 	Kidney
+	0550		KNEE	Knee
+	0550		KNEEF	Knee Fluid
+	0550		KNEEJ	Knee Joint
+	0550		LABIA	Labia
+	0550		LABMA	Labia Majora
+	0550		LABMI	Labia Minora
+	0550		LACRI	Lacrimal
+	0550		LAM	Lamella
+	0550		LARYN	Larynx
+	0550		LEG	Leg
+	0550		LENS	Lens
+	0550		LING	Lingual
+	0550		LINGU	Lingula
+	0550		LIP	Lip
+	0550		LIVER	Liver
+	0550		LMN	Lumen
+	0550		LN	Lymph Node
+	0550		LNG	Lymph Node, Groin
+	0550		LOBE	Lobe
+	0550		LOCH	Lochia
+	0550		LUMBA	Lumbar
+	0550		LUNG	Lung
+	0550		LYM	Lymphocytes
+	0550		MAC	Macrophages
+	0550		MALLE	Malleolus
+	0550		MANDI	Mandible/Mandibular
+	0550		MAR	Marrow
+	0550		MAST	Mastoid
+	0550		MAXIL	Maxilla/Maxillary
+	0550		MAXS	Maxillary Sinus
+	0550		MEATU	Meatus
+	0550		MEC	Meconium
+	0550		MEDST	Mediastinum
+	0550		MEDU	Medullary
+	0550		METAC	Metacarpal
+	0550		METAT	Metatarsal
+	0550		MILK	Milk, Breast
+	0550		MITRL	Mitral Valve
+	0550		MOLAR	Molar
+	0550		MONSU	Mons Ureteris
+	0550		MONSV	Mons Veneris(Mons Pubis)
+	0550		MOU	Membrane
+	0550		MOUTH	Mouth
+	0550		MP	Mons Pubis
+	0550		MPB	Meninges
+	0550		MRSA2	Mrsa:
+	0550		MYO	Myocardium
+	0550		NAIL	Nail
+	0550		NAILB	Nail Bed
+	0550		NAILF	Nail, Finger
+	0550		NAILT	Nail, Toe
+	0550		NARES	Nares
+	0550		NASL	Nasal
+	0550		NAVEL	Navel
+	0550		NECK	Neck
+	0550		NERVE	Nerve
+	0550		NIPPL	Nipple
+	0550		NLACR	Nasolacrimal
+	0550		NOS	Nose (Nasal Passage)
+	0550		NOSE	Nose
+	0550		NOSTR	Nostril
+	0550		NP	Nasopharyngeal
+	0550		NSS	Nasal Septum
+	0550		NTRAC	Nasotracheal
+	0550		OCCIP	Occipital
+	0550		OLECR	Olecranon
+	0550		OMEN	Omentum
+	0550		ORBIT	Orbit/Orbital
+	0550		ORO	Oropharynx
+	0550		OSCOX	Os coxa (pelvic girdle)
+	0550		OVARY	Ovary
+	0550		PAFL	Pancreatic Fluid
+	0550		PALAT	Palate
+	0550		PALM	Palm
+	0550		PANAL	Perianal/Perirectal
+	0550		PANCR	Pancreas
+	0550		PARAT	Paratracheal
+	0550		PARIE	Parietal
+	0550		PARON	Paronychia
+	0550		PAROT	Parotid
+	0550		PAS	Parasternal
+	0550		PATEL	Patella
+	0550		PCARD	Pericardium
+	0550		PCLIT	Periclitoral
+	0550		PELV	Pelvis
+	0550		PENIS	Penis
+	0550		PENSH	Penile Shaft
+	0550		PER	Peritoneal
+	0550		PERI	Pericardial Fluid
+	0550		PERIH	Perihepatic
+	0550		PERIN	Perineal Abscess
+	0550		PERIS	Perisplenic
+	0550		PERIT	Peritoneum
+	0550		PERIU	Periurethal
+	0550		PERIV	Perivesicular
+	0550		PERRA	Perirectal
+	0550		PERT	Peritoneal Fluid
+	0550		PHALA	Phalanyx
+	0550		PILO	Pilonidal
+	0550		PINNA	Pinna
+	0550		PLACF	Placenta (Fetal Side)
+	0550		PLACM	Placenta (Maternal Side)
+	0550		PLANT	Plantar
+	0550		PLATH	Palate, Hard
+	0550		PLATS	Palate, Soft
+	0550		PLC	Placenta
+	0550		PLEU	Pleural Fluid
+	0550		PLEUR	Pleura
+	0550		PLR	Pleural Fluid (Thoracentesis Fld)
+	0550		PNEAL	Perineal
+	0550		PNEPH	Perinephric
+	0550		PNM	Perineum
+	0550		POPLI	Popliteal
+	0550		PORBI	Periorbital
+	0550		PREAU	Preauricular
+	0550		PRERE	Prerenal
+	0550		PROS	Prostatic Fluid
+	0550		PRST	Prostate Gland
+	0550		PTONS	Peritonsillar
+	0550		PUBIC	Pubic
+	0550		PUL	Pulmonary Artery
+	0550		RADI	Radial
+	0550		RADIUS	Radius
+	0550		RBC	Red Blood Cells
+	0550		RECTL	Rectal
+	0550		RECTU	Rectum
+	0550		RENL	Renal
+	0550		RIB	Rib
+	0550		RNP	Renal Pelvis
+	0550		RPERI	Retroperitoneal
+	0550		SAC	Uterine Cul/De/Sac
+	0550		SACIL	Sacroiliac
+	0550		SACRA	Sacral
+	0550		SACRO	Sacrococcygeal
+	0550		SACRU	Sacrum
+	0550		SALGL	Salivary Gland
+	0550		SCALP	Scalp
+	0550		SCAPU	Scapula/Scapular
+	0550		SCLAV	Supraclavicle/Supraclavicular
+	0550		SCLER	Sclera
+	0550		SCLV	Sub Clavian
+	0550		SCROT	Scrotum/Scrotal
+	0550		SDP	Subdiaphramatic
+	0550		SEM	Seminal Fluid
+	0550		SEMN	Semen
+	0550		SEPTU	Septum/Septal
+	0550		SEROM	Seroma
+	0550		SGF	Subgaleal Fluid
+	0550		SHIN	Shin
+	0550		SHOL	Shoulder
+	0550		SHOLJ	Sholder Joint
+	0550		SIGMO	Sigmoid
+	0550		SINUS	Sinus
+	0550		SKENE	Skene's Gland
+	0550		SKM	Skeletal Muscle
+	0550		SKULL	Skull
+	0550		SOLE	Sole
+	0550		SPCOR	Spinal Cord
+	0550		SPHEN	Sphenoid
+	0550		SPLN	Spleen
+	0550		SPRM	Spermatozoa
+	0550		SPX	Supra Cervical
+	0550		STER	Sternum/Sternal
+	0550		STOM	Stoma
+	0550		STOMA	Stomach
+	0550		STOOLL	Liquid Stool
+	0550		STUMP	Stump
+	0550		SUB	Subdural
+	0550		SUBD	Subdural Fluid
+	0550		SUBM	Submandibular
+	0550		SUBME	Submental
+	0550		SUBPH	Subphrenic
+	0550		SUBX	Submaxillary
+	0550		SUPB	Suprapubic Specimen
+	0550		SUPRA	Suprapubic
+	0550		SWT	Sweat
+	0550		SWTG	Sweat Gland
+	0550		SYN	Synovial Fluid
+	0550		SYNOL	Synovial
+	0550		SYNOV	Synovium
+	0550		TARS	Tarsal
+	0550		TBRON	Transbronchial
+	0550		TCN	Transcarina Asp
+	0550		TDUCT	Tear Duct
+	0550		TEAR	Tears
+	0550		TEMPL	Temple
+	0550		TEMPO	Temporal
+	0550		TESTI	Testicle(Testis)
+	0550		THIGH	Thigh
+	0550		THM	Thymus
+	0550		THORA	Thoracentesis
+	0550		THRB	Throat
+	0550		THUMB	Thumb
+	0550		THYRD	Thyroid
+	0550		TIBIA	Tibia
+	0550		TML	Temporal Lobe
+	0550		TNL	Thumbnail
+	0550		TOE	Toe
+	0550		TOEN	Toe Nail
+	0550		TONG	Tongue
+	0550		TONS	Tonsil
+	0550		TOOTH	Tooth
+	0550		TRCHE	Trachea/Tracheal
+	0550		TSK	Tooth Socket
+	0550		ULNA	Ulna/Ulnar
+	0550		UMB	Umbilical Blood
+	0550		UMBL	Umbilicus
+	0550		URET	Ureter
+	0550		URTH	Urethra
+	0550		USTOM	Stoma, Urinary
+	0550		UTER	Uterus
+	0550		UTERI	Uterine
+	0550		VAGIN	Vagina/Vaginal
+	0550		VAL	Valve
+	0550		VAS	Vas Deferens
+	0550		VASTL	Vastus Lateralis
+	0550		VAULT	Vault
+	0550		VCSF	Ventricular CSF
+	0550		VCUFF	Vaginal Cuff
+	0550		VEIN	Vein
+	0550		VENTG	Ventragluteal
+	0550		VERMI	Vermis Cerebelli
+	0550		VERTC	Vertebra, cervical
+	0550		VERTL	Vertebra, lumbar
+	0550		VERTT	Vertebra, thoracic
+	0550		VESCL	Vesicular
+	0550		VESFLD	Vesicular Fluid
+	0550		VESI	Vesicle
+	0550		VESTI	Vestibule(Genital)
+	0550		VGV	Vaginal Vault
+	0550		VITR	Vitreous Fluid
+	0550		VOC	Vocal Cord
+	0550		VULVA	Vulva
+	0550		WBC	Leukocytes
+	0550		WRIST	Wrist
