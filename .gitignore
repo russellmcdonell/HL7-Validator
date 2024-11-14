@@ -11,6 +11,10 @@ reports/
 #HL7 Schemas and logs
 schema/v2.4/xsd/*
 schema/v2.4/*.csv
+schema/v2.5/xsd/*
+schema/v2.5/*.csv
+*.hl7
+*.rpt
 *.log
 
 # Unit test / coverage reports
