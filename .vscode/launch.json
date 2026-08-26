@@ -43,6 +43,75 @@
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
             "args": ["-I", "input", "-O", "output", "-i", "example04.hl7", "-R", "reports", "-L", "logs", "-l", "example04.log", "-S", "schema/v2.4", "-v", "2" ]
+        },
+        {
+            "name": "Parse Appendix A",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "parseAppendixA.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "schema/v2.5", "-O", "schema/v2.5", "-i", "AppendixA.docx", "-o", "Appendix A.xlsx", "-L", "logs", "-l", "parseAppendixA.log", "-v", "4" ]
+        },
+        {
+            "name": "Parse Chapter 2A",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "parseCH02A.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "schema/v2.5", "-O", "schema/v2.5", "-i", "CH02A.docx", "-o", "data types.xlsx", "-L", "logs", "-l", "parseCH02A.log", "-v", "4" ]
+        },
+        {
+            "name": "Make Train Diagram",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "xsd2train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-m", "REF_I12", "-S", "schema/ADRM", "-O", "schema/ADRM", "-o", "REF_I12.png", "-L", "logs", "-l", "xsd2train.log", "-v", "2" ]
+        },
+        {
+            "name": "Make Abstract Message Structure",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "xsd2ams.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-m", "REF_I12", "-S", "schema/ADRM", "-O", "schema/ADRM", "-o", "REF_I12.xlsx", "-L", "logs", "-l", "xsd2ams.log", "-v", "2" ]
+        },
+        {
+            "name": "Get NATA data",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "getNATAdata.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/."
+        },
+        {
+            "name": "hl7Validator ADRM Example02",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "example02.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example02.log", "-v", "4" ]
+        },
+        {
+            "name": "hl7Validator ADRM Example04",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "example04.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example04.log", "-v", "4" ]
         }
     ]
 }

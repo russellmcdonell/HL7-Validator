@@ -1,0 +1,159 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+<!--
+    v2.xml Message Definitions Version v2.4  - REF_I12
+    HL7® Version 2.4, © Health Level Seven, Inc.  All rights reserved.  HL7 and Health Level Seven are registered trademarks of Health Level Seven, Inc.
+-->
+<xsd:schema
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:hl7-org:v2xml"
+    xmlns:hl7="urn:com.sun:encoder-hl7-1.0"
+    targetNamespace="urn:hl7-org:v2xml" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0">
+
+    <!-- include segment definitions for version v2.4 -->
+    <xsd:include schemaLocation="segments.xsd"/>
+
+    <xsd:annotation>
+	<xsd:appinfo source="urn:com.sun:encoder">
+	    <encoding xmlns="urn:com.sun:encoder" name="HL7 v2 Encoding" namespace="urn:com.sun:encoder-hl7-1.0" style="hl7encoder-1.0"/>
+	</xsd:appinfo>
+    </xsd:annotation>
+
+    <!--
+	MESSAGE REF_I12
+    -->
+    <!-- .. groups used in message REF_I12 -->
+    <xsd:complexType name="REF_I12.PROVIDER_CONTACT.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="PRD" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.PROVIDER_CONTACT" type="REF_I12.PROVIDER_CONTACT.CONTENT"/>
+    <xsd:complexType name="REF_I12.INSURANCE.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="IN1" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.INSURANCE" type="REF_I12.INSURANCE.CONTENT"/>
+    <xsd:complexType name="REF_I12.RESULTS.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="OBX" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.RESULTS" type="REF_I12.RESULTS.CONTENT"/>
+    <xsd:complexType name="REF_I12.OBSERVATION.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="OBR" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.RESULTS" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.OBSERVATION" type="REF_I12.OBSERVATION.CONTENT"/>
+    <xsd:complexType name="REF_I12.PATIENT_VISIT.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="PV1" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="PV2" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.PATIENT_VISIT" type="REF_I12.PATIENT_VISIT.CONTENT"/>
+    <xsd:complexType name="REF_I12.ORDER_DETAIL.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="RXO" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="RXR" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="RXC" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.RESULTS" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.ORDER_DETAIL" type="REF_I12.ORDER_DETAIL.CONTENT"/>
+    <xsd:complexType name="REF_I12.ENCODING.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="RXE" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="RXR" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="RXC" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.RESULTS" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.ENCODING" type="REF_I12.ENCODING.CONTENT"/>
+    <xsd:complexType name="REF_I12.DISPENSE.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="RXD" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="RXR" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="RXC" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.DISPENSE" type="REF_I12.DISPENSE.CONTENT"/>
+    <xsd:complexType name="REF_I12.ADMINISTRATION.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="RXA" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="RXR" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.ADMINISTRATION" type="REF_I12.ADMINISTRATION.CONTENT"/>
+    <xsd:complexType name="REF_I12.ORDER.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="ORC" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.ORDER_DETAIL" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.ENCODING" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.DISPENSE" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.ADMINISTRATION" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.ORDER" type="REF_I12.ORDER.CONTENT"/>
+    <xsd:complexType name="REF_I12.ROLE.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="ROL" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="VAR" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.ROLE" type="REF_I12.ROLE.CONTENT"/>
+    <xsd:complexType name="REF_I12.PROBLEM.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="PRB" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="VAR" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.ROLE" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.PROBLEM" type="REF_I12.PROBLEM.CONTENT"/>
+    <xsd:complexType name="REF_I12.GOAL.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="GOL" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="VAR" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.ROLE" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.GOAL" type="REF_I12.GOAL.CONTENT"/>
+    <xsd:complexType name="REF_I12.PATHWAY.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="PTH" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="VAR" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.ROLE" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12.PATHWAY" type="REF_I12.PATHWAY.CONTENT"/>
+   <!-- .. message definition REF_I12 -->
+    <xsd:complexType name="REF_I12.CONTENT">
+        <xsd:sequence>
+            <xsd:element ref="MSH" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="RF1" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.PROVIDER_CONTACT" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element ref="PID" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="PD1" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="NK1" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.INSURANCE" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="DG1" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="AL1" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="IAM" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.OBSERVATION" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.PATIENT_VISIT" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="REF_I12.ORDER" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.PROBLEM" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.GOAL" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="REF_I12.PATHWAY" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="REF_I12" type="REF_I12.CONTENT">
+        <xsd:annotation>
+            <xsd:appinfo source="urn:com.sun:encoder">
+                <top xmlns="urn:com.sun:encoder">true</top>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+</xsd:schema>

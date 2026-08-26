@@ -10,9 +10,9 @@ reports/
 
 #HL7 Schemas and logs
 schema/v2.4/xsd/*
-schema/v2.4/*.csv
+schema/v2.4/*.xlsx
 schema/v2.5/xsd/*
-schema/v2.5/*.csv
+schema/v2.5/*.xlsx
 *.hl7
 *.rpt
 *.log
