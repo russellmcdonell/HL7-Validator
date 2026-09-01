@@ -112,6 +112,36 @@
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
             "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "example04.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example04.log", "-v", "4" ]
+        },
+        {
+            "name": "hl7Validator ADRM Prostate Cancer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "ADRM Prostate Cancer.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM Prostate Cancer.log", "-v", "4" ]
+        },
+        {
+            "name": "hl7Validator ADRM Colorectal Cancer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "ADRM Colorectal Cancer.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM Colorectal Cancer.log", "-v", "4" ]
+        },
+        {
+            "name": "Test a Business Rule",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "testBusinessRules.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-S", "schema/ADRM", "-R", "Business Rules DMN.xlsx", "-L", "logs/ADRM", "-l", "testBusinessRules.log", "-v", "4" ]
         }
     ]
 }

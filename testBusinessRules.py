@@ -96,34 +96,35 @@ if __name__ == '__main__':
             logger.critical(error, extra={'raw_message': True})
         logging.shutdown()
         sys.exit(EX_CONFIG)
-    else:
-        logger.info('test_Business Rules DMN.xlsx loaded')
-        glossary = dmnRules.getGlossary()
-        logger.debug(f'Glossary after load():', extra={'raw_message': True})
-        w = [0, 0, 0]
-        for businessConcept in glossary:
-            if len(businessConcept) > w[0]:
-                w[0] = len(businessConcept)
-            for variable in glossary[businessConcept]:
-                if len(variable) > w[1]:
-                    w[1] = len(variable)
-                name, value, descriptions = glossary[businessConcept][variable]
-                if len(name) > w[2]:
-                    w[2] = len(name)
-        for businessConcept in glossary:
-            for variable in glossary[businessConcept]:
-                name, value, descriptions = glossary[businessConcept][variable]
-                for i, description in enumerate(descriptions):
-                    if description is None:
-                        descriptions[i] = ""
-                logger.debug(f'Variable:{variable:{w[1]+5}}Business Concept:{businessConcept:{w[0]+5}}Name:{name:{w[2]+5}}Description(s):{",".join(descriptions)}', extra={'raw_message': True})
+    logger.info(f'{os.path.join(schemaDir, rulesFile)} loaded')
+    glossary = dmnRules.getGlossary()
+    logger.debug(f'Glossary after load():', extra={'raw_message': True})
+    w = [0, 0, 0]
+    for businessConcept in glossary:
+        if len(businessConcept) > w[0]:
+            w[0] = len(businessConcept)
+        for variable in glossary[businessConcept]:
+            if len(variable) > w[1]:
+                w[1] = len(variable)
+            name, value, descriptions = glossary[businessConcept][variable]
+            if len(name) > w[2]:
+                w[2] = len(name)
+    for businessConcept in glossary:
+        for variable in glossary[businessConcept]:
+            name, value, descriptions = glossary[businessConcept][variable]
+            for i, description in enumerate(descriptions):
+                if description is None:
+                    descriptions[i] = ""
+            logger.debug(f'Variable:{variable:{w[1]+5}}Business Concept:{businessConcept:{w[0]+5}}Name:{name:{w[2]+5}}Description(s):{",".join(descriptions)}', extra={'raw_message': True})
     logger.debug('', extra={'raw_message': True})
 
     data = {}
-    data['Rule'] = 'PRD-7 Prescriber'
-    data['PRD-7.1'] = '4998022'
-    data['PRD-7.2'] = 'AUSHIC'
-    data['PRD-7.3'] = 'PRES'
+    data['Rule'] = 'HL7au:00044.7.1'
+    data['XCN.1'] = '419786CW'
+    data['XCN.2.1'] = "CRUICE"
+    data['XCN.3'] = "ANTHONY"
+    data['XCN.9'] = 'AUSHICPR'
+    data['XCN.13'] = 'UPIN'
     logger.info('Testing: %s\n',repr(data))
     (status, newData) = dmnRules.decide(data)
     logger.info('Decisions', extra={'raw_message':True})
@@ -174,7 +175,7 @@ if __name__ == '__main__':
         for i, error in enumerate(status['errors']):
             logger.critical(error, extra={'raw_message':True})
     else:
-        logger.info('Tested successfully - no errors')
+        logger.info('Tested')
         if "Result" in result:
             if "Passed" not in result["Result"]:
                 logger.critical(f'Rule:{data["Rule"]} failed to set "Passed"')

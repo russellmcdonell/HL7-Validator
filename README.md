@@ -110,7 +110,7 @@ created using DMN (Decision Model Notation).
 
 "**Busienss Rules DMN.xlsx**" must be a valid Decision Model Notation workbook, compatible with the **pyDMNrules** Python module - an implementation of the Object Managment Group's (OMG) Decision Model Notation (DMN) specification. DMN require the business rules to be written in DMN's FEEL (Friendly Enough Expression Language) language.
 
-Each Business Rule, defined in "**Business Rules.xlsx**" must match a decision table defined in "**Business Rules DMN.xlsx**".
+Every Business Rule must have a name. If the Business Rule name starts with the character "#", then that rule will be considered disabled and will not be run; you don't have to delete a rule that you do not want to run, you can just comment it out in **Business Rules.xlsx". For **Datatype Business Rules**, **Field Business Rules**, **Segment Business Rules** and **XPath Business Rules** [see below], that rule name is the linkage between rule parameters in **Business Rules.xlsx** and the matching decision table defined in **Business Rules DMN.xlsx**. The Decision Table on the Decision Worksheet in **Business Rules DMN.xlsx** is that linkage.
 
 **HL7Validator** will use the "**Business Rules DMN.xslx**" workbook
 to create a **Rules Engine**; something that data can be passed through in order to check if it complies with the defined **Busines Rules**.
@@ -158,6 +158,28 @@ and a **Rules Engine** rule called 'Check Address' for checking the XAD datatype
     data["XAD.4"] = "QLD"
     data["XAD.5"] = "4151"
     (status, newData) = dmnRules.decide(data)
+
+NOTE: Datatypes with definitions in the HL7 Standard are already tested for structural validity as per the table below.
+
+| Datatype | Structural Test | Regex expression |
+| --- | --- | --- |
+| CF/TX | Check for invalid escape sequences | \\\\(?![HNSTRE]\\\\\|X[0-9A-Fa-f]+\\\\\|Z[^\\\\]*\\\\\|C[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{6}\\\\) |
+| DT | Valid Date and parse with dateutil.parser | ^[12]\d{3}((0[1-9]\|1[0-2])(0[1-9]\|[12]\d\|3[01])?)?\$ |
+| ED | Validly encoded ED data | |
+| FT | Check for invalid escape sequences | \\\\(?![HNSTRE]\\\\\|X[0-9A-Fa-f]+\\\\\|Z[^\\\\]*\\\\\|C[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{6}\\\\\|\\.sp([\d]+)?\\\\\|\\.(br\|ce\|fi\|nf)\\\\\|\\.\(in\|ti)[-+]?[\\d]+\\\\\|\\.sk\\d+\\\\) |
+| | Also check for indents after a printable character | (?<!(^\|\\\.br\\\|\\\.sp([\\d]+)?\\\\)(\\\.(br\|ce\|fi\|nf)\\\\\|\\\.\(in\|ti)[-+]?[\\d]+\\\\)*)\\\.\(in\|ti)[-+]?[\\d]+\\\\ |
+| NM | Check for correctly formatted numeric | ^[-+]?\\d+(\\.\\d*)?\$ |
+| RI | Check for legally formatted time interval | ^\([01]\\d\|2[0-4])[0-5]\\d(,\([01]\\d\|2[0-4])[0-5]\\d)*\$ |
+| SI | Check for correctly formatted Sequence Identifier | ^\\d{1,4}\$ |
+| SN | Check for valid comparitor | |
+| | Check for correctly formatted separator/suffix | |
+| ST | Check for invalid escape sequences | \\\\(?![STRE]\\\\\|C[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{6}\\\\) |
+| TM | Valid Time | ^([01]\\d\|2[0-4])([0-5]\\d([0-5]\\d(\\.\\d{1,4})?)?)?([-+]\(0\\d\|1[0-3])[0-5]\\d)?\$ |
+| TN/XTN | Correctly formatted telephone number* | ^(\\\d\\d)?((\\d{3}))?\\d{3}-\\d{4}(X\\d{4})?(B\\d{4})?(C.*)?\$ |
+| TS | Valid Date and Time, plus parse with dateutil.parser | ^[12]\\d{3}((0[1-9]\|1[0-2])((0[1-9]\|[12]\\d\|3[01])(([01]\\d\|2[0-4])([0-5]\\d([0-5]\\d(\\.\\d{1,4})?)?)?)?)?)?([-+]\(0\\d\|1[0-3])[0-5]\\d)?\$ |
+| | Also checks any precision | ^[YLDMHS]$ |
+
+* This is the format defined in the HL7 Standard. It is possible that it is not correct for your region. **HL7 Validator** has a command line option [-T telephonePatter|--telephonePattern=telephonePattern] which lets you specify an alternate regular expression for the pattern of you local phone numbers.
 
 ### Field Business Rules
 
@@ -330,7 +352,7 @@ NOTE: the data fetched from each **xpath** field/component/subcomponent is passe
 For each **rule path**/**field path** test the data for the **field path** will be the data from a single instance of that field. It will be passed to the **Rules Engine** using the same naming and construction convention outlined in **Field Business Rules** above. For the subsequent **xpath**s the name is changed and the data is passed as DMN Lists. DMN has functions for testing lists ("list contains()" and "index of()") and it is possible to construct DMN Decision Tables that iterate over a List. However, this complexity may not reflect the underlying test you are trying to perform. There may be a relationship between each **field node** and the matching **xpath node**s. You may wish to test the first **field node** with the first node in each **xpath** list and the second **field node** with the second node in each **xpath** list. You can enforce this by setting **linked** to "y".
 
 When **linked** is set to "y" all **xpath** field/component/subcomponent data is passed a single values, not in a DMN List. This can simplify the writing of the matching DMN rule (or Decision Tables), but possibly at the expense of not testing all the data.
-An additional parameter (**Repeat Number**) will be passed to the **Rules Engine**, identifying the repetition being tested. This can be used for diagnostic messages returned from the **Rules Engine**.
+An additional parameter (**Repeat Number**) will be passed to the **Rules Engine**, identifying the repetition being tested. This can be used in diagnostic messages returned from the **Rules Engine**.
 
 Setting **linked** to "y" makes sense when all the **xpath** expressions lead to fields that don't repeat, or where you only want to test the first repetition. For instance, you may want to test that all numeric data has the correct units for each test code. Your **XPath Business Rule** may look like
 
@@ -346,6 +368,93 @@ And the data passed to the **Rules Engine** could look like
     data["aOBX-3.3"] = "LN"
     data["bOBX-6"] = "mmol/L"
     (status, newData) = dmnRules.decide(data)
+
+### Parser Business Rules
+
+Sometime the data in a field/component/subcomponent must match some grammer or lexical structure.
+For instance, if you use UCUM for units of measurement, then UCUM code is actually a UCUM expression, which has to comply with the UCUM grammer for units of measurement. Similarly, the data on OBX-5 may be a Base64 encoded HTML document. Once decoded, that document must be valid HTML, or perhaps XHTML. And the conformance profile may ban certain HTML tags.
+
+**Parser Business Rules** are different to all the other Business Rules. **Parser Business Rules** are part of the code. If you need another parser then you have to edit the code. Simiarly, the tests that are valid for each parser are part of the code. If you want an additional test for an existing parser then you have to edit the code.
+
+**Parser Business Rules** are run after all the **XPath Business Rules** have been run.
+The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "parser rules" with the headings "rule", "parser", "test(s)", "idBase64" and "xpath".
+These are not **DMN** rules, so the column "rule" has no functional value, but can be used to document the conformance profile point being tested.
+The "parser" must be one of the defined parser from the table below. "test(s)" is a comma separated list of parser test to perform on the data.
+"idBase64" must be "Y" if the data should be Base64 encoded. **HL7 Validator** will attempt to decode the data from Base64 encoding, if "isBase64" is "Y", before passing the data to the specified parser.
+
+Each test must be a valid test for the specified parser taken from the table below. If the first character of a test is "#" then that test will be deemed to have been temporarily disabled and won't be run.
+
+"xpath" must be an absolute XPath from the root of the HL7 v2.xml message which may return multiple instances of data, each of which will be tested.
+The "xpath" expression is will probably be complex, with conditions to constrain the selection to data that is relevant for the specified parser test(s)
+
+| rule | parser | test(s) | isBase64 | xpath |
+| --- | --- | --- | --- |
+| Check UCUM | UCUM | isValid | | //OBX.6/CE.1[../CE.3[text() = "UCUM"]] |
+
+#### The UCUM Parser
+
+The UCUM parser uses the Python 'ucumvert' module to test if the data is a valid UCUM expression.
+Is is usually used to test the Units of Measurement in OBX-6.
+It is a simple validity tester and does not test that the UCUM expression is the correct expression for the test code in OBX-3.
+For that, you would need fixed relationship between the test code and the unit of measurement string and a **Segment Business Rule** [see above].
+
+#### The FT Parser
+
+**HL7 Validator** validates FT data according to the rules in Chapter 2 of the HL7 Standard if the datatype is "FT".
+However, it does pass if all the escape sequences are validly constructed. Your conformance profile may exclude some escape sequences
+such as hexidecimal data or locally defined escape sequences. The FT parser is not so much a parser as a set of validation tests on the FT data itself.
+
+#### The XHTML Parser
+
+**HL7 Validator** uses the Python 'lxml' module to build the HL7 v2.xml message and to do any **XHTML Parser** testing.
+XML parsing can be either 'strict' or somewhat relaxed, with the parser fixing easily identified minor errors.
+The **XHTML Parser** can do either. One of the **XHTML Parer** tests is **XHTMLstrict**. If this test is in the list of tests the it will be performed first, and if it fails no other **XHTML Parser** tests will be run on the selected text.
+
+**HL7 Validator** uses the 'lxml' module to do the strict parsing, but the Python module BeautifulSoup to parse the selected test before performing any of the other tests.
+
+#### The PDF Parser
+
+**HL7 Validator** uses the Python "pypdf" module to do any **PDF Parser** testing.
+
+#### The Defined Parsers and Tests
+
+| Parser | Tests | Description |
+| --- | --- | --- |
+| UCUM | isValid | Check that a UCUM expression is valid |
+| FT | noX | Fail if \\Xdddd...\\ in FT data |
+| | noZ | Fail if \\Zdddd...\\ in FT data |
+| | noCE | Fail if \\.ce\\ in FT data |
+| | noRepeats | Fail if XML element containing FT data repeats |
+| | noC | Fail if \\Cxxyy\\ in FT data |
+| | noM | Fail if \\Mxxyy\\ or \\Mxxyyzz\\ in FT data |
+| XHTML | XHTMLstrict | Check that the XHTML text is strictly correct |
+| | noHTTP | Check that no tags that have a href starting with http:// |
+| | noExternalCSS | Check that there are no \<link\> tags with ' type="text/css" and a href starting with https:// |
+| | noScripts | Check that there are no \<script\> tags |
+| | noBase | Check that there are no \<base\> tags |
+| | noLink | Check that there are no \<link\> tags |
+| | noXlink | Check that there are no \<xlink\> tags |
+| | noFrame | Check that there are no \<frame\> tags |
+| | noIframe | Check that there are no \<iframe\> tags |
+| | noForm | Check that there are no \<form\> tags |
+| | noObject | Check that there are no \<object\> tags |
+| | noScripts | Check that there are no \<script\> tags |
+| | coreDisplay | Check that there is a \<div\> tag with ' class="reportDisplay" ' |
+| | OBXimages | \<image\> tags must have a "src" of "hl7v2://OBX.\<setID\> |
+| PDF | PDFstrict | Check that the PDF document is strictly compliant with the header version |
+| | versionPDF/A-1b | Check that the header version is "PDF/A-1b" |
+| | allFontsEmbedded | Check that all the used fonts are embedded in the document |
+| | noComments | Checks that there are no comments (annotations) in the document |
+| | canPrint | Check that the document can be printed |
+| | canCopy | Check that the document can be copied |
+| RTF | wellFormed | Check that RTF starts with \{\\rtf and had balanced opening and closing clurly bracies |
+| | noNesting | Check that there are no nested tables |
+| | noOLE | Check that there are no Object Linking or Embedding object |
+| | noEmbeddedFonts | Check that there are no embedded fonts |
+| | noShapes | Check that there are no shapes/other drawing objects |
+| | noSmartTags | Check that there are no smart tags |
+| | noChangeTracking | Check that there are no change tracking markup or comments |
+| | noSectionLayout | Check that there is no section specific page layout |
 
 ## Business Rules Definitions
 
