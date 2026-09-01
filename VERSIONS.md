@@ -1,5 +1,12 @@
 # HL7 Validator
 
+## Version 1.1 - 1-Sep-2026
+
+This is a "beta" release (two addition messages tested)  
+Added parsers for "UCUM", "FT", "XHTML", "PDF" and "RTF" with associated tests for each see [README](https://github.com/russellmcdonell/HL7-Validator)  
+Added two example messages from the ADRM specification [which don't pass ADRM - sigh]
+
+
 ## Version 1.0 - 26-Aug-2026
 
 This is an "alpha" release. It has been tested with two messages, but it tests the expected things and reports the expected errors.

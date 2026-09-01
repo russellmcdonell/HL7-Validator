@@ -4,7 +4,6 @@ Script hl7Validator.py
 A script to validate an HL7 v2.x vertical bar message with respect to it's equivalient HL7 v2.xml XML schema.
 This script also outputs the equivalent HL7 v2.xml XML tagged message.
 
-
 This script reads an HL7 v2.x vertical bar message from <stdin>, or a file,
 or all the message files in a folder.
 
@@ -15,6 +14,7 @@ or all the message files in a folder.
         [-R reportDir|--reportDir=reportDir]
         [-O outputDir|--outputDir=outputDir]
         [-S schemaDir|--schemaDir=schemaDir]
+        [-T telephonePattern|--telephonePattern=telephonePattern]
         [-v loggingLevel|--verbose=logingLevel]
         [-L logDir|--logDir=logDir]
         [-l logfile|--logfile=logfile]
@@ -41,6 +41,9 @@ or all the message files in a folder.
     The folder containing the HL7 v2.xml XML Schema files for the relevant version of HL7 v2.x
     (default = 'schema/v2.4')
 
+    -T telephonePattern|--telephonePattern=telephonePattern
+    The regular expression pattern for validating telephone numbers.
+
     -v loggingLevel|--verbose=loggingLevel
     Set the level of logging that you want.
 
@@ -54,11 +57,19 @@ or all the message files in a folder.
 # pylint: disable=invalid-name, bare-except, pointless-string-statement, global-statement; superfluous-parens
 
 import os
+import io
 import sys
 import logging
 import argparse
-import re
+import regex as re
 import copy
+import base64
+from dateutil import parser as du_parser
+from ucumvert import PintUcumRegistry
+from bs4 import BeautifulSoup
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
+from oletools.rtfobj import RtfObjParser
 from openpyxl import load_workbook
 import pandas as pd
 from lxml import etree as et
@@ -110,15 +121,33 @@ charXref = re.compile(r'\\X([0-9A-Fa-f][0-9A-Fa-f])+\\')
 charZref = re.compile(r'\\Z([0-9A-Fa-f][0-9A-Fa-f])+\\')
 hl7charRef = re.compile(r'&amp;(#x([0-9A-Fa-f][0-9A-Fa-f])+;)')
 DTpattern = re.compile(r'^[12]\d{3}((0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])?)?$')
-DTMpattern = re.compile(r'^[12]\d{3}((0[1-9]|1[0-2])((0[1-9]|[12]\d|3[01])(([01]\d|2[0-4])([0-5]\d([0-5]\d(\.\d{1,4})?)?)?)?)?)?([-+]?(0\d|1[0-3])[0-5]\d)?$')
 NMpattern = re.compile(r'^[-+]?\d+(\.\d*)?$')
 RI2pattern = re.compile(r'^([01]\d|2[0-4])[0-5]\d(,([01]\d|2[0-4])[0-5]\d)*$')
 SIpattern = re.compile(r'^\d{1,4}$')
-TMpattern = re.compile(r'^([01]\d|2[0-4])([0-5]\d([0-5]\d(\.\d{1,4})?)?)?([-+]?(0\d|1[0-3])[0-5]\d)?$')
+TMpattern = re.compile(r'^([01]\d|2[0-4])([0-5]\d([0-5]\d(\.\d{1,4})?)?)?([-+](0\d|1[0-3])[0-5]\d)?$')
 TNpattern = re.compile(r'^(\d\d)?((\d{3}))?\d{3}-\d{4}(X\d{4})?(B\d{4})?(C.*)?$')
+TSpattern = re.compile(r'^[12]\d{3}((0[1-9]|1[0-2])((0[1-9]|[12]\d|3[01])(([01]\d|2[0-4])([0-5]\d([0-5]\d(\.\d{1,4})?)?)?)?)?)?([-+](0\d|1[0-3])[0-5]\d)?$')
 TS2pattern = re.compile(r'^[YLDMHS]$')
 Hexpattern = re.compile(r'^[A-Fa-f0-9]*$')
 Base64pattern = re.compile(r'^[A-Za-z0-9+/]={0,2}$')
+notBase64pattern = re.compile(r'[^A-Za-z0-9+/=]')
+notEscapedpattern = re.compile(r'[|^&~\n]')
+badSTpattern = re.compile(r'\\(?![STRE]\\|C[0-9A-Fa-f]{4}\\|M[0-9A-Fa-f]{4}\\|M[0-9A-Fa-f]{6}\\)')
+badTXCFpattern = re.compile(r'\\(?![HNSTRE]\\|X[0-9A-Fa-f]+\\|Z[^\\]*\\|C[0-9A-Fa-f]{4}\\|M[0-9A-Fa-f]{4}\\|M[0-9A-Fa-f]{6}\\)')
+badFTpattern = re.compile(r'\\(?![HNSTRE]\\|X[0-9A-Fa-f]+\\|Z[^\\]*\\|C[0-9A-Fa-f]{4}\\|M[0-9A-Fa-f]{4}\\|M[0-9A-Fa-f]{6}\\|\.sp([\d]+)?\\|\.(br|ce|fi|nf)\\|\.(in|ti)[-+]?[\d]+\\|\.sk\d+\\)')
+badTIINpattern = re.compile(r'(?<!(^|\\\.br\\|\\\.sp([\d]+)?\\)(\\\.(br|ce|fi|nf)\\|\\\.(in|ti)[-+]?[\d]+\\)*)\\\.(in|ti)[-+]?[\d]+\\')
+noX = re.compile(r'\\X([0-9A-Fa-f])+\\')
+noZ = re.compile(r'\\Z([^\\])*\\')
+noCE = re.compile(r'\\\.ce\\')
+noC = re.compile(r'\\C[0-9A-Fa-f]{4}\\')
+noM = re.compile(r'\\M([0-9A-Fa-f]{4}|[0-9A-Fa-f]{6})\\')
+noItap = re.compile(r'\\itap([2-9])')
+noNestrow = re.compile(r'\\nestrow')
+RTFfont_pattern = re.compile(r'\{\\f\d+[^}]+?(?:\\fontemb|\\fontfile)[^}]+?\}')
+RTFshapes = re.compile(r'\\shp\b|\\sp\b|\\defshp\b|\\shptxt\b|\\objdata\b')
+RTFsmartTags = re.compile(r'\\smarttag\b|\\factoidname\b')
+RTFchangeTracking = re.compile(r'\\revtbl\b|\\delteted\b|\\revdeleted\b|\\revised\b|\\annotation\b')
+RTFsectionLayout = re.compile(r'\\sectd\b')
 isSeg = re.compile(r'^[A-Z][A-Z0-9]{2}$')
 msgStruct = None
 reportFile = None                   # The report file
@@ -131,9 +160,26 @@ dataTypeBusinessRules = {}          # The business rules associated with specifi
 fieldBusinessRules = {}             # The business rules associated with specific fields
 segmentBusinessRules = {}           # The business rules associated with specific segments
 XPathBusinessRules = {}             # Whole of message business rules based upon XPath expressions
+ParserBusinessRules = {}            # Whole of message business rules using Parsers to test data
+Parsers = ["UCUM", "FT", "XHTML", "PDF", "RTF"]                  # The list of available parsers
+ParserTests = {                     # The tests associated with each parser
+    "UCUM": ["isValid"],             # The tests for the UCUM parser
+    "FT": ["noX", "noZ", "noCE", "noRepeats", "noC", "noM"],                    # The tests for the FT parser
+    "XHTML": ["XMLstrict", "noHTTP", "noExternalCSS", "noScripts",              # The tests for the XHTML parser
+              "noBase", "noLink", "noXlink", "noFrame", "noIframe",
+              "noForm", "noObject","coreDisplay", "OBXimages"],
+    "PDF": ["PDFstrict", "versionPDF/A-1b", "allFontsEmbedded",                 # The tests for the PDF parser
+            "noComments", "canPrint", "canCopy"], 
+    "RTF": ["wellFormed", "noNesting", "noOLE", "noEmbeddedFonts",              # The tests for the RTF parser
+            "noShapes", "noSmartTags", "noChangeTracking",
+            "noSectionLayout"]
+}
+ureg = PintUcumRegistry()           # The UCUM registry for unit conversions
 rulesEngine = None                  # The DMN rules engine for validating fields
 glossary = {}                       # The glossary from the Rules Engine
 XMLclean = re.compile(u'[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+')
+SegmentNodes = []                   # A list of the segment nodes created in the HL7 v2.xml message
+ERRrepeats = []                     # The list of errors encountered
 
 
 def getAppendixA(schemaDir):
@@ -323,9 +369,9 @@ def getValueSets(schemaDir):
             if (groups is None) or (groups.strip() == ''):
                 groupList = [None]
             else:
-                groupList = groups.split(',')
+                groupList = [item.strip() for item in groups.split(',')]
                 for iGroup in range(len(groupList) - 1, -1, -1):
-                    if groupList[iGroup].strip() == '':
+                    if groupList[iGroup] == '':
                         del groupList[iGroup]
                 if len(groupList) == 0:
                     groupList = [None]
@@ -339,7 +385,7 @@ def getValueSets(schemaDir):
                     logging.shutdown()
                     sys.exit(EX_CONFIG)
                 if (description is not None) and (description.strip() != ''):
-                    valueSets[fieldComponent][system][group][code] = description.split('|')
+                    valueSets[fieldComponent][system][group][code] = [item.strip() for item in description.split('|')]
                 else:
                     valueSets[fieldComponent][system][group][code] = None
     return
@@ -389,29 +435,30 @@ def getBusinessRules(schemaDir):
         sys.exit(EX_CONFIG)
     for row in data_rows:
         dataType, group, segment, rule = row[0:4]
-        if (dataType is None) or (str(dataType).strip() == ''):
+        dataType = str(dataType).strip() if dataType is not None else None
+        if (dataType is None) or (dataType == ''):
             break
-        dataType = str(dataType).strip()
-        if group is None:
+        rule = str(rule).strip() if rule is not None else None
+        if (rule is None) or (rule.startswith("#")) or (rule == ''):
+            continue
+        group = str(group).strip() if group is not None else None
+        if (group is None) or (group == ''):
             groupList = [None]
         else:
-            groupList = group.split(',')
+            groupList = [item.strip() for item in group.split(',')]
             for iGroup in range(len(groupList) - 1, -1, -1):
-                if groupList[iGroup].strip() == '':
+                if groupList[iGroup] == '':
                     del groupList[iGroup]
-                else:
-                    groupList[iGroup] = groupList[iGroup].strip()
             if len(groupList) == 0:
                 groupList = [None]
-        if segment is None:
+        segment = str(segment).strip() if segment is not None else None
+        if (segment is None) or (segment == ''):
             segmentList = [None]
         else:
-            segmentList = segment.split(',')
+            segmentList = [item.strip() for item in segment.split(',')]
             for iSegment in range(len(segmentList) - 1, -1, -1):
-                if segmentList[iSegment].strip() == '':
+                if segmentList[iSegment] == '':
                     del segmentList[iSegment]
-                else:
-                    segmentList[iSegment] = segmentList[iSegment].strip()
             if len(segmentList) == 0:
                 segmentList = [None]
         if dataType not in dataTypeBusinessRules:
@@ -455,35 +502,37 @@ def getBusinessRules(schemaDir):
         logging.shutdown()
         sys.exit(EX_CONFIG)
     for row in data_rows:
-        field, group, rule, thisType, count = row[0:5]
-        if field is None:
-            fieldList = [None]
-        else:
-            fieldList = field.split(',')
-            for iField in range(len(fieldList) - 1, -1, -1):
-                if fieldList[iField].strip() == '':
-                    del fieldList[iField]
-                else:
-                    fieldList[iField] = fieldList[iField].strip()
+        fields, group, rule, thisType, count = row[0:5]
+        fields = str(fields).strip() if fields is not None else None
+        if (fields is None) or (fields == ''):
+            break
+        rule = str(rule).strip() if rule is not None else None
+        if (rule is None) or (rule.startswith("#")) or (rule == ''):
+            continue
+        fieldList = [item.strip() for item in fields.split(',')]
+        for iField in range(len(fieldList) - 1, -1, -1):
+            if fieldList[iField] == '':
+                del fieldList[iField]
+            else:
                 if not isSeg.match(fieldList[iField][0:3]):
                     logger.critical('Invalid segment code (%s)/field(%s) in column "field" in Worksheet "field rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', fieldList[iField][0:3], fieldList[iField], schemaDir)
                     logging.shutdown()
                     sys.exit(EX_CONFIG)
-            if len(fieldList) == 0:
-                fieldList = [None]
-        if group is None:
+        if len(fieldList) == 0:
+            break
+        group = str(group).strip() if group is not None else None
+        if (group is None) or (group == ''):
             groupList = [None]
         else:
-            groupList = group.split(',')
+            groupList = [item.strip() for item in group.split(',')]
             for iGroup in range(len(groupList) - 1, -1, -1):
-                if groupList[iGroup].strip() == '':
+                if groupList[iGroup] == '':
                     del groupList[iGroup]
-                else:
-                    groupList[iGroup] = groupList[iGroup].strip()
             if len(groupList) == 0:
                 groupList = [None]
+        thisType = str(thisType).strip() if thisType is not None else None
         if thisType not in ["min", "max", "all"]:
-            logger.critical('Invalid value in column "type" for field("%s"), rule("%s") of type("%s") in Worksheet "field rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', field, rule, thisType, schemaDir)
+            logger.critical('Invalid value in column "type" for field(s)("%s"), rule("%s") of type("%s") in Worksheet "field rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', fields, rule, thisType, schemaDir)
             logging.shutdown()
             sys.exit(EX_CONFIG)
         if thisType in ["min", "max"]:
@@ -545,33 +594,36 @@ def getBusinessRules(schemaDir):
         sys.exit(EX_CONFIG)
     for row in data_rows:
         segment, groups, rule, repFields, thisType, count = row[0:6]
-        if (segment is None) or (str(segment).strip() == ''):
+        segment = str(segment).strip() if segment is not None else None
+        if (segment is None) or (segment == ''):
             break
         segment = str(segment).strip()
         if not isSeg.match(segment):
             logger.critical('Invalid value (%s) in column "segment" in Worksheet "segment rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', segment, schemaDir)
             logging.shutdown()
             sys.exit(EX_CONFIG)
-        if (groups is None) or (str(groups).strip() == ''):
+        rule = str(rule).strip() if rule is not None else None
+        if (rule is None) or (rule.startswith("#")) or (rule == ''):
+            continue
+        groups = str(groups).strip() if groups is not None else None
+        if (groups is None) or (groups == ''):
             groupList = [None]
         else:
-            groupList = groups.split(',')
+            groupList = [item.strip() for item in groups.split(',')]
             for iGroup in range(len(groupList) - 1, -1, -1):
-                if groupList[iGroup].strip() == '':
+                if groupList[iGroup] == '':
                     del groupList[iGroup]
-                else:
-                    groupList[iGroup] = groupList[iGroup].strip()
             if len(groupList) == 0:
                 groupList = [None]
-        if (repFields is None) or (str(repFields).strip() == ''):
+        repFields = str(repFields).strip() if repFields is not None else None
+        if (repFields is None) or (repFields == ''):
             repFields = tuple([None])
         else:
-            repFieldsList = repFields.split(',')
+            repFieldsList = [item.strip() for item in repFields.split(',')]
             for iField in range(len(repFieldsList) - 1, -1, -1):
-                if str(repFieldsList[iField]).strip() == '':
+                if repFieldsList[iField] == '':
                     del repFieldsList[iField]
                 else:
-                    repFieldsList[iField] = str(repFieldsList[iField]).strip()
                     if repFieldsList[iField][0:3] != segment:
                         logger.critical('Invalid value (%s) in column "repFields" for segment(%s) in Worksheet "segment rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', repFieldsList[iField], segment, schemaDir)
                         logging.shutdown()
@@ -658,8 +710,11 @@ def getBusinessRules(schemaDir):
         maxXPath += 1
     for row in data_rows:
         rule, rulePath, ruleType, ruleCount, fieldPath, fieldType, fieldCount, linked = row[0:8]
-        if (rule is None) or (str(rule).strip() == ''):
+        rule = str(rule).strip() if rule is not None else None
+        if (rule is None) or (rule == ''):
             break
+        if rule.startswith("#"):
+            continue
         rule = str(rule).strip()
         rulePath = str(rulePath).strip()
         if not rulePath.startswith('/'):
@@ -735,6 +790,83 @@ def getBusinessRules(schemaDir):
             logging.shutdown()
             sys.exit(EX_CONFIG)
 
+    # Look for Message Parser Business Rules
+    if "parser rules" not in wb.sheetnames:
+        logger.critical('Missing Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    ws = wb["parser rules"]
+    # Extract the data from the Worksheet and check that it has the required columns
+    data = list(ws.iter_rows(values_only=True))
+    columns = data[0] if data else []
+    data_rows = data[1:] if len(data) > 1 else []
+    if "rule" != columns[0]:
+        logger.critical('Missing column "rule" in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    if "parser" != columns[1]:
+        logger.critical('Missing column "parser" in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    if "test(s)" != columns[2]:
+        logger.critical('Missing column "test(s)" in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    if "isBase64" != columns[3]:
+        logger.critical('Missing column "isBase64" in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    if "xpath" != columns[4]:
+        logger.critical('Missing column "xpath" in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    for row in data_rows:
+        rule, parser, tests, isBase64, xpath = row[0:5]
+        rule = str(rule).strip() if rule is not None else None
+        if (rule is None) or (rule == ''):
+            break
+        if rule.startswith("#"):
+            continue
+        parser = str(parser).strip() if parser is not None else None
+        if parser not in Parsers:
+            logger.critical('Invalid value in column "parser" for rule("%s") with parser("%s") in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', rule, parser, schemaDir)
+            logging.shutdown()
+            sys.exit(EX_CONFIG)
+        tests = str(tests).strip() if tests is not None else None
+        if(tests is None) or (tests == ''):
+            tests = []
+        else:
+            tests = [item.strip() for item in str(tests).split(',')]
+            for iTest in range(len(tests) - 1, -1, -1):
+                thisTest = tests[iTest]
+                if (thisTest == '') or (thisTest.startswith):
+                    del tests[iTest]
+                else:
+                    if thisTest not in ParserTests[parser]:
+                        logger.critical('Invalid value in column "test(s)" for rule("%s") with parser("%s") and test("%s") in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', rule, parser, thisTest, schemaDir)
+                        logging.shutdown()
+                        sys.exit(EX_CONFIG)
+                    tests[iTest] = thisTest
+        tests = tuple(tests)
+        isBase64 = str(isBase64).strip()
+        if isBase64.upper() == 'Y':
+            isBase64 = True
+        else:
+            isBase64 = False
+        xpath = str(xpath).strip()
+        if not xpath.startswith('/'):
+            logger.critical('Invalid value in column "xpath" for rule("%s") with xpath("%s") in Worksheet "parser rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', rule, xpath, schemaDir)
+            logging.shutdown()
+            sys.exit(EX_CONFIG)
+        if rule not in ParserBusinessRules:
+            ParserBusinessRules[rule] = {}
+        if parser not in ParserBusinessRules[rule]:
+            ParserBusinessRules[rule][parser] = {}
+        ParserBusinessRules[rule][parser][tests] = {
+            'isBase64': isBase64,
+            'xpath': xpath
+        }
+        
     # Read in the DMN rules
     if not os.path.isfile(os.path.join(schemaDir, 'Business Rules DMN.xlsx')):
         logger.critical('Business Rules is missing  Excel Workbook "Business Rules DMN.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
@@ -816,7 +948,7 @@ def getFieldData(data, fieldNode, xpaths, linked, repNo, rule, rulePath, ruleTyp
     Get the field data from a field node and the xpath data from xpath nodes
     '''
 
-    global reportFile, hl7XML
+    global reportFile, hl7XML, ERRrepeats
 
     fieldName = fieldNode.tag.replace(".", "-", 1)
     if len(fieldNode) == 0:
@@ -844,7 +976,9 @@ def getFieldData(data, fieldNode, xpaths, linked, repNo, rule, rulePath, ruleTyp
         try:
             xpathNodes = fieldNode.xpath(xpath)
         except Exception as e:
-            comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:XPath {xpath}) Testing failure - {e}'
+            errorPath, errorSeg, errorSegNo, errorField = XPathTo(fieldNode, "")
+            comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:XPath {xpath}) at {errorPath} - Testing failure - {e}'
+            ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
             print(comment, file=reportFile)
             hl7XML.append(et.Comment(comment))
             continue
@@ -857,7 +991,9 @@ def getFieldData(data, fieldNode, xpaths, linked, repNo, rule, rulePath, ruleTyp
                 continue
             parent = fieldNode.getparent()
             if (parent is None) or (len(parent.tag) != 3) or (not xpathNode.tag.startswith(parent.tag)):        # xpathNode should be a field
-                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:XPath {xpath}) Testing failure - xpath must return a field'
+                errorPath, errorSeg, errorSegNo,errorField = XPathTo(fieldNode, "")
+                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:XPath {xpath}) at {errorPath} - Testing failure - xpath must return a field'
+                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
                 print(comment, file=reportFile)
                 hl7XML.append(et.Comment(comment))
                 continue
@@ -939,9 +1075,10 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
     if depth > 200:
         # Treat this segment as unexpected
         SegmentStatus[segmentNo] = False
-        comment= f'Unexpected Segment, segment {segmentNo + 1:d} - "{Segments[segmentNo]}"'
-        print(comment, file=reportFile)
         newElement = et.Element(tag)
+        comment= f'ERROR:Unexpected Segment, segment {segmentNo + 1:d} - "{Segments[segmentNo]}"'
+        ERRrepeats.append(["", segmentNo + 1, 0, comment])
+        print(comment, file=reportFile)
         newElement.append(et.Comment(comment))
         segmentNo += 1
         return True, newElement
@@ -956,7 +1093,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
     lastGroup = None    # The last group we found - used to count the number of times we have found this group
     while sequenceAt < len(sequenceList):           # Check the next segment
         if not SegmentStatus[segmentNo]:            # Previously found to be an unexpected segment - report it and skip it
-            comment= f'Unexpected Segment, segment {segmentNo + 1:d}: "{Segments[segmentNo]}"'
+            comment= f'ERROR:Unexpected Segment, segment {segmentNo + 1:d}: "{Segments[segmentNo]}"'
+            ERRrepeats.append(["", segmentNo + 1, 0, comment])
             print(comment, file=reportFile)
             if not tagged:
                 thisElement = et.Element(tag)
@@ -1033,7 +1171,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     passed = segmentBusinessRules[thisSeg][tag][rule][repFields][thisType]['passed']
                                     count = segmentBusinessRules[thisSeg][tag][rule][repFields][thisType]['count']
                                     if ((thisType == "min") and (passed < count)) or ((thisType == "max") and (passed > count)):
-                                        comment = f'Failed Segment Business Rule ({thisSeg}:{tag}:{rule}:{repFields}:{thisType}:{count} - passed {passed})'
+                                        comment = f'ERROR:Failed Segment Business Rule ({thisSeg}:{tag}:{rule}:{repFields}:{thisType}:{count} - passed {passed})'
+                                        ERRrepeats.append([thisSeg, segmentNo + 1, 0, comment])
                                         print(comment, file=reportFile)
                                         thisElement.append(et.Comment(comment))
                     if segmentNo == len(Segments):      # Group used all the segments
@@ -1079,7 +1218,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
             # Otherwise, treat this segment as 'unexpected'
             restart = True
             SegmentStatus[segmentNo] = False
-            comment= f'Unexpected Segment, segment {segmentNo + 1:d}: "{Segments[segmentNo]}"'
+            comment= f'ERROR:Unexpected Segment, segment {segmentNo + 1:d}: "{Segments[segmentNo]}"'
+            ERRrepeats.append(["", segmentNo + 1, 0, comment])
             print(comment, file=reportFile)
             if not tagged:
                 thisElement = et.Element(tag)
@@ -1159,6 +1299,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
             if (i >= len(Fields)) or (field == ''):         # An empty or missing field
                 if (fieldMin is not None) and (fieldMin > 0):
                     comment = f'ERROR: Missing required field [{fieldCode}] in Segment {seg}, segment {segmentNo + 1:d}'
+                    ERRrepeats.append([seg, segmentNo + 1, i + 1, comment])
                     print(comment, file=reportFile)
                     fieldXML.append(et.Comment(comment))
                     segElement.append(fieldXML)
@@ -1169,25 +1310,28 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                     comment = f'WARNING: Undefined Field in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
                 else:
                     comment = f'WARNING: Unexpected field in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}-{i + 1:d}, repetition [{j + 1:d}]'
-                    print(comment, file=reportFile)
-                    fieldXML.append(et.Comment(comment))
-                    # Check for illegal characters in the field and remove and report them
-                    badChars = XMLclean.finditer(field)
-                    if len(list(badChars)) > 0:
-                        fieldXML.text = XMLclean.sub(field, '')
-                        for badChar in badChars:
-                            comment = f'WARNING: Illegal character(s) [{repr(field[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
-                            print(comment, file=reportFile)
-                            fieldXML.append(et.Comment(comment))
-                    else:
-                        fieldXML.text = field
-                    comment = fixElement(fieldXML, 'ST', None, None, None)
-                    if comment is not None:
-                        comment += f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                ERRrepeats.append([seg, segmentNo + 1, i + 1, comment])
+                print(comment, file=reportFile)
+                fieldXML.append(et.Comment(comment))
+                # Check for illegal characters in the field and remove and report them
+                badChars = XMLclean.finditer(field)
+                if len(list(badChars)) > 0:
+                    fieldXML.text = XMLclean.sub(field, '')
+                    for badChar in badChars:
+                        comment = f'WARNING: Illegal character(s) [{repr(field[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                        ERRrepeats.append([seg, segmentNo + 1, i + 1, comment])
                         print(comment, file=reportFile)
                         fieldXML.append(et.Comment(comment))
-                    segElement.append(fieldXML)
-                    continue
+                else:
+                    fieldXML.text = field
+                comment = fixElement(fieldXML, 'ST', None, None, None)
+                if comment is not None:
+                    comment = 'ERROR:' + comment + f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                    ERRrepeats.append([seg, segmentNo + 1, i + 1, comment])
+                    print(comment, file=reportFile)
+                    fieldXML.append(et.Comment(comment))
+                segElement.append(fieldXML)
+                continue
             # Split this field into repetitions - except for the encoding characters and FT data
             if (seg == 'MSH') and (i == 1):
                 fieldReps = [field]
@@ -1223,6 +1367,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                     continue
                 if (fieldMax is not None) and (fieldMax <= j):
                     comment = f'WARNING: Unexpected field repeat [{j + 1:d}] in segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}]'
+                    ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                     print(comment, file=reportFile)
                     fieldXML.append(et.Comment(comment))
                     continue
@@ -1233,6 +1378,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         fieldType = Fields[4]
                     if fieldType == 'TX':
                         comment = f'WARNING: Invalid data type TX in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                        ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                         print(comment, file=reportFile)
                         fieldXML.append(et.Comment(comment))
                         fieldType = 'ST'
@@ -1276,6 +1422,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         if component == '':
                             if (componentMin is not None) and (componentMin > 0):
                                 comment = f'WARNING: Missing required component [{componentCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repeat [{j + 1:d}]'
+                                ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
                                 fieldXML.append(componentXML)
@@ -1285,6 +1432,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 comment = f'WARNING: Unexpected component in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] - {component}'
                             else:
                                 comment = f'WARNING: Undefined component in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                             print(comment, file=reportFile)
                             componentXML.append(et.Comment(comment))
                             # Check for illegal characters in the component and remove and report them
@@ -1293,13 +1441,15 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 componentXML.text = XMLclean.sub(component, '')
                                 for badChar in badChars:
                                     comment = f'WARNING: Illegal character(s) [{repr(component[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                                    ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                     print(comment, file=reportFile)
                                     componentXML.append(et.Comment(comment))
                             else:
                                 componentXML.text = component
                             comment = fixElement(componentXML, 'ST', fieldType, k + 1, fieldXML)
                             if comment is not None:
-                                comment += f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}]'
+                                comment = 'ERROR:' + comment + f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}]'
+                                ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
                             fieldXML.append(componentXML)
@@ -1342,6 +1492,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 if subComponent == '':
                                     if (subCompMin is not None) and (subCompMin > 0):
                                         comment = f'ERROR: Missing required subcomponent [{subCompCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
                                         componentXML.append(subComponentXML)
@@ -1351,6 +1502,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                         comment = f'WARNING: Undefined subcomponent [{subCompCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
                                     else:
                                         comment = f'WARNING: Unexpected subcomponent [{subCompCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}] - {subComponent}'
+                                    ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                     print(comment, file=reportFile)
                                     subComponentXML.append(et.Comment(comment))
                                     # Check for illegal characters in the subcomponent and remove and report them
@@ -1359,6 +1511,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                         subComponentXML.text = XMLclean.sub(subComponent, '')
                                         for badChar in badChars:
                                             comment = f'WARNING: Illegal character(s) [{repr(subComponent[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                             print(comment, file=reportFile)
                                             subComponentXML.append(et.Comment(comment))
                                     else:
@@ -1366,7 +1519,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     subComponentXML.append(et.Comment(comment))
                                     comment = fixElement(subComponentXML, subCompType, componentType, l + 1, componentXML)
                                     if comment is not None:
-                                        comment += f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        comment = 'ERROR:' + comment + f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
                                     componentXML.append(subComponentXML)
@@ -1404,11 +1558,13 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     subComponentXML.text = XMLclean.sub(subComponent, '')
                                     for badChar in badChars:
                                         comment = f'WARNING: Illegal character(s) [{repr(subComponent[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
                                 comment = fixElement(subComponentXML, subCompType, componentType, l + 1, componentXML)
                                 if comment is not None:
-                                    comment += f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                    comment = 'ERROR:' + comment + f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                    ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                     print(comment, file=reportFile)
                                     subComponentXML.append(et.Comment(comment))
                                 # Check the subcomponent/component/field tables for this subcomponent
@@ -1463,6 +1619,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 if (datatypeLengths is not None) and (subCompType in datatypeLengths) and (l in datatypeLengths[subCompType]):
                                     if len(subComponent) > datatypeLengths[subCompType][l]:
                                         comment = f'WARNING: Illegally long subcomponent - "{subComponent}" in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
                                 # Check value sets for this subcomponent if it is a coding system
@@ -1477,8 +1634,39 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                                 subComponentXML.append(et.Comment(comment))
                                             elif (valueSets[componentCode][subComponent][group][subComponents[l - 2]] is not None) and (subComponents[l - 1] not in valueSets[componentCode][subComponent][group][subComponents[l - 2]]):
                                                 comment = f'COMMENT: Description "{subComponents[l - 1]}" not valid for Identifier "{subComponents[l - 2]}" in coding system "{subComponent}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component[{componentCode}]'
+                                                ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                                 print(comment, file=reportFile)
                                                 subComponentXML.append(et.Comment(comment))
+                                if subCompType in dataTypeBusinessRules:
+                                    for group in dataTypeBusinessRules[subCompType]:
+                                        if (group is not None) and (group not in previousTags) and (group != tag):
+                                            continue
+                                        for segment in dataTypeBusinessRules[subCompType][group]:
+                                            if (segment is not None) and (segment != seg):
+                                                continue
+                                            for rule in dataTypeBusinessRules[subCompType][group][segment]:
+                                                data['Rule'] = rule
+                                                logger.debug(f'Checking Business Datatype Rule({rule}) with data {data}', extra={'raw_message':True})
+                                                (status, newData) = rulesEngine.decide(data)
+                                                if 'errors' in status:
+                                                    logger.critical('Critical Error(s) in Rules Definitions in Data Type Rules for rule (%s)', rule)
+                                                    for thisError in status['errors']:
+                                                        logger.critical('%s', thisError)
+                                                    logging.shutdown()
+                                                    sys.exit(EX_CONFIG)
+                                                if isinstance(newData, list):
+                                                    if len(newData) == 0:
+                                                        logger.critical('Critical Error in Rules Definitions in Data Type Rules for rule (%s) - no Decision Table executed', rule)
+                                                        logging.shutdown()
+                                                        sys.exit(EX_CONFIG)
+                                                    Result = newData[-1]['Result']
+                                                else:
+                                                    Result = newData['Result']
+                                                if Result['Passed'] == False:
+                                                    comment = f'{Result["Reason"]} - Datatype Rule ({rule}), dataType({componentType}) - Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component {componentCode}, component data ({component})'
+                                                    ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
+                                                    print(comment, file=reportFile)
+                                                    subComponentXML.append(et.Comment(comment))
                                 # End of this subcomponent
                                 componentXML.append(subComponentXML)
                         else:       # No subcomponents - just validate this component
@@ -1525,7 +1713,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     componentXML.append(et.Comment(comment))
                             comment = fixElement(componentXML, componentType, fieldType, i + 1, fieldXML)
                             if comment is not None:
-                                comment += f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}]'
+                                comment = 'ERROR:' + comment + f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}]'
+                                ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
                             # Check the component/field tables for this component
@@ -1564,12 +1753,14 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     comment = f'COMMENT: Illegal value "{component}" - not in {testedTables[0]} table in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
                                 else:
                                     comment = f'COMMENT: Illegal value "{component}" - not in {"/".join(testedTables)} tables in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                                ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
                             # Check the component length                           
                             if (datatypeLengths is not None) and (componentType in datatypeLengths) and (k in datatypeLengths[componentType]):
                                 if len(component) > datatypeLengths[componentType][k]:
                                     comment = f'WARNING: Illegally long component - "{component}" in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}]'
+                                    ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                     print(comment, file=reportFile)
                                     componentXML.append(et.Comment(comment))
                             # Check value sets for this component if it is a coding system
@@ -1581,20 +1772,22 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     if (group is None) or (group in previousTags) or (group == tag):
                                         if Components[k - 2] not in valueSets[fieldCode][component][group]:
                                             comment = f'COMMENT: Identifier "{Components[k - 2]}" not in coding system "{component}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                             print(comment, file=reportFile)
                                             componentXML.append(et.Comment(comment))
                                         elif (valueSets[fieldCode][component][group][Components[k - 2]] is not None) and (Components[k - 1] not in valueSets[fieldCode][component][group][Components[k - 2]]):
                                             comment = f'COMMENT: Description "{Components[k - 1]}" not valid for Identifier "{Components[k - 2]}" in coding system "{component}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                             print(comment, file=reportFile)
                                             componentXML.append(et.Comment(comment))
                         if componentType in dataTypeBusinessRules:
-                            for group in dataTypeBusinessRules[componentType][rule]:
+                            for group in dataTypeBusinessRules[componentType]:
                                 if (group is not None) and (group not in previousTags) and (group != tag):
                                     continue
-                                for segment in dataTypeBusinessRules[componentType][rule][group]:
+                                for segment in dataTypeBusinessRules[componentType][group]:
                                     if (segment is not None) and (segment != seg):
                                         continue
-                                    for rule in dataTypeBusinessRules[componentType][rule][group][segment]:
+                                    for rule in dataTypeBusinessRules[componentType][group][segment]:
                                         data['Rule'] = rule
                                         logger.debug(f'Checking Business Datatype Rule({rule}) with data {data}', extra={'raw_message':True})
                                         (status, newData) = rulesEngine.decide(data)
@@ -1614,6 +1807,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                             Result = newData['Result']
                                         if Result['Passed'] == False:
                                             comment = f'{Result["Reason"]} - Datatype Rule ({rule}), dataType({componentType}) - Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component {componentCode}, component data ({component})'
+                                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                             print(comment, file=reportFile)
                                             componentXML.append(et.Comment(comment))
                         # End of this component
@@ -1636,28 +1830,34 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         fieldXML.text = XMLclean.sub(thisField, '')
                         for badChar in badChars:
                             comment = f'WARNING: Illegal character(s) [{repr(thisField[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
-                    comment = fixElement(fieldXML, fieldType, None, None, None)
-                    if comment is not None:
-                        comment += f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
-                        print(comment, file=reportFile)
-                        fieldXML.append(et.Comment(comment))
+                    if fieldCode not in ['MSH-1', 'MSH-2']:
+                        comment = fixElement(fieldXML, fieldType, None, None, None)
+                        if comment is not None:
+                            comment = 'ERROR:' + comment + f' in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
+                            print(comment, file=reportFile)
+                            fieldXML.append(et.Comment(comment))
                     # Check field table and field length
                     logger.debug(f'Checking field "{thisField}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] against fieldTable {fieldTable}', extra={'raw_message':True})
                     if (fieldTable is not None) and (hl7Tables is not None):
                         if fieldTable in hl7Tables:
                             if thisField not in hl7Tables[fieldTable]['codes']:
                                 comment = f'WARNING:Illegal value "{thisField}" - not in table {hl7Tables[fieldTable]["type"]} {fieldTable} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                                ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                 print(comment, file=reportFile)
                                 fieldXML.append(et.Comment(comment))
                         else:
                             comment = f'WARNING:Illegal value "{thisField}" - not in table {fieldTable} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
                     if (fieldLengths is not None) and (fieldCode in fieldLengths) and (fieldLengths[fieldCode] not in [999999, 65356]):
                         if len(thisField) > fieldLengths[fieldCode]:
                             comment = f'WARNING: Illegally long field - "{thisField}" in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
                 if fieldType in dataTypeBusinessRules:
@@ -1687,6 +1887,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     Result = newData['Result']
                                 if Result['Passed'] == False:
                                     comment = f'{Result["Reason"]} - Datatype Rule ({rule}), dataType({fieldType}) - Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], field data ({thisField})'
+                                    ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                     print(comment, file=reportFile)
                                     fieldXML.append(et.Comment(comment))
                 # End if this field repetition
@@ -1721,19 +1922,21 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                             fieldRulesPassed[rule][group][thisType] += 1
                             if (Result['Passed'] == False) and ('all' in fieldBusinessRules[fieldCode][group][rule]):
                                 comment = f'{Result["Reason"]} - Field Business Rule ({rule}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], field data ({thisField})'
+                                ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                                 print(comment, file=reportFile)
                                 fieldXML.append(et.Comment(comment))
-
             # End of these field repetitions - end of this field - check the counts in any "min"/"max" business rules for this field
             for rule in fieldRulesPassed:
                 for group in fieldRulesPassed[rule]:
                     for thisType in fieldRulesPassed[rule][group]:
                         if (thisType == 'max') and (fieldRulesPassed[rule][group][thisType] > fieldBusinessRules[fieldCode][group][rule]['max']):
                             comment = f'ERROR: Business Rule (rule {rule}:ruleType {thisType}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode} - {fieldRulesPassed[rule][group][thisType]} valid repetitions > {fieldBusinessRules[fieldCode][group][rule]['max']}'
+                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
                         elif (thisType == 'min') and (fieldRulesPassed[rule][group][thisType] < fieldBusinessRules[fieldCode][group][rule]['min']):
                             comment = f'ERROR: Business Rule (rule {rule}:ruleType {thisType}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode} - {fieldRulesPassed[rule][group][thisType]} valid repetitions < {fieldBusinessRules[fieldCode][group][rule]['min']}'
+                            ERRrepeats.append([seg, segmentNo + 1, j + 1, comment])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
         # End of this segment
@@ -1766,6 +1969,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 Result = newData['Result']
                             if Result['Passed'] == False:
                                 comment = f'{Result["Reason"]} - Segment Business Rule ({rule}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}'
+                                ERRrepeats.append([seg, segmentNo + 1, 0, comment])
                                 print(comment, file=reportFile)
                                 segElement.append(et.Comment(comment))
                             else:
@@ -1806,6 +2010,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     else:
                                         if None in segmentBusinessRules[seg][group][rule][repeatFields]:
                                             comment = f'{Result["Reason"]} - Segment Business Rule ({rule}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}'
+                                            ERRrepeats.append([seg, segmentNo + 1, 0, comment])
                                             print(comment, file=reportFile)
                                             segElement.append(et.Comment(comment))
                                 if passed:
@@ -1816,6 +2021,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
 
         # Add this segment element to the XML message                                
         thisElement.append(segElement)
+        SegmentNodes.append(segElement)
         segmentNo += 1
 
         if segmentNo == len(Segments):
@@ -1856,17 +2062,19 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
         return None
 
     # Check some known patterns
+    if textType == 'CF':            # Check that this is a correctly formatted coded value
+        reTest = badTXCFpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted coded value "{reTest.group()}" in "{elementText}"'
+        return None
     if textType == 'DT':            # Check that this is a correctly formatted date
-        if DTpattern.search(elementText) is None:
-            return f'Illegally formated date "{elementText}"'
-        return None
-    if textType == 'DTM':           # Check that this is a correctly formatted date/time
-        if DTMpattern.search(elementText) is None:
-            return f'Illegally formatted date/time "{elementText}"'
-        return None
-    if (parentType == 'ED') and (parentSequence == 4):          # Check that this is correclty formatted encoding
-        if elementText not in ['Hex', 'Base64']:
-            return f'Illegal Encapsulated Data encoding "{elementText}"'
+        reTest = DTpattern.search(elementText)
+        if reTest is None:
+            return f'Illegally formated date "{reTest.group()}" in "{elementText}"'
+        try:
+            du_parser.parse(elementText)
+        except (ValueError, OverflowError):
+            return f'Illegally formatted date "{elementText}"'
         return None
     if (parentType == 'ED') and (parentSequence == 5):          # Check that this is correclty formatted Hex or Base64 encoded data
         if parentXML is None:
@@ -1880,20 +2088,46 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
         if encoding == 'Hex':
             if ((len(elementText) % 2) != 0) or (Hexpattern.search(elementText) is None):
                 return f'Illegally formated Hex data'
-        elif ((len(elementText) % 4) != 0) or (Base64pattern.search(elementText) is None):
-            return f'Illegally formated Base64 encoded data'
+        elif encoding == 'Base64':
+            if (len(elementText) % 4) != 0:
+                return f'Illegally formated Base64 encoded data'
+            badChar = notBase64pattern.search(elementText)
+            if badChar is not None:
+                return f'Illegally character:"{repr(badChar.group())}" in Base64 encoded data'
+            if Base64pattern.search(elementText) is None:
+                return f'Illegally formated Base64 encoded data (bad padding)'
+            try:
+                if isinstance(elementText, str):
+                    elementText = elementText.encode('utf-8')
+                base64.b64decode(elementText, validate=True)
+            except Exception as e:
+                return f'Illegally formated Base64 encoded data:{str(e)}'
         return None       
+    if textType == 'FT':            # Check that this is a correctly formatted text
+        reTest = notEscapedpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{elementText}"'
+        reTest = badFTpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted text "{reTest.group()}" in "{elementText}"'
+        reTest = badTIINpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted text [indent after text] "{reTest.group()}" in "{elementText}"'
+        return None
     if textType == 'NM':            # Check that this is a corractly formatted number
-        if NMpattern.search(elementText) is None:
-            return(f'Illegally formatted number "{elementText}"')
+        reTest = NMpattern.search(elementText)
+        if reTest is None:
+            return(f'Illegally formatted number "{reTest.group()}" in "{elementText}"')
         return None
     if (parentType == 'RI') and (parentSequence == 2):          # Check that this is a correctly formatted time interval
-        if RI2pattern.search(elementText) is None:
+        reTest = RI2pattern.search(elementText)
+        if reTest is None:
             return f'Illegally formatted time interval "{elementText}"'
         return None
     if textType == 'SI':            # Check that this is a correctly formatted sequence identifier
-        if SIpattern.search(elementText) is None:
-            return f'Illegally formatted sequence identifier "{elementText}"'
+        reTest = SIpattern.search(elementText)
+        if reTest is None:
+            return f'Illegally formatted sequence identifier "{reTest.group()}" in "{elementText}"'
         return None
     if textType == 'SN.1':          # Check that this is a correctly formatted structure numeric comparitor
         if elementText not in ['<', '>', '=', '<=', '>=', '<>']:
@@ -1903,25 +2137,53 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
         if (len(elementText) > 1) or (elementText not in '+-/.:'):
             return f'Illegally formatted numeric separator/suffix "{elementText}"'
         return None
+    if textType == 'ST':            # Check that this is a correctly formatted string text
+        reTest = notEscapedpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{elementText}"'
+        reTest = badSTpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted string text "{reTest.group()}" in "{elementText}"'
+        return None
     if textType == 'TM':            # Check that this is a correctly formatted time
-        if TMpattern.search(elementText) is None:
+        reTest = TMpattern.search(elementText)
+        if reTest is None:
             return f'Illegally formatted time "{elementText}"'
         return None
     if textType == 'TN':            # Check that this is a correctly formatted telephone number
-        if TNpattern.search(elementText) is None:
+        reTest = TNpattern.search(elementText)
+        if reTest is None:
             return f'Illegally formatted telephone number "{elementText}"'
         return None
-    if (parentType == 'TS') and (parentSequence == 1):          # Check that this is a correctly formatted timestamp [DTM]
-        if DTMpattern.search(elementText) is None:
+    if (parentType == 'TS') and (parentSequence == 1):          # Check that this is a correctly formatted timestamp [TS]
+        reTest = TSpattern.search(elementText)
+        if reTest is None:
+            return f'Illegally formatted date/time "{elementText}"'
+        try:
+            if len(elementText) > 8:
+                du_parser.parse(elementText[0:8]+"T"+elementText[8:])
+            else:
+                du_parser.parse(elementText)
+        except (ValueError, OverflowError):
             return f'Illegally formatted date/time "{elementText}"'
         return None
     if (parentType == 'TS') and (parentSequence == 2):          # Check that this is a correctly formatted time degree of precision
-        if TS2pattern.search(elementText) is None:
+        reTest = TS2pattern.search(elementText)
+        if reTest is None:
             return f'Illegally formatted time degree of precission "{elementText}"'
         return None
+    if textType == 'TX':            # Check that this is a correctly formatted text
+        reTest = notEscapedpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{elementText}"'
+        reTest = badTXCFpattern.search(elementText)
+        if reTest is not None:
+            return f'Illegally formatted text "{reTest.group()}" in "{elementText}"'
+        return None
     if (parentType == 'XTN') and (parentSequence == 1):         # Check that this is a correctly formatted telephone number [TN]
-        if TNpattern.search(elementText) is None:
-            return f'Illegally formatted telephone number "{elementText}"'
+        reTest = TNpattern.search(elementText)
+        if reTest is None:
+            return f'Illegally formatted telephone number "{reTest.group()}" in "{elementText}"'
         return None
 
     '''
@@ -1980,6 +2242,73 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
     return None
 
 
+def XPathTo(thisNode, children, seg, segNo, field):
+    thisTag = thisNode.tag
+    if thisTag == msgStruct:
+        if children == "":
+            return "/" + msgStruct, seg, field
+        else:
+            return "/" + msgStruct + "/" + children, seg, field
+    parentNode = thisNode.parent
+    if seg == "":
+        parentTag = parentNode.tag
+        if parentTag == msgStruct:
+            if isSeg(thisTag) is not None:
+                seg = thisTag
+                segNo = SegmentNodes.index(thisNode) + 1
+        else:
+            grandparentNode = parentNode.parent
+            grandparentTag = grandparentNode.tag
+            if grandparentTag == msgStruct:
+                if isSeg(parentTag) is not None:
+                    seg = parentTag
+                    segNo = SegmentNodes.index(parentNode) + 1
+                    field = thisTag
+                elif isSeg(thisTag) is not None:
+                    seg = thisTag
+                    segNo = SegmentNodes.index(thisNode) + 1
+    if len(parentNode) > 1:
+        Iam = 0
+        Ifound = 0
+        for i, child in enumerate(parentNode):
+            if child == thisNode:
+                Iam = i
+            if child.tag == thisTag:
+                Ifound += 1
+        if Ifound > 1:
+            thisTag += f'[{Iam+1}]'
+    if children == "":
+        return XPathTo(parentNode, thisTag, seg, segNo, field)
+    else:
+        return XPathTo(parentNode, thisTag + "/" + children, seg, segNo, field)
+
+
+embedding_keys = {"/FontFile", "/FontFile2", "/FontFile3"}
+fonts_used = set()
+fonts_embedded = set()
+def finddFonts(obj):
+    if obj is None:
+        return False
+    if hasattr(obj, "keys"):
+        if "/BaseFont" in obj:
+            fonts_used.add(obj["/BaseFont"])
+        if "/FontName" in obj:
+            if any(key in obj for key in embedding_keys):
+                fonts_embedded.add(obj["/FontName"])
+        for key in obj.keys():
+            try:
+                finddFonts(obj[key])
+            except Exception:
+                continue
+    elif isinstance(obj, list):
+        for item in obj:
+            try:
+                finddFonts(item)
+            except Exception:
+                continue
+    return
+
+
 # Define a logging Formatter class
 # To suppress program/level/datetime at the start of a logging record use
 # logger.xxxx('message', extra={'raw_message':True})
@@ -2015,6 +2344,8 @@ if __name__ == '__main__':
                         help='The folder where the HL7 v2.xml XML tagged message(s) will be created (default="output")')
     parser.add_argument('-S', '--schemaDir', dest='schemaDir', required=True, metavar='schemaDir',
                         help='The folder containing the HL7 v2.xml XML schema files (e.g. "schema/v2.4")')
+    parser.add_argument('-T', '--telephonePattern', dest='telephonePattern', default=None, metavar='telephonePattern',
+                        help='The regular expression pattern for validating telephone numbers')
     parser.add_argument ('-v', '--verbose', dest='verbose', type=int, choices=range(0,5),
                          help='The level of logging\n\t0=CRITICAL,1=ERROR,2=WARNING,3=INFO,4=DEBUG')
     parser.add_argument ('-L', '--logDir', dest='logDir', default='.', metavar='logDir',
@@ -2031,6 +2362,7 @@ if __name__ == '__main__':
     logDir = args.logDir
     logFile = args.logFile
     loggingLevel = args.verbose
+    telephonePattern = args.telephonePattern
 
     # Set up logging
     loggingLevels = {0:logging.CRITICAL, 1:logging.ERROR, 2:logging.WARNING, 3:logging.INFO, 4:logging.DEBUG}
@@ -2048,6 +2380,15 @@ if __name__ == '__main__':
     formatter = ConditionalFormatter(logformat, dateformat)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
+    # Compile the telephone pattern if specified
+    if telephonePattern is not None:
+        try:
+            TNpattern = re.compile(telephonePattern)
+        except re.error as e:
+            logger.critical('Invalid telephone pattern: %s', e)
+            logging.shutdown()
+            sys.exit(EX_CONFIG)
 
     # Check that the schemaDir folder exist and read in the segment, fields and datatype schemas
     if not os.path.isdir(schemaDir):
@@ -2255,6 +2596,7 @@ if __name__ == '__main__':
                                 if thisType not in ['min', 'max']:
                                     continue
                                 segmentBusinessRules[thisSeg][group][rule][repeatFields][thisType]['passed'] = 0
+            ERRrepeats = []
             restart, hl7XML = validateXML(segmentList, msgStruct, [], False, False, 0)
             if restart:         # Truncate the report file by closing it and reopening
                 if reportFile != sys.stdout:
@@ -2281,7 +2623,7 @@ if __name__ == '__main__':
                             count = segmentBusinessRules[thisSeg][group][rule][repeatFields][thisType]['count']
                             if ((thisType == "min") and (passed < count)) or ((thisType == "max") and (passed > count)):
                                 comment = f'Failed Segment Business Rule ({thisSeg}:{group}:{rule}:{repeatFields}:{thisType}:{count} - passed {passed})'
-                                print(comment, file=reportFile)
+                                ERRrepeats.append([thisSeg, group, rule, repeatFields, thisType, comment])
                                 hl7XML.append(et.Comment(comment))
                     
         # Now run the XPath Buisness Rules
@@ -2291,6 +2633,7 @@ if __name__ == '__main__':
                     ruleNodes = hl7XML.xpath(rulePath)          # Fetch the rule nodes from the hl7XML message
                 except Exception as e:
                     comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}) Testing failure - {e}'
+                    ERRrepeats.append(['',0,0,comment])
                     print(comment, file=reportFile)
                     hl7XML.append(et.Comment(comment))
                     continue
@@ -2300,7 +2643,9 @@ if __name__ == '__main__':
                     if ruleNode.tag is et.Comment:
                         continue
                     if (not ruleNode.tag.startswith(msgStruct)) and (not len(ruleNode.tag) == 3):        # ruleNode must be a segment group or a segment
-                        comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}) Testing failure - rulePath must return a segment group or a segment'
+                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", "")
+                        comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}) Testing failure at {errorPath} - rulePath must return a segment group or a segment'
+                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
                         print(comment, file=reportFile)
                         hl7XML.append(et.Comment(comment))
                         continue
@@ -2313,7 +2658,9 @@ if __name__ == '__main__':
                                 else:                               # Absolute addressing
                                     fieldNodes = hl7XML.xpath(fieldPath)
                             except Exception as e:
+                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", "")
                                 comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}) Testing failure - {e}'
+                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
                                 print(comment, file=reportFile)
                                 hl7XML.append(et.Comment(comment))
                                 continue
@@ -2326,7 +2673,9 @@ if __name__ == '__main__':
                                             continue
                                         parent = fieldNode.getparent()
                                         if (parent is None) or (len(parent.tag) != 3) or (not fieldNode.tag.startswith(parent.tag)):        # fieldNode must be a child a segment group or a segment
-                                            comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}) Testing failure - fieldPath must return a field'
+                                            errorPath, errorSeg, errorSegNo, errorField = XPathTo(fieldNode, "", "", "")
+                                            comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}) Testing failure at {errorPath} - fieldPath must return a field'
+                                            ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
                                             print(comment, file=reportFile)
                                             hl7XML.append(et.Comment(comment))
                                             continue
@@ -2355,33 +2704,446 @@ if __name__ == '__main__':
                                             Result = newData['Result']
                                         if not linked:
                                             if Result['Passed'] == False:
-                                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:fieldType {fieldType}:linked {linked}) Testing failure'
+                                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(fieldNode, "", "", "")
+                                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:fieldType {fieldType}:linked {linked}) Testing failure at {errorPath}'
+                                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
                                                 print(comment, file=reportFile)
                                                 hl7XML.append(et.Comment(comment))
                                         else:
                                             if Result['Passed'] == True:
                                                 fieldCount -= 1
                                                 ruleCount -= 1
-                                        if fieldType in ['min', 'max']:
-                                            noPassed = XPathBusinessRules[rule][rulePath][ruleType]['fields'][fieldPath][fieldType][linked]['fieldCount'] - fieldCount
-                                            if (fieldType == 'min') and (fieldCount > 0):
-                                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:fieldType {fieldType}) Testing failure - {noPassed:d} field(s) passed'
-                                                print(comment, file=reportFile)
-                                                hl7XML.append(et.Comment(comment))
-                                            if (fieldType == 'max') and (fieldCount < 0):
-                                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:fieldType {fieldType}) Testing failure - {noPassed:d} field(s) passed'
-                                                print(comment, file=reportFile)
-                                                hl7XML.append(et.Comment(comment))
+                                    if fieldType in ['min', 'max']:
+                                        noPassed = XPathBusinessRules[rule][rulePath][ruleType]['fields'][fieldPath][fieldType][linked]['fieldCount'] - fieldCount
+                                        if (fieldType == 'min') and (fieldCount > 0):
+                                            errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", "")
+                                            comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:fieldType {fieldType}) Testing failure at {errorPath} - {noPassed:d} field(s) passed'
+                                            ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                            print(comment, file=reportFile)
+                                            hl7XML.append(et.Comment(comment))
+                                        if (fieldType == 'max') and (fieldCount < 0):
+                                            errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", "")
+                                            comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}:fieldPath {fieldPath}:fieldType {fieldType}) Testing failure at {errorPath} - {noPassed:d} field(s) passed'
+                                            ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                            print(comment, file=reportFile)
+                                            hl7XML.append(et.Comment(comment))
                         if ruleType in ['min', 'max']:
                             noPassed = XPathBusinessRules[rule][rulePath][ruleType]['ruleCount'] - ruleCount
                             if (ruleType == 'min') and (fieldCount > 0):
-                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}) Testing failure - {noPassed:d} rule(s) passed'
+                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", "")
+                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}) Testing failure at {errorPath} - {noPassed:d} rule(s) passed'
+                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
                                 print(comment, file=reportFile)
                                 hl7XML.append(et.Comment(comment))
                             if (ruleType == 'max') and (ruleCount < 0):
-                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}) Testing failure - {noPassed:d} rule(s) passed'
+                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", "")
+                                comment = f'ERROR: XPath Business Rule (rule {rule}:rulePath {rulePath}:ruleType {ruleType}) Testing failure at {errorPath} - {noPassed:d} rule(s) passed'
+                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
                                 print(comment, file=reportFile)
                                 hl7XML.append(et.Comment(comment))
+
+        # Now run the Parser rules
+        for rule in ParserBusinessRules:
+            for parser in ParserBusinessRules[rule]:
+                for tests in ParserBusinessRules[rule][parser]:
+                    isBase64 = ParserBusinessRules[rule][parser][tests]['isBase64']
+                    xpath = ParserBusinessRules[rule][parser][tests]['xpath']
+                    try:
+                        parserNodes = hl7XML.xpath(xpath)          # Fetch the rule nodes from the hl7XML message
+                    except Exception as e:
+                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) Testing failure - {e}'
+                        ERRrepeats.append(["",0,0,comment])
+                        print(comment, file=reportFile)
+                        hl7XML.append(et.Comment(comment))
+                        continue
+                    for thisNode in parserNodes:
+                        nodeData = thisNode.text
+                        if isBase64:
+                            try:
+                                if isinstance(nodeData, str):
+                                    nodeData = nodeData.encode('utf-8')
+                                nodeData = base64.b64decode(nodeData, validate=True).decode('utf-8')
+                            except Exception as e:
+                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - Base64 decoding failure - {e}'
+                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                print(comment, file=reportFile)
+                                hl7XML.append(et.Comment(comment))
+                                continue
+                        if parser == 'UCUM':
+                            for test in list(tests):
+                                if test == 'isValid':
+                                    try:
+                                        nodeData = ureg.from_ucum(nodeData)
+                                    except Exception as e:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - UCUM parsing failure - {e}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                        if parser == "FT":
+                            for test in list(tests):
+                                if test == 'noX':
+                                    reTest = noX.search(nodeData)
+                                    if reTest is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - FT (noX) test failure - {reTest.group()}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == 'noZ':
+                                    reTest = noZ.search(nodeData)
+                                    if reTest is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - FT (noZ) test failure - {reTest.group()}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == 'noCE':
+                                    reTest = noCE.search(nodeData)
+                                    if reTest is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - FT (noCE) test failure - {reTest.group()}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == 'noRepeats':
+                                    siblings = thisNode.xpath('./follow-siblings::*')
+                                    for sibling in siblings:
+                                        if isinstance(sibling, et.Comment):
+                                            continue
+                                        if sibling.tag == thisNode.tag:
+                                            errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                            comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - FT (noRepeats) test failure - found repeat'
+                                            ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                            print(comment, file=reportFile)
+                                            hl7XML.append(et.Comment(comment))
+                                            break
+                                    continue
+                                if test == 'noC':
+                                    reTest = noC.search(nodeData)
+                                    if reTest is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - FT (noC) test failure - {reTest.group()}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == 'noM':
+                                    reTest = noM.search(nodeData)
+                                    if reTest is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - FT (noM) test failure - {reTest.group()}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                        if parser == "XHTML":
+                            if 'XMLstrict' in test:
+                                XHTMLparser = et.XMLParser(recover=False,resolve_entities=False, no_network=True)
+                                try:
+                                    nodeTree = et.fromstring(nodeData, parser=XHTMLparser)
+                                except et.XMLSyntaxError as e:
+                                    errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                    comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (XMLstrict) test failure - {str(e)}'
+                                    ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                    print(comment, file=reportFile)
+                                    hl7XML.append(et.Comment(comment))
+                                    continue
+                            try:
+                                soup = BeautifulSoup(nodeData, "lxml-xml")
+                            except Exception as e:
+                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (lxml-xml) parse failure - {str(e)}'
+                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                print(comment, file=reportFile)
+                                hl7XML.append(et.Comment(comment))
+                                continue
+                            for test in list(tests):
+                                if test == 'noHTTP':
+                                    anchors = soup.find_all(href=re.compile(r'^http://'))
+                                    if len(anchors) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noHTTP) test failure - {len(anchors)} http:// links found'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noExternalCSS":
+                                    links = soup.find_all('link', rel='stylesheet', href=re.compile(r'^https://'))
+                                    if len(links) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noExternalCSS) test failure - {len(links)} https:// links found'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noScripts":
+                                    scripts = soup.find_all('script')
+                                    if len(scripts) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noScripts) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noBase":
+                                    bases = soup.find_all('base')
+                                    if len(bases) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noBase) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noLink":
+                                    links = soup.find_all('link')
+                                    if len(links) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noLink) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noXlink":
+                                    xlinks = soup.find_all('xlink')
+                                    if len(xlinks) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noXlink) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noFrame":
+                                    frames = soup.find_all('frame')
+                                    if len(frames) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noFrame) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noIframe":
+                                    iframes = soup.find_all('iframe')
+                                    if len(iframes) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noIframe) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noForm":
+                                    forms = soup.find_all('form')
+                                    if len(forms) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noForm) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "noObject":
+                                    objects = soup.find_all('object')
+                                    if len(objects) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (noObject) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "coreDisplay":
+                                    coreDisplay = soup.find('div', class_='reportDisplay')
+                                    if coreDisplay is None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (coreDisplay) test failure'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                if test == "OBXimages":
+                                    obxImages = soup.find_all('img')
+                                    for obxImage in obxImages:
+                                        if obxImage.has_attr('src'):
+                                            if not obxImage['src'].startswith('hl7v2://OBX.'):
+                                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                                comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (OBXimages) test failure - invalid image source'
+                                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                                print(comment, file=reportFile)
+                                                hl7XML.append(et.Comment(comment))
+                                            obxRef = obxImage['src'].replace('hl7v2://OBX.', '')
+                                            thisOBX = hl7XML.find(f"//OBX/OBX.1[@ID='{obxRef}']")
+                                            if thisOBX is None:
+                                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                                comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (OBXimages) test failure - referenced OBX not found'
+                                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                                print(comment, file=reportFile)
+                                                hl7XML.append(et.Comment(comment))
+                                            if len(thisOBX) > 1:
+                                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                                comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - XHTML (OBXimages) test failure - multiple OBX elements found for reference'
+                                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                                print(comment, file=reportFile)
+                                                hl7XML.append(et.Comment(comment))
+                        if parser == "PDF":
+                            try:
+                                pdf_stream = io.BytesIO(nodeData)
+                                if "PDFstrict" in tests:
+                                    reader = PdfReader(pdf_stream, strict=True)
+                                else:
+                                    reader = PdfReader(pdf_stream, strict=False)
+                            except (PdfReadError, Exception) as e:
+                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - PDF test failure - not PDF document'
+                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                print(comment, file=reportFile)
+                                hl7XML.append(et.Comment(comment))
+                                continue
+                            if reader.is_encrypted:
+                                errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - PDF test failure - encrypted PDF document'
+                                ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                print(comment, file=reportFile)
+                                hl7XML.append(et.Comment(comment))
+                                continue
+                            for test in tests:
+                                if test == "versionPDF/A-1b":
+                                    header = reader.pdf_header
+                                    pdf_version = header.replace("%PDF-", "").strip()
+                                    if pdf_version != "1.4":
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - PDF test failure - incorrect PDF version: {pdf_version}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                    xmp = reader.xmp_metadata
+                                    if xmp is None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - PDF test failure - incorrect version - missing XMP metadata'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                    part = xmp.pdfaid_part
+                                    conformance = xmp.pdfaid_conformance
+                                    if part != "1" or conformance != "B":
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - PDF test failure - incorrect PDF/A-1b conformance: part={part}, conformance={conformance}'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "allFontsEmbedded":
+                                    fonts_used = set()
+                                    fonts_embedded = set()
+                                    for page in reader.pages:
+                                        if "/Resources" in page:
+                                            finddFonts(page["/Resources"].get_object())
+                                    clean_used = {f.lstrip('/') for f in fonts_used}
+                                    clean_embedded = {f.lstrip('/') for f in fonts_embedded}
+                                    if len(clean_used - clean_embedded) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - PDF test failure - unembedded font used in document'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noComments":
+                                    for page in reader.pages:
+                                        if "/Annots" in page:
+                                            errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                            comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - PDF test failure - comments found in document'
+                                            ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                            print(comment, file=reportFile)
+                                            hl7XML.append(et.Comment(comment))
+                                            continue
+                                if test == "canPrint":
+                                    continue    # All PDFs without a password can be printed
+                                if test == "canCopy":
+                                    continue    # All PDFs without a password can be copied
+                        if parser == "RTF":
+                            for test in tests:
+                                if test == "wellFormed":
+                                    if not nodeData.strip().startswith(r"{\rtf"):
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - invalid RTF content'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                    continue
+                                    balance = 0
+                                    inEscape = False
+                                    for char in nodeData:
+                                        if inEscape:
+                                            inEscape = False
+                                            continue
+                                        if char == '\\':
+                                            inEscape = True
+                                            continue
+                                        if char == '{' and not inEscape:
+                                            balance += 1
+                                        elif char == '}':
+                                            balance -= 1
+                                            if balance < 0:
+                                                break
+                                    if balance != 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - unbalanced braces'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noNesting":
+                                    if (noItap.search(nodeData) is not None) or (noNestrow.search(nodeData) is not None):
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - nested tables'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noOLE":
+                                    RTFparser = RtfObjParser(nodeData)
+                                    RTFparser.parse()
+                                    if len(RTFparser.oleObjects) > 0:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - OLE objects not allowed'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noEmbeddedFonts":
+                                    if RTFfont_pattern.search(nodeData) is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - embedded fonts not allowed'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noShapes":
+                                    if RTFshapes.search(nodeData) is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - shapes not allowed'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noSmartTags":
+                                    if RTFsmartTags.search(nodeData) is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - smart tags not allowed'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noChangeTracking":
+                                    if RTFchangeTracking.search(nodeData) is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - change tracking not allowed'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
+                                if test == "noSectionLayout":
+                                    if RTFsectionLayout.search(nodeData) is not None:
+                                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", "")
+                                        comment = f'ERROR: Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - RTF test failure - section layout not allowed'
+                                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment])
+                                        print(comment, file=reportFile)
+                                        hl7XML.append(et.Comment(comment))
+                                        continue
 
         # Save the HL7 V2.xml message
         hl7XML.set('xmlns', 'urn:hl7-org:v2xml')
