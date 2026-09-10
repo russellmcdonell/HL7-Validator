@@ -91,7 +91,8 @@
             "program": "getNATAdata.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "cwd": "${workspaceFolder}/."
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-L", "logs/ADRM", "-l", "getNATAdata.log", "-v", "4" ]
         },
         {
             "name": "hl7Validator ADRM Example02",
@@ -132,6 +133,26 @@
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
             "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "ADRM Colorectal Cancer.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM Colorectal Cancer.log", "-v", "4" ]
+        },
+        {
+            "name": "hl7Validator MLLP",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-p", "7777", "-A", "localhost", "-a", "7778","-S", "schema/ADRM", "-L", "logs/ADRM", "-l", "MLLP Server.log"]
+        },
+        {
+            "name": "hl7Validator Web Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-p", "8080", "-s", "-S", "schema/ADRM", "-L", "logs/ADRM", "-l", "Web Server.log"]
         },
         {
             "name": "Test a Business Rule",

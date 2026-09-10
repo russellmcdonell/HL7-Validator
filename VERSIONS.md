@@ -1,11 +1,20 @@
 # HL7 Validator
 
+## Version 1.2 - 10-Sep-2026
+
+This is the last major development of Version 1. Any further releases of Version 1.x will be bug fix releases.
+
+Added 'External Business Rules' - rules that call external services to validate data
+Added support for TCP/IP connections
+
+- server for listening for MLLP encoded messages and returning validation/conformace data in the ERR segment of the Application Acknowledgement
+- webserver with form for pasting message and getting a display of the validation/conformance information in a tabulated form.
+
 ## Version 1.1 - 1-Sep-2026
 
 This is a "beta" release (two addition messages tested)  
 Added parsers for "UCUM", "FT", "XHTML", "PDF" and "RTF" with associated tests for each see [README](https://github.com/russellmcdonell/HL7-Validator)  
 Added two example messages from the ADRM specification [which don't pass ADRM - sigh]
-
 
 ## Version 1.0 - 26-Aug-2026
 

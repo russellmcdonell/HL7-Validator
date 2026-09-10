@@ -71,32 +71,47 @@ EX_NOPERM = 77          # permission denied
 EX_CONFIG = 78          # configuration error
 
 
-isPathology = re.compile(r'Pathology|Clinical Lab', re.IGNORECASE)  # A regex pattern to match "Pathology" or "Clinical Lab" in a case-insensitive manner
-removeComment = re.compile(r'\s*\(.*?\).*')  # A regex pattern to remove comments enclosed in parentheses
+isVet = re.compile(r'Veterinary|Animal', re.IGNORECASE)  # A regex pattern to match "Pathology" or "Clinical Lab" in a case-insensitive manner
+removeComment = re.compile(r'\s*\([^\)]*\).*')  # A regex pattern to remove comments enclosed in parentheses
 
 
 def getNATAdata(soup, ws):
     '''
     Get the NATA Accreditation numbers and Organisation Names from the NATA website
     '''
+
+    global labs
+
     anchors = soup.select('a')
     for anchor in anchors:
         href = anchor.get('href')
         if href and href.startswith('https://nata.com.au/accredited-organisation/'):
             bits = href.split('-')
             NATAnumber = bits[-2]
-            siteNumber = bits[-1][:-1]  # Remove the trailing slash from the site number
+            siteNumber = bits[-1]
+            siteNumber = siteNumber.split('/')[0].strip()
             paras = anchor.find_all('p')
+            origName = paras[0].text.strip()
             orgName = paras[0].text.strip()
-            if isPathology.search(orgName) is None:
-                continue  # Skip if the organisation name does not contain "Pathology"
+            if isVet.search(orgName) is not None:
+                continue  # Skip if the organisation name contains "Veterinary" or "Animal"
             orgName = orgName.replace('"', '')  # Remove double quotes from the organisation name
             orgNames = orgName.split('\n')
             orgName = removeComment.sub('', orgNames[0])  # Remove comments from the organisation name
             orgName = orgName.strip()  # Remove leading and trailing whitespace from the organisation name
-            siteName = paras[1].text
+            if orgName.find('    ') != -1:
+                orgName = orgName.split('    ')[0]
+            if origName != orgName:
+                logging.warning(f'Original name "{origName}" is different from cleaned organisation name "{orgName}"')
+            siteName = paras[1].text.strip()
+            if isVet.search(siteName) is not None:
+                continue  # Skip if the site name contains "Veterinary" or "Animal"
             siteName = siteName.replace('"', '')  # Remove double quotes from the site name
+            siteNames = siteName.split('\n')
+            siteName = removeComment.sub('', siteNames[0])  # Remove comments from the site name
             siteName = siteName.strip()  # Remove leading and trailing whitespace from the site name
+            if siteName.find('    ') != -1:
+                siteName = siteName.split('    ')[0]
             if siteName.startswith('Accreditation'):
                 siteName = ''  # Clear the site name if it starts with "Accreditation"
             addressTag = anchor.find('span')
@@ -122,6 +137,8 @@ def getNATAdata(soup, ws):
                             phone = name.find_next_sibling('span')
                             if phone:
                                 phoneNo = phone.text.strip()
+                                if phoneNo.startswith('P:'):
+                                    phoneNo = phoneNo[2:].strip()
                                 email = phone.find_next_sibling('span')
                                 if email:
                                     emailSpan = email.find('span')
@@ -129,7 +146,18 @@ def getNATAdata(soup, ws):
                                         name = emailSpan['data-name']
                                         domain = emailSpan['data-domain']
                                         emailAddress = f"{name[::-1]}@{domain[::-1]}"
-            ws.append([NATAnumber, orgName, siteName, siteNumber, address, contactName, phoneNo, emailAddress])
+            if orgName not in labs:
+                labs[orgName] = {}
+            if NATAnumber not in labs[orgName]:
+                labs[orgName][NATAnumber] = {}
+            if contactName not in labs[orgName][NATAnumber]:
+                labs[orgName][NATAnumber][contactName]= {}
+            contact = tuple([phoneNo, emailAddress])
+            if contact not in labs[orgName][NATAnumber][contactName]:
+                labs[orgName][NATAnumber][contactName][contact] = []
+            site = tuple([siteName, siteNumber, address])
+            if site not in labs[orgName][NATAnumber][contactName][contact]:
+                labs[orgName][NATAnumber][contactName][contact].append(site)
 
 
 headers = {
@@ -194,28 +222,46 @@ if __name__ == '__main__':
     wb = Workbook()
     ws = wb.active
     ws.title = "NATA Data"
-    ws.append(['NATA Accreditation Number', 'Organisation Name', 'Site Name', 'Site Number', 'Address', 'Contact Name', 'Phone Number', 'Email Address'])
+    ws.append(['Organisation Name', 'NATA Accreditation Number', 'Contact Name', 'Phone Number', 'Email Address', 'Site Name', 'Site Number', 'Site Address'])
+    labs = {}
 
-    # Get the NATA data from the NATA website
-    # Make the first request
-    print(f"Getting page 1 of NATA data")
-    response = requests.get("https://nata.com.au/?post_type=site&s=&filter=&state=&status=", headers=headers)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, "html.parser")
-        getNATAdata(soup, ws)
-
-    # Make the remaining requests
-    for page in range(2, 10000):
-        sleep(2)  # Be nice to the NATA website and don't hammer it with requests
-        print(f"Getting page {page} of NATA data")
-        response = requests.get(f"https://nata.com.au/page/{page}/?post_type=site&s=&filter=&state=&status=", headers=headers)
+    for service in ["pathology", "cytopathology", "microbiology", "haematology", "immunohaematology", "infertility"]:
+        # Get the NATA data from the NATA website
+        # Make the first request
+        print(f"Getting page 1 of NATA data for service: {service}")
+        response = requests.get(f'https://nata.com.au/?post_type=site&s={service}&filter=service&state=&status=', headers=headers)
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, "html.parser")
             getNATAdata(soup, ws)
-        else:
-            break
 
-        wb.save(os.path.join(outputDir, outputFile.replace('.csv', '.xlsx')))
+        # Make the remaining requests
+        for page in range(2, 10000):
+            sleep(2)  # Be nice to the NATA website and don't hammer it with requests
+            print(f"Getting page {page} of NATA data for service: {service}")
+            response = requests.get(f'https://nata.com.au/page/{page}/?post_type=site&s={service}&filter=service&state=&status=', headers=headers)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, "html.parser")
+                getNATAdata(soup, ws)
+            else:
+                break
 
-
-                
+    row = [None,None,None,None,None,None,None,None]
+    for lab in sorted(labs):
+        row[0] = lab
+        for number in sorted(labs[lab]):
+            row[1] = number
+            for contactName in labs[lab][number]:
+                row[2] = contactName
+                for contact in labs[lab][number][contactName]:
+                    phoneNo, emailAddress = list(contact)
+                    row[3] = phoneNo
+                    row[4] = emailAddress
+                    for site in labs[lab][number][contactName][contact]:
+                        siteName, siteNumber, address = list(site)
+                        row[5] = siteName
+                        row[6] = siteNumber
+                        row[7] = address
+                        ws.append(row)
+                        row = [None,None,None,None,None,None,None,None]
+    wb.save(os.path.join(outputDir, outputFile.replace('.csv', '.xlsx')))
+               

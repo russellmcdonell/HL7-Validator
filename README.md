@@ -314,7 +314,7 @@ These **XPath Business Rules** are rules that will be applied after every segmen
 
 NOTE: HL7 v2.xml uses "seg" as the XML tag for segments and "seg.n" as the XML tag for fields. XPath expression must follow the HL7 v2.xml naming conventions. Hence //OBR/OBR.1 is all OBR-1 fields in all OBR segments. Components and subcomponents use "datatype.n" for tags. Hence, ERR-1.4.1, with a value of "130", is encoded in the HL7 v2.xml message as  
 "\<ERR\>\<ERR.1\>\<ELD.4\>\<CE.1\>130\</CE.1\>\</ELD.4\>\</ERR.1\>\</ERR\>"  
-as the ERR.1 field has the datatype of "ELD" and the first subcomponent of the fourth ELD component had the datatype of CE. The XPath to this value would be '//ERR/ERR.1/ELD.4/CE1'.
+as the ERR.1 field has the datatype of "ELD" and the first subcomponent of the fourth ELD component had the datatype of CE. The XPath to this value would be '//ERR/ERR.1/ELD.4/CE.1'.
 
 The subsequent **XPath**s can be absolute or a relative path from **field path**. e.g. "../OBX.5" to retrieve the data from the OBX-5 field in this OBX segment (**field path** must be a path to a field in an OBX segment).
 
@@ -374,13 +374,13 @@ And the data passed to the **Rules Engine** could look like
 Sometime the data in a field/component/subcomponent must match some grammer or lexical structure.
 For instance, if you use UCUM for units of measurement, then UCUM code is actually a UCUM expression, which has to comply with the UCUM grammer for units of measurement. Similarly, the data on OBX-5 may be a Base64 encoded HTML document. Once decoded, that document must be valid HTML, or perhaps XHTML. And the conformance profile may ban certain HTML tags.
 
-**Parser Business Rules** are different to all the other Business Rules. **Parser Business Rules** are part of the code. If you need another parser then you have to edit the code. Simiarly, the tests that are valid for each parser are part of the code. If you want an additional test for an existing parser then you have to edit the code.
+**Parser Business Rules** are different to all the other Business Rules. **Parser Business Rules** are part of the code. If you need another parser then you have to edit the code. Simiarly, the tests that are valid for each parser are part of the code. If you want an additional test for an existing parser then you have to edit the code. Similarly, no field/component/subcomponent definition is required in the "Glossary" in **Business Rules DMN.xlsx** as the data fetched for **Paser Business Rules** testing will not be passed to the **Rules Engine**.
 
 **Parser Business Rules** are run after all the **XPath Business Rules** have been run.
-The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "parser rules" with the headings "rule", "parser", "test(s)", "idBase64" and "xpath".
+The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "parser rules" with the headings "rule", "parser", "test(s)", "isBase64" and "xpath".
 These are not **DMN** rules, so the column "rule" has no functional value, but can be used to document the conformance profile point being tested.
 The "parser" must be one of the defined parser from the table below. "test(s)" is a comma separated list of parser test to perform on the data.
-"idBase64" must be "Y" if the data should be Base64 encoded. **HL7 Validator** will attempt to decode the data from Base64 encoding, if "isBase64" is "Y", before passing the data to the specified parser.
+"isBase64" must be "Y" if the data should be Base64 encoded. **HL7 Validator** will attempt to decode the data from Base64 encoding, if "isBase64" is "Y", before passing the data to the specified parser.
 
 Each test must be a valid test for the specified parser taken from the table below. If the first character of a test is "#" then that test will be deemed to have been temporarily disabled and won't be run.
 
@@ -455,6 +455,29 @@ The **XHTML Parser** can do either. One of the **XHTML Parer** tests is **XHTMLs
 | | noSmartTags | Check that there are no smart tags |
 | | noChangeTracking | Check that there are no change tracking markup or comments |
 | | noSectionLayout | Check that there is no section specific page layout |
+
+## External Business Rules
+
+**External Business Rules** let **HL7 Validator** validate data, using external service such as a FHIR Provider Directory service, or a Healthcare Identifiers Patient Search service. **External Business Rules**, like **Parser Business Rules** are different to all the DMN based Business Rules. **External Business Rules** are part of the code. If you need access another service then you have to edit the code. If you need to access an existing **External Buisness Rule** service, but by another method, then you will have to edit the code.  Similarly, no field/component/subcomponent definition is required in the "Glossary" in **Business Rules DMN.xlsx** as the data fetched for **External Business Rules** testing will not be passed to the **Rules Engine**.
+
+**Externa Business Rules** are run after all the **Parser Business Rules** have been run.
+The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "external rules" with the headings "rule", "service", "username", "password", "APIkey", "URL" followed by a sequence of columns with the headed "xpath". The first column with a heading other than "xpath" (e.g. "Comment"/"Description"/"Annotation") will define the maximum number of "xpath" definitions. For each"rule", the first "xpath" column that is empty or blank, will define the actual number of "xpath"s that apply to that specific rule.
+
+These are not **DMN** rules, so the column "rule" has no functional value, but will be used to document the conformance profile point being tested.
+The "service" must be one of the defined services from the table below. The "username", "password" and "APIkey" columns can be used to configure the security tokens required to access the service. However, you may want to leave these columns blank, and hard code these in **hl7Validator.py** for security reasons.
+[They can be configured for each service and are the first things defined after the import statments at the top of the script.]
+The "URL" is the URL for accessing the service, not including any parameters. The "xpath" columns define the parameters for the Service. The first "xpath" must be an absolute **XPath Expression** to a field/component/subcomponent where the data for the first parameter in the set of parameters to be validated, will be found. If this is **XPath Expression** returns multiple matching nodes then the **External Business Rule** will be run for each node in the returned list. Second and subsequent "xpath" expressions can be absolute or relative, but if relative, they will be relative to the current node returned by the first "xpath" expression. Each "xpath" **XPath Expression** must only select data that is suitable for testing by the specified service, for the matching service parameter. The number of "xpath" expressions must match the number of parameters required for each external service.
+
+NOTE: If second and subsequent "xpath" expression return multiple matching nodes, the only the data from the first node in the list will be use as the matching parameter data.
+
+### The Defined External Services
+
+| Service | Description | Parameters |
+| --- | --- | --- }
+| csiroUCUM | The Australian UCUM validation service [CSIRO Ontology Server (ontoserver)] | "UCUM expression" |
+| healthLink | The Australasian HealthLink FHIR Provider Directory service | "edi" |
+| IHI | The Australian Healthcare Identifiers Patient Search service (not yet implemented) | |
+| HPII | The Australian Healthcare Identifiers Provider Search service (not yet implemented) | |
 
 ## Business Rules Definitions
 
