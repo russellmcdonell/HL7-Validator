@@ -1,5 +1,12 @@
 # HL7 Validator
 
+## Version  1.3 - 18-Sep-2026
+
+Added optimisation to **Datatype Business Rules**, **Field Business Rules** and **Segment Business Rules** so that things are not tested more than once even if they match multiple groups in the "group(s)" column  
+Added negation for "group(s)" - if a group name starts with "!" then data in that group will be excluded from any testing for the matching datatype, field or segment.  
+Made 'severity' a user configurable attribute for all **Business Rules**  
+Multiple bug fixes associated with escapting an descaping FT/TX/CF/ST data.
+
 ## Version 1.2 - 10-Sep-2026
 
 This is the last major development of Version 1. Any further releases of Version 1.x will be bug fix releases.

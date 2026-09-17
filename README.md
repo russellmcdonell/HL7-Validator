@@ -117,12 +117,16 @@ to create a **Rules Engine**; something that data can be passed through in order
 
 ### Datatype Business Rules
 
-Datatype Business rules are general rules that apply to all instances of a datatype, such as identifiers must have a coding system, patients and practitioners must have a name, organizations must have a street address. The Excel Workbook, "**Busisness Rules.xlsx**", must contain one Worksheet named "**datatype rules**" with the headings "datatype", "group(s)", "segment(s)" and "rule". These rules are executed after the data in a field or component have been validated, if the datatype of that field or component has a defined Datatype Business Rule. "group(s)", if specified, must be a comma listed set of one or more message structure groups and can be used to restrict testing to only instances of this datatype in segments in one or more of the message structure groups named in the "group(s)" column. The message structure is a message structure group and can be used to restrict rules to specific message types (e.g. ORM_O01 for orders and ORU_R01 for results). "segment(s)", if specified, must be a list of segment codes and can be used to restrict testing to only instances of this datatype in the specified segment(s).
+Datatype Business rules are general rules that apply to all instances of a datatype, such as identifiers must have a coding system, patients and practitioners must have a name, organizations must have a street address. The Excel Workbook, "**Busisness Rules.xlsx**", must contain one Worksheet named "**datatype rules**" with the headings "datatype", "group(s)", "segment(s)", "rule" and "severity". These rules are executed after the data in a field, component or subcomponent have been validated, if the datatype of that field, component or subcomponent has a defined **Datatype Business Rule**. "group(s)", if specified, must be a comma listed set of one or more **message structure groups** and can be used to restrict testing to only instances of this datatype in segments in one or more of the message structure groups named in the "group(s)" column. The message structure itself is a **message structure group** and can be used to restrict rules to specific message types (e.g. ORM_O01 for orders and ORU_R01 for results). If a group starts with the "!" character, then that is an exclusion group and this datatype will not be tested within this exclusion group. If all the **messages structure groups** are exclusion message structure groups, then all instance of this datatype in the message will be tested, except within the exclusion **message structure groups**. If there is a mix of inclusion and exclusion **message structure groups** in the list, then **HL7 Validator** assumes that the exclusions are for structures that are child structures of an included group. Exclusions override inclusions.
 
-| datatype | group(s) | segment(s) | rule |
-| --- | --- | --- | --- | --- |
-| CE | ORU_R01 | OBX | Check CE Coding System |
-| CE | ORU_R01 | OBX | Check LOINC |
+"segment(s)", if specified, must be a list of segment codes and can be used to restrict testing to only instances of this datatype, in the specified segment(s), within the specified **messages structure groups**. If a segment code starts with the "!" character, then this is a segment to be excluded and data of this datatype in this segment, within the any specified **message structure group** will not be tested. Exclusions override inclusions.
+
+"severity" must be a valid HL7 Severity code ["W", "I", "E"] (HL7 Table 0516 - Error severity)
+
+| datatype | group(s) | segment(s) | rule | severity |
+| --- | --- | --- | --- | --- | --- |
+| CE | ORU_R01 | OBX | Check CE Coding System | W |
+| CE | ORU_R01 | OBX | Check LOINC | I |
 
 There can be multiple rules for each datatype; the first might check that identifiers have coding systems whilst the second check the identifier and the alternate identifier to ensure that any LOINC code is the identifier and not the alternate identifier.
 
@@ -163,17 +167,17 @@ NOTE: Datatypes with definitions in the HL7 Standard are already tested for stru
 
 | Datatype | Structural Test | Regex expression |
 | --- | --- | --- |
-| CF/TX | Check for invalid escape sequences | \\\\(?![HNSTRE]\\\\\|X[0-9A-Fa-f]+\\\\\|Z[^\\\\]*\\\\\|C[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{6}\\\\) |
+| CF/TX | Check for invalid escape sequences | \\\\(?![HNSTRE]\|X[0-9A-Fa-f]+\|Z[^\\\\]*\|C[0-9A-Fa-f]{4}\|M[0-9A-Fa-f]{4}\|M[0-9A-Fa-f]{6})\\\\ |
 | DT | Valid Date and parse with dateutil.parser | ^[12]\d{3}((0[1-9]\|1[0-2])(0[1-9]\|[12]\d\|3[01])?)?\$ |
 | ED | Validly encoded ED data | |
-| FT | Check for invalid escape sequences | \\\\(?![HNSTRE]\\\\\|X[0-9A-Fa-f]+\\\\\|Z[^\\\\]*\\\\\|C[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{6}\\\\\|\\.sp([\d]+)?\\\\\|\\.(br\|ce\|fi\|nf)\\\\\|\\.\(in\|ti)[-+]?[\\d]+\\\\\|\\.sk\\d+\\\\) |
+| FT | Check for invalid escape sequences | \\\\(?![HNSTRE]\|X[0-9A-Fa-f]+\|Z[^\\\\]*\|C[0-9A-Fa-f]{4}\|M[0-9A-Fa-f]{4}\|M[0-9A-Fa-f]{6}\|\\.sp([\d]+)?\|\\.(br\|ce\|fi\|nf)\|\\.\(in\|ti)[-+]?[\\d]+\|\\.sk\\d+)\\\\ |
 | | Also check for indents after a printable character | (?<!(^\|\\\.br\\\|\\\.sp([\\d]+)?\\\\)(\\\.(br\|ce\|fi\|nf)\\\\\|\\\.\(in\|ti)[-+]?[\\d]+\\\\)*)\\\.\(in\|ti)[-+]?[\\d]+\\\\ |
 | NM | Check for correctly formatted numeric | ^[-+]?\\d+(\\.\\d*)?\$ |
 | RI | Check for legally formatted time interval | ^\([01]\\d\|2[0-4])[0-5]\\d(,\([01]\\d\|2[0-4])[0-5]\\d)*\$ |
 | SI | Check for correctly formatted Sequence Identifier | ^\\d{1,4}\$ |
 | SN | Check for valid comparitor | |
 | | Check for correctly formatted separator/suffix | |
-| ST | Check for invalid escape sequences | \\\\(?![STRE]\\\\\|C[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{4}\\\\\|M[0-9A-Fa-f]{6}\\\\) |
+| ST | Check for invalid escape sequences | \\\\(?![STRE]\|C[0-9A-Fa-f]{4}\|M[0-9A-Fa-f]{4}\|M[0-9A-Fa-f]{6})\\\\ |
 | TM | Valid Time | ^([01]\\d\|2[0-4])([0-5]\\d([0-5]\\d(\\.\\d{1,4})?)?)?([-+]\(0\\d\|1[0-3])[0-5]\\d)?\$ |
 | TN/XTN | Correctly formatted telephone number* | ^(\\\d\\d)?((\\d{3}))?\\d{3}-\\d{4}(X\\d{4})?(B\\d{4})?(C.*)?\$ |
 | TS | Valid Date and Time, plus parse with dateutil.parser | ^[12]\\d{3}((0[1-9]\|1[0-2])((0[1-9]\|[12]\\d\|3[01])(([01]\\d\|2[0-4])([0-5]\\d([0-5]\\d(\\.\\d{1,4})?)?)?)?)?)?([-+]\(0\\d\|1[0-3])[0-5]\\d)?\$ |
@@ -183,26 +187,28 @@ NOTE: Datatypes with definitions in the HL7 Standard are already tested for stru
 
 ### Field Business Rules
 
-Field Business Rules test one instance, of one field, in one segment and are executed after all of the data in the field and all repetition of that field, has been validated. The Excel Workbook, "**Business Rules.xlsx**", must contain one Worksheet named "**field rules**" with the headings "field(s)", "group(s)", "rule", "type" and "count". "field(s)" is a comma separated list of message fields. The rules for each field that will be applied to each repetition of each specified field. "group(s)", if specified, must be a comma listed set of one or more message structure groups and can be used to restrict testing to only instances of field(s) in segments in one or more of the message structure groups named in the "group(s)" column. The message structure **is a message structure group** and can be used to restrict rules to specific message types (e.g. ORM_O01 for orders and ORU_R01 for results). There may be different business rules for a specific ORB field in a laboratory order and different rules for the same OBR field in a pharmacy order.
+Field Business Rules test one instance, of one field, in one segment and are executed after all of the data in the field and all repetition of that field, has been validated. The Excel Workbook, "**Business Rules.xlsx**", must contain one Worksheet named "**field rules**" with the headings "field(s)", "group(s)", "rule", "type", "count" and "severity". "field(s)" is a comma separated list of message fields. The rules for each field that will be applied to each repetition of each specified field. "group(s)", if specified, must be a comma listed set of one or more message structure groups and can be used to restrict testing to only instances of field(s) in segments in one or more of the message structure groups named in the "group(s)" column. The message structure **is a message structure group** and can be used to restrict rules to specific message types (e.g. ORM_O01 for orders and ORU_R01 for results).  If a group starts with the "!" character, then that is an exclusion group and this field will not be tested within this exclusion group. Exclusions override inclusions. There may be different business rules for a specific OBR field in a laboratory order and different rules for the same OBR field in a pharmacy order.
 
-| field(s) | group(s) | rule | type | count |
-| --- | --- | --- | --- | --- |
-| PV1-8 | | ProvIDtest | all | |
+| field(s) | group(s) | rule | type | count | severity |
+| --- | --- | --- | --- | --- | --- |
+| PV1-8 | | ProvIDtest | all | | W |
 
 The "type" must be "all", "min" or "max".
 
 * Rules of type "all" will fail testing if **any** repeat of a field fails the business rule and every failure will be reported.
 * Rules of type "min" and "max" require a mandatory "count" and will not fail for any specific repetition, but rather a count of successes will be maintained. After all repetitions of a field have been tested, the rule will fail if less than "min" or more than "max" repetitions pass the business rule and that failure will be reported.
 
+"severity" must be a valid HL7 Severity code ["W", "I", "E"] (HL7 Table 0516 - Error severity)
+
 There can be multiple rules for each field or set of fields; for instance the rule "ProvIDtest", of type "all" may test all Provider identifiers for a specific Assigning Authority and pass or fail each Provider ID with that Assigning Authority, depending upon whether or not the Provider ID passes a set of valid data tests. The default, for any Provider ID with another Assigning Authority would be pass, so that those other Provider IDs would not reported as errors.
 
 You could then create a second buisness rule (ProvIDcount) with the same DMN logic as "ProvIDtest", but where the default, for any Provider ID with another Assigning Authority would be fail. You could then test that there is one, and only one, Provider Identifier, with this Assigning Authority, with a valid Provider ID, amongst all the repeitions of the field(s) by adding two more rules to "**Business Rules.xlsx**" on the "field rules" worksheet, both for fields containing Provider IDS;  one" with "rule" "ProvIDcount", "type" "min" and "count" "1"; the other with "rule" "ProvIDcount", "type", "max" and "count" "1". The conformance test here assumes that a provider can be identified multiple times in a field, with multiple different identifiers, but that they must be identified exactly once with the officially sanctioned identifier.
 
-| field(s) | group(s) | rule | type | count |
-| --- | --- | --- | --- | --- |
-| PV1-7,PV1-8,PV1-9,PV1-17,ORC-10,ORC-11,ORC-12,ORC-19,OBR-10,OBR-16 | | ProvIDtest | all | |
-| PV1-7,PV1-17,ORC-12,OBR-16 | ORU_R01,ORM_O01 | ProvIDcount | min | 1 |
-| PV1-7,PV1-17,ORC-12,OBR-16 | ORU_R01,ORM_O01 | ProvIDcount | max | 1 |
+| field(s) | group(s) | rule | type | count | severity |
+| --- | --- | --- | --- | --- | --- |
+| PV1-7,PV1-8,PV1-9,PV1-17,ORC-10,ORC-11,ORC-12,ORC-19,OBR-10,OBR-16 | | ProvIDtest | all | | W |
+| PV1-7,PV1-17,ORC-12,OBR-16 | ORU_R01,ORM_O01 | ProvIDcount | min | 1 | E |
+| PV1-7,PV1-17,ORC-12,OBR-16 | ORU_R01,ORM_O01 | ProvIDcount | max | 1 | E |
 
 This checks that there are no Attending Doctors, Referring Doctors, Consulting Doctor, Admitting Doctor, Entering Practitioner, Verified by Practitioner, Ordering Provider (in ORC), Action By Provider, Collection Identifier Provider or Ordering Provider (in OBR) that has an invalid Provider ID. It also check that there is exactly one Attending Doctor, Admitting Doctor, one Ordering Provider (in ORC) and one Ordering Provider (in OBR) in Lab orders and Lab results.
 
@@ -234,23 +240,21 @@ and a string value of "Reason" containing the reason that the input did/did not 
 
 ### Segment Businees Rules
 
-Segment Business Rules test each instance of a segment as a whole, passing all the field, components and subcompoonents. **Segment Business Rules** enable the testing of the relationships between the fields in each instance of the specified segment. The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "segment rules" with the headings "segment", "group(s)", "rule", "repFields", "type" and "count".
+Segment Business Rules test each instance of a segment as a whole, passing all the field, components and subcompoonents. **Segment Business Rules** enable the testing of the relationships between the fields in each instance of the specified segment. The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "segment rules" with the headings "segment", "group(s)", "rule", "repeatFields", "type", "count" and "severity".
 These are rules that will be applied to each insance of the segment, after field validation of all the field in the segment, to ensure combinations of fields within the segment meet some busienss rule. "group(s)", if specified, must be a comma separted list of one or more message structure groups and can used to be restrict testing to only instances of this segment in one or more of the message structure groups named in the "group(s)" column. The message structure **is a message structure group** and can be used to restrict rules to specific message types (e.g. ORM_O01 for orders and ORU_R01 for results).
 
-| segment | group(s) | rule | repFields | type | count |
-| --- | --- | --- | --- | --- | --- |
-| OBX | ORU_R01.OBSERVATION | SNOMED_CT | OBX-3,OBX-5 | all | |
+| segment | group(s) | rule | repeatFields | type | count | severity |
+| --- | --- | --- | --- | --- | --- | --- |
+| OBX | ORU_R01.OBSERVATION | SNOMED_CT | OBX-3,OBX-5 | all | | I |
 
 This could test that OBX-5 is only the SNOMED_CT concepts of "Consent withdrawn" or "Consent not withdrawn" when OBX-3 is the SNOMED_CT concept of "Upload Consent".
-
-Note: A segment can be tested more than once, for the same rule, if multiple segment groups are specified and some segment groups are contained within other segment groups. For instance  
-| OBX | ORU_R01,ORU_R01.ORDER_OBSERVATION,ORU_R01.OBSERVATION |  
-will test the OBX segment three time as ORU_R01.OBSERVATION is contained within ORU_R01.ORDER_OBSERVATION and both are in the ORU_R01 message structure.
 
 The "type" can be "min" or "max" or blank.
 
 * Rules without a type will fail testing if **any** instance of the segment fails the business rule and every failure will be reported.
 * Rules of type "min" and "max" require a mandatory "count" and will not fail for any specific instance of the segment, but rather a count of successes will be maintained for instances of the segment, within each group (if any groups are specified). The rule will fail if, after all instances of the segment, within each group (if any groups are specified) have been tested, less than "min" or more than "max" instances of this segment passed the business rule and that failure will be reported.
+
+"severity" must be a valid HL7 Severity code ["W", "I", "E"] (HL7 Table 0516 - Error severity)
 
 NOTE: You can have different rules for inner segment groups and outer segment groups, for the same segment.
 
@@ -267,7 +271,7 @@ where the keys are the field names or component names or subcomponent names and 
 Only fields/components/subcomponent present in the segment and defined in the **Rules Engine** **Glossary** will be populated as **Rules Engine** input data.
 Any field which does not repeat will be passed as a value. However, if a field can repeat then the field data will be a **DMN List** matching the field/component/subcomponent values from the repetitions.
 
-DMN has a built-in FEEL function "contains()" to determine if a value exists in a List. And you can chose to test just a specific List value. However, the business rule may be easier to write and easier to implement, if the segment was tested once for each "repetition" of a repeating field or sets of repetitions for multiple repeating fields. To support this, the "repeating" fields can be listed, as a comma separated list of fields, in the "repFields" column. The number of repetitions in the first field in "repFields" will determine the number of times the segment data is tested using the **Rules Engine**.
+DMN has a built-in FEEL function "contains()" to determine if a value exists in a List. And you can chose to test just a specific List value. However, the business rule may be easier to write and easier to implement, if the segment was tested once for each "repetition" of a repeating field or sets of repetitions for multiple repeating fields. To support this, the "repeating" fields can be listed, as a comma separated list of fields, in the "repeatFields" column. The number of repetitions in the first field in "repeatFields" will determine the number of times the segment data is tested using the **Rules Engine**.
 An additional parameter (**Repeat Number**) will be passed to the **Rules Engine**, identifying the repetition being tested. This can be used for diagnostic messages returned from the **Rules Engine**.
 
 NOTE: If "min" or "max" is specified, then the set of tests, for the repeating field, is considered **one test** of the **Segment Business Rule**; if any one repetition passes then this **Segment Business Rule** passes for this instance of this segment.
@@ -305,7 +309,7 @@ and a string value of "Reason" containing the reason that the input data did/dud
 **HL7 Validator** parses a message using the matching v2.xml Schema. As by product, it creates the matching HL7 v2.xml message
 which you will find in the output folder. To facilitate complex testing rules, it is possible to pass the **Rules Engine** multiple fields/components/subcomponents that have been located in the message, using a set of XPATH expressions. **HL7 Validator** uses the Python **lxml** module to find the matching data in the message.
 
-The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "XPath rules" with the headings "rule", "rule path", "rule type", "rule count", "field path", "field type", "field count" and "linked" followed by a sequence of columns with the headed "xpath". The first column with a heading other than "xpath" (e.g. "Comment"/"Description"/"Annotation") will define the maximum number of "xpath" definitions. For each"rule", the first "xpath" column that is empty or blank, will define the actual number of "xpath"s that apply to that specific rule.
+The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "XPath rules" with the headings "rule", "rule path", "rule type", "rule count", "field path", "field type", "field count", "linked" and "severity" followed by a sequence of columns with the headed "xpath". The first column with a heading other than "xpath" (e.g. "Comment"/"Description"/"Annotation") will define the maximum number of "xpath" definitions. For each"rule", the first "xpath" column that is empty or blank, will define the actual number of "xpath"s that apply to that specific rule.
 
 These **XPath Business Rules** are rules that will be applied after every segment, field, component and subcomponent has been validated and tested with the **Field Busieness Rules** and **Segment Business Rules**.
 
@@ -330,6 +334,8 @@ The action taken, and failures reported will depend upon the "**rule type**" and
 
 * Rules with a **field type** of "all" will report every failure.
 * Rules with a **field type** of type "min" and "max" require a mandatory **field count** and will not fail for any specific repetition, but rather a count of successes will be maintained for each **root path**. After all repetitions for a specific **root path** have been tested the count of successes will be checked. The **rule** will fail for this **root path** node, and that failure will be reported, if **field type** is "min" and the count of successe is less than **field count**. The rule will also fail for this **root path**, and that failure will be reported, if **field type** is "max" and more than **field count** repetitions have passed the business rule.
+
+"severity" must be a valid HL7 Severity code ["W", "I", "E"] (HL7 Table 0516 - Error severity)
 
 #### Subsequent **xpath**s and **linked**
 
@@ -377,7 +383,7 @@ For instance, if you use UCUM for units of measurement, then UCUM code is actual
 **Parser Business Rules** are different to all the other Business Rules. **Parser Business Rules** are part of the code. If you need another parser then you have to edit the code. Simiarly, the tests that are valid for each parser are part of the code. If you want an additional test for an existing parser then you have to edit the code. Similarly, no field/component/subcomponent definition is required in the "Glossary" in **Business Rules DMN.xlsx** as the data fetched for **Paser Business Rules** testing will not be passed to the **Rules Engine**.
 
 **Parser Business Rules** are run after all the **XPath Business Rules** have been run.
-The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "parser rules" with the headings "rule", "parser", "test(s)", "isBase64" and "xpath".
+The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "parser rules" with the headings "rule", "parser", "test(s)", "isBase64", "severity" and "xpath".
 These are not **DMN** rules, so the column "rule" has no functional value, but can be used to document the conformance profile point being tested.
 The "parser" must be one of the defined parser from the table below. "test(s)" is a comma separated list of parser test to perform on the data.
 "isBase64" must be "Y" if the data should be Base64 encoded. **HL7 Validator** will attempt to decode the data from Base64 encoding, if "isBase64" is "Y", before passing the data to the specified parser.
@@ -387,9 +393,11 @@ Each test must be a valid test for the specified parser taken from the table bel
 "xpath" must be an absolute XPath from the root of the HL7 v2.xml message which may return multiple instances of data, each of which will be tested.
 The "xpath" expression is will probably be complex, with conditions to constrain the selection to data that is relevant for the specified parser test(s)
 
-| rule | parser | test(s) | isBase64 | xpath |
-| --- | --- | --- | --- |
-| Check UCUM | UCUM | isValid | | //OBX.6/CE.1[../CE.3[text() = "UCUM"]] |
+| rule | parser | test(s) | isBase64 |severity | xpath |
+| --- | --- | --- | --- | --- |
+| Check UCUM | UCUM | isValid | | I | //OBX.6/CE.1[../CE.3[text() = "UCUM"]] |
+
+"severity" must be a valid HL7 Severity code ["W", "I", "E"] (HL7 Table 0516 - Error severity)
 
 #### The UCUM Parser
 
@@ -461,7 +469,7 @@ The **XHTML Parser** can do either. One of the **XHTML Parer** tests is **XHTMLs
 **External Business Rules** let **HL7 Validator** validate data, using external service such as a FHIR Provider Directory service, or a Healthcare Identifiers Patient Search service. **External Business Rules**, like **Parser Business Rules** are different to all the DMN based Business Rules. **External Business Rules** are part of the code. If you need access another service then you have to edit the code. If you need to access an existing **External Buisness Rule** service, but by another method, then you will have to edit the code.  Similarly, no field/component/subcomponent definition is required in the "Glossary" in **Business Rules DMN.xlsx** as the data fetched for **External Business Rules** testing will not be passed to the **Rules Engine**.
 
 **Externa Business Rules** are run after all the **Parser Business Rules** have been run.
-The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "external rules" with the headings "rule", "service", "username", "password", "APIkey", "URL" followed by a sequence of columns with the headed "xpath". The first column with a heading other than "xpath" (e.g. "Comment"/"Description"/"Annotation") will define the maximum number of "xpath" definitions. For each"rule", the first "xpath" column that is empty or blank, will define the actual number of "xpath"s that apply to that specific rule.
+The "**Business Rules.xlsx**" Excel Workbook, must contain a Worksheet called "external rules" with the headings "rule", "service", "username", "password", "APIkey", "URL", "severity" followed by a sequence of columns with the headed "xpath". The first column with a heading other than "xpath" (e.g. "Comment"/"Description"/"Annotation") will define the maximum number of "xpath" definitions. For each"rule", the first "xpath" column that is empty or blank, will define the actual number of "xpath"s that apply to that specific rule.
 
 These are not **DMN** rules, so the column "rule" has no functional value, but will be used to document the conformance profile point being tested.
 The "service" must be one of the defined services from the table below. The "username", "password" and "APIkey" columns can be used to configure the security tokens required to access the service. However, you may want to leave these columns blank, and hard code these in **hl7Validator.py** for security reasons.
@@ -469,6 +477,8 @@ The "service" must be one of the defined services from the table below. The "use
 The "URL" is the URL for accessing the service, not including any parameters. The "xpath" columns define the parameters for the Service. The first "xpath" must be an absolute **XPath Expression** to a field/component/subcomponent where the data for the first parameter in the set of parameters to be validated, will be found. If this is **XPath Expression** returns multiple matching nodes then the **External Business Rule** will be run for each node in the returned list. Second and subsequent "xpath" expressions can be absolute or relative, but if relative, they will be relative to the current node returned by the first "xpath" expression. Each "xpath" **XPath Expression** must only select data that is suitable for testing by the specified service, for the matching service parameter. The number of "xpath" expressions must match the number of parameters required for each external service.
 
 NOTE: If second and subsequent "xpath" expression return multiple matching nodes, the only the data from the first node in the list will be use as the matching parameter data.
+
+"severity" must be a valid HL7 Severity code ["W", "I", "E"] (HL7 Table 0516 - Error severity)
 
 ### The Defined External Services
 
@@ -481,14 +491,28 @@ NOTE: If second and subsequent "xpath" expression return multiple matching nodes
 
 ## Business Rules Definitions
 
-If the Excel Workbook "**Business Rules.xlsx" exists then the Excel Workbook "Business Rules DMN.xlsx" must also exist and it must contain
-a Decision Model Notaion (DMN) specification compatible with **pyDMNrules**. **HL7 Validator** will build a **Rules Engine** from the Excel Workbook "**Business Rules DMN.xlsx**".
+If the Excel Workbook "**Business Rules.xlsx**" exists then the Excel Workbook "**Business Rules DMN.xlsx**" must also exist and it must contain
+a Decision Model Notaion (DMN) specification of all the **Business Rules**. "**Business Rules DMN.xlsx**" must be compatible with Python's **pyDMNrules** module. **HL7 Validator** will build a **Rules Engine** from the Excel Workbook "**Business Rules DMN.xlsx**".
 
-Each segment, referenced by any Decision Table, should be it's own Business Concept. The variables within a segment Business Concept are normal, HL7 field, component and subcomponent names (unless you are referencing an **xpath** expression [see above]). e.g.
+Each segment and datatype, referenced by any Decision Table, should be it's own Business Concept.
+
+The variables within a segment Business Concept are normal, HL7 field, component and subcomponent names (unless you are referencing an **xpath** expression [see above]). e.g.
 
 OBX-2  
 OBX-3.1  
-OBR-15.1.1  
+OBR-15.1.1
+
+The variables within a datatype Business Concept are named as the datatype followed by a period and the item sequence number. e.g.
+
+XCN.1  
+XCN.2  
+XCN.2.1  
+XCN.2.2  
+XCN.2.3  
+XCN.2.4  
+XCN.2.5  
+XCN.3  
+XCN.4
 
 The Attributes of each Variable must be a valid FEEL name, that is unique within each Businesss Concept (segment Code). One way of doing this is to preface the field number with "f", the component number with "c" and the subcomponent number with "s".
 
@@ -497,8 +521,22 @@ The Attributes of each Variable must be a valid FEEL name, that is unique within
 | OBX-2 | OBX | f2 |
 | aOBX-2 | | af2 |
 | OBX-3.1 | | f3c1 |
-| OBR-15.1.1 | OBR | f15c1s1 |
+| OBR-15.1.1 | | f15c1s1 |
+| XCN.1 | XCN | c1 |
+| XCN.2 | | c2 |
+| XCN.2.1 | | c2s1 |
+| XCN.2.2 | | c2s2 |
+| XCN.2.3 | | c2s3 |
+| XCN.2.4 | | c2s4 |
+| XCN.2.5 | | c2s5 |
+| XCN.3 | | c3 |
+| XCN.4 | | c4 |
 
 NOTE: the second "OBX-2" definition is there to support an **xpath** expression [see above] that returns an "OBX" field.
 
 The "Decision" table in the DMN specification uses the passed "Rule" to select which Decision Tables to invoke. The names of the rules should be unique across all types of **Business Rules**; you shouldn't have two rules called the same thing when one is testing one set of fields and the other is testing a different set of fields.
+
+All of the test specific decision tables must return two values.
+
+* 'Passed' - a boolean which is has the S-FEEL value of 'true' if the rule passed, or the S-FEEL value of 'false' if the rule fails.
+* 'Reason' - a text string explaining why the rule passed or failed

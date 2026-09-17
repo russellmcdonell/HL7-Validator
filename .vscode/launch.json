@@ -72,7 +72,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
-            "args": ["-m", "REF_I12", "-S", "schema/ADRM", "-O", "schema/ADRM", "-o", "REF_I12.png", "-L", "logs", "-l", "xsd2train.log", "-v", "2" ]
+            "args": ["-m", "RRI_I12", "-S", "schema/ADRM", "-O", "schema/ADRM", "-o", "RRI_I12.png", "-L", "logs", "-l", "xsd2train.log", "-v", "2" ]
         },
         {
             "name": "Make Abstract Message Structure",
@@ -82,7 +82,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
-            "args": ["-m", "REF_I12", "-S", "schema/ADRM", "-O", "schema/ADRM", "-o", "REF_I12.xlsx", "-L", "logs", "-l", "xsd2ams.log", "-v", "2" ]
+            "args": ["-m", "RRI_I12", "-S", "schema/ADRM", "-O", "schema/ADRM", "-o", "RRI_I12.xlsx", "-L", "logs", "-l", "xsd2ams.log", "-v", "2" ]
         },
         {
             "name": "Get NATA data",
@@ -95,44 +95,54 @@
             "args": ["-L", "logs/ADRM", "-l", "getNATAdata.log", "-v", "4" ]
         },
         {
-            "name": "hl7Validator ADRM Example02",
+            "name": "hl7Validator ADRM",
             "type": "debugpy",
             "request": "launch",
             "program": "hl7Validator.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
-            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "example02.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example02.log", "-v", "4" ]
+            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM.log", "-v", "4" ]
         },
         {
-            "name": "hl7Validator ADRM Example04",
+            "name": "hl7Validator ADRM IHE Order",
             "type": "debugpy",
             "request": "launch",
             "program": "hl7Validator.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
-            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "example04.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example04.log", "-v", "4" ]
+            "args": ["-I", "input/ADRM", "-i", "20260907_072647_574-0000_QAP_HL7v2_Orders_Message.hl7", "-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM_Order.log", "-v", "4" ]
         },
         {
-            "name": "hl7Validator ADRM Prostate Cancer",
+            "name": "hl7Validator ADRM IHE Result",
             "type": "debugpy",
             "request": "launch",
             "program": "hl7Validator.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
-            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "ADRM Prostate Cancer.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM Prostate Cancer.log", "-v", "4" ]
+            "args": ["-I", "input/ADRM", "-i", "20260907_073811_745-0000_RCPAQAP_HL7v2_Results_Message.hl7", "-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM_Result.log", "-v", "4" ]
         },
         {
-            "name": "hl7Validator ADRM Colorectal Cancer",
+            "name": "hl7Validator ADRM example 02",
             "type": "debugpy",
             "request": "launch",
             "program": "hl7Validator.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
-            "args": ["-I", "input/ADRM", "-O", "output/ADRM", "-i", "ADRM Colorectal Cancer.hl7", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM Colorectal Cancer.log", "-v", "4" ]
+            "args": ["-I", "input/ADRM", "-i", "example02.hl7","-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example02.log", "-v", "4" ]
+        },
+        {
+            "name": "hl7Validator ADRM example 04",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input/ADRM", "-i", "example04.hl7","-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example04.log", "-v", "4" ]
         },
         {
             "name": "hl7Validator MLLP",
