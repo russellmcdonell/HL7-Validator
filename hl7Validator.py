@@ -186,7 +186,7 @@ TNpattern = re.compile(r'^(\d\d)?((\d{3}))?\d{3}-\d{4}(X\d{4})?(B\d{4})?(C.*)?$'
 TSpattern = re.compile(r'^[12]\d{3}((0[1-9]|1[0-2])((0[1-9]|[12]\d|3[01])(([01]\d|2[0-4])([0-5]\d([0-5]\d(\.\d{1,4})?)?)?)?)?)?([-+](0\d|1[0-3])[0-5]\d)?$')
 TS2pattern = re.compile(r'^[YLDMHS]$')
 Hexpattern = re.compile(r'^[A-Fa-f0-9]*$')
-Base64pattern = re.compile(r'^[A-Za-z0-9+/]={0,2}$')
+Base64pattern = re.compile(r'^[A-Za-z0-9+/]*={0,2}$')
 notBase64pattern = re.compile(r'[^A-Za-z0-9+/=]')
 notEscapedpattern = re.compile(r'[|^&~\n]')
 badSTpattern = re.compile(r'\\(?!C[0-9A-Fa-f]{4}|M[0-9A-Fa-f]{4}|M[0-9A-Fa-f]{6})\\')
@@ -2696,15 +2696,15 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
     if textType == 'FT':            # Check that this is a correctly formatted text
         reTest = notEscapedpattern.search(originalText)
         if reTest is not None:
-            comment = f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{elementText}"'
+            comment = f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{originalText}"'
         else:
-            reTest = badFTpattern.search(elementText)
+            reTest = badFTpattern.search(originalText)
             if reTest is not None:
-                comment = f'Illegally formatted text "{reTest.group()}" in "{elementText}"'
+                comment = f'Illegally formatted text "{reTest.group()}" in "{originalText}"'
             else:
-                reTest = badTIINpattern.search(elementText)
+                reTest = badTIINpattern.search(originalText)
                 if reTest is not None:
-                    comment = f'Illegally formatted text [indent after text] "{reTest.group()}" in "{elementText}"'
+                    comment = f'Illegally formatted text [indent after text] "{reTest.group()}" in "{originalText}"'
     if textType == 'NM':            # Check that this is a corractly formatted number
         reTest = NMpattern.search(elementText)
         if reTest is None:
@@ -2729,13 +2729,13 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
             return f'Illegally formatted numeric separator/suffix "{elementText}"', rulesText
         return None, rulesText
     if textType == 'ST':            # Check that this is a correctly formatted string text
-        reTest = notEscapedpattern.search(elementText)
+        reTest = notEscapedpattern.search(originalText)
         if reTest is not None:
-            comment = f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{elementText}"'
+            comment = f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{originalText}"'
         else:
-            reTest = badSTpattern.search(elementText)
+            reTest = badSTpattern.search(originalText)
             if reTest is not None:
-                comment = f'Illegally formatted string text "{reTest.group()}" in "{elementText}"'
+                comment = f'Illegally formatted string text "{reTest.group()}" in "{originalText}"'
     if textType == 'TM':            # Check that this is a correctly formatted time
         reTest = TMpattern.search(elementText)
         if reTest is None:
@@ -2764,13 +2764,13 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
             return f'Illegally formatted time degree of precission "{elementText}"', rulesText
         return None, rulesText
     if textType == 'TX':            # Check that this is a correctly formatted text
-        reTest = notEscapedpattern.search(elementText)
+        reTest = notEscapedpattern.search(originalText)
         if reTest is not None:
-            comment = f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{elementText}"'
+            comment = f'Illegally formatted text [unescaped characters] "{reTest.group()}" in "{originalText}"'
         else:
-            reTest = badTXCFpattern.search(elementText)
+            reTest = badTXCFpattern.search(originalText)
             if reTest is not None:
-                comment = f'Illegally formatted text "{reTest.group()}" in "{elementText}"'
+                comment = f'Illegally formatted text "{reTest.group()}" in "{originalText}"'
     if (parentType == 'XTN') and (parentSequence == 1):         # Check that this is a correctly formatted telephone number [TN]
         reTest = TNpattern.search(elementText)
         if reTest is None:

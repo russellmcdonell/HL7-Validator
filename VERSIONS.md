@@ -1,6 +1,12 @@
 # HL7 Validator
 
-## Version  1.3 - 18-Sep-2026
+## Version 1.4 - 18-Sep-2026 [pm]
+
+BUG FIXes:
+Typo in ED checking regex.  
+Testing cleaned, rather than original text for bad escape characters  
+
+## Version 1.3 - 18-Sep-2026 [am]
 
 Added optimisation to **Datatype Business Rules**, **Field Business Rules** and **Segment Business Rules** so that things are not tested more than once even if they match multiple groups in the "group(s)" column  
 Added negation for "group(s)" - if a group name starts with "!" then data in that group will be excluded from any testing for the matching datatype, field or segment.  
