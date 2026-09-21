@@ -5,7 +5,7 @@ Validate HL7 vertical bar messages and optionally, check for conformance to spec
 
 ## Validation
 
-**HL7 Validator** validates an HL7 vertical bar message against the equivalent HL7 v2.xml Schema.  
+**HL7 Validator** validates an HL7 vertical bar message against the equivalent **HL7 v2.xml Schema**.  
 HL7 v2.xml XML Schema definitions, for various HL7 v2.x versions, can be obtained from [HL7 International](https://www.hl7.org/).
 
 ### HL7 v2.xml Schema
@@ -101,8 +101,7 @@ Sometimes one or more fields, components or subcomponents may need to conform to
 * A OBR segment indicating patient consent, must have an acceptable consent value ("withdrawn"/"not withdrawn")
 * The last segment in an OBR/OBX group **must** be a display segment
 
-To support conformance testing **HL7 Validator** uses Business Rules
-created using DMN (Decision Model Notation).
+To support conformance testing **HL7 Validator** uses Business Rules created using DMN (Decision Model Notation), parsers and calls to external services.
 
 **HL7 Validator** checks for the existance of two Excel Workbooks, "**Business Rules.xlsx**" and "**Business Rules DMN.xlsx**" in the "Schema Directory".
 
@@ -110,10 +109,24 @@ created using DMN (Decision Model Notation).
 
 "**Busienss Rules DMN.xlsx**" must be a valid Decision Model Notation workbook, compatible with the **pyDMNrules** Python module - an implementation of the Object Managment Group's (OMG) Decision Model Notation (DMN) specification. DMN require the business rules to be written in DMN's FEEL (Friendly Enough Expression Language) language.
 
-Every Business Rule must have a name. If the Business Rule name starts with the character "#", then that rule will be considered disabled and will not be run; you don't have to delete a rule that you do not want to run, you can just comment it out in **Business Rules.xlsx". For **Datatype Business Rules**, **Field Business Rules**, **Segment Business Rules** and **XPath Business Rules** [see below], that rule name is the linkage between rule parameters in **Business Rules.xlsx** and the matching decision table defined in **Business Rules DMN.xlsx**. The Decision Table on the Decision Worksheet in **Business Rules DMN.xlsx** is that linkage.
+Every Business Rule must have a name. If the Business Rule name starts with the character "#", then that rule will be considered disabled and will not be run; you don't have to delete a rule that you do not want to run, you can just comment it out in "**Business Rules.xlsx**". For **Datatype Business Rules**, **Field Business Rules**, **Segment Business Rules** and **XPath Business Rules** [see below], that rule name is the linkage between rule parameters in **Business Rules.xlsx** and the matching decision table defined in **Business Rules DMN.xlsx**. The Decision Table on the **Decision** Worksheet in **Business Rules DMN.xlsx** is that linkage.
 
-**HL7Validator** will use the "**Business Rules DMN.xslx**" workbook
-to create a **Rules Engine**; something that data can be passed through in order to check if it complies with the defined **Busines Rules**.
+**HL7Validator** will use the "**Business Rules DMN.xslx**" workbook to create a **Rules Engine**. The data triggered by "**Business Rules.xlsx**" will be passed to the **Rules Engine** which will confirm whether or not the data meets the defined **Busines Rules**.
+
+### Table Business Rules
+
+By default, **HL7 Validator** will check items of data against the matching HL7 and User-defined tables as specified in the **HL7 v2.xml Schemas**.
+Some of the User-defined tables have only a few example values. Others have none. You may need to edit **Appendix A.xlsx** to define the specific codes for your use case.
+However, sometimes that is not appropriate. For instance, in a general testing environment it may be impossible to assemble the full list of all Sending Applications.
+Sometimes the values have to be tested using an external directory service [see **External Business Rules** below].
+It may be the case that in one scenario (Orders) some of the values are valid, but in other secenarios (Results) all values are valid and you have
+created **Field Business Rules** [see below] to cover both scenarios.
+In all these cases you need to suppress the default testing against the HL7 or User-defined table values.
+
+The Excel Workbook, "**Busisness Rules.xlsx**", must contain one Worksheet named "**table rules**" with the headings "item" and "table".
+"item" must be a field, component or subcomponent code in the form of SEG-N, SEG-N.N or SEG-N.N.N for field/component/subcomponent codes.
+"table" must be a HL7 or User-defined table in the form of HL7NNNN or UserNNNN to match then naming convention in **Appendix A.xlsx**.
+Any data in the associated field/component/subcomponent will not be tested to see if it exists in any of the specified HL7 or User-defined table.
 
 ### Datatype Business Rules
 

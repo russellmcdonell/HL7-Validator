@@ -72,7 +72,7 @@ if __name__ == '__main__':
     else:
         logger.setLevel(logging.INFO)
     if args.logFile:
-        handler = logging.FileHandler(os.path.join(args.logDir, args.logFile))
+        handler = logging.FileHandler(os.path.join(args.logDir, args.logFile), mode='w')
     else:
         handler = logging.StreamHandler()
     logformat = progName + ' %(levelname)s[%(asctime)s]: %(message)s'
@@ -120,10 +120,11 @@ if __name__ == '__main__':
 
     data = {}
     data['Rule'] = 'HL7au:00044.7.1'
-    data['XCN.1'] = '419786CW'
+    # data['XCN.1'] = '419786CW'
+    data['XCN.1'] = '488998CK'
     data['XCN.2.1'] = "CRUICE"
     data['XCN.3'] = "ANTHONY"
-    data['XCN.9'] = 'AUSHICPR'
+    data['XCN.9.1'] = 'AUSHICPR'
     data['XCN.13'] = 'UPIN'
     logger.info('Testing: %s\n',repr(data))
     (status, newData) = dmnRules.decide(data)

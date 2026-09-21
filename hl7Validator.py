@@ -158,6 +158,8 @@ MSH16 = None            # The value of the MSH-16 field (Application Acknowledgm
 ackSeq = 1              # The acknowledgment sequence number
 hl7XML = None           # The XML representation of the current HL7 message
 xmlMapping = { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&apos;", '"': "&quot;"}
+isHL7table = re.compile(r'^HL7\d{4}$')
+isUserDefinedTable = re.compile(r'^User\d{4}$')
 isHex = re.compile(r'&#[0-9A-Fa-f][0-9A-Fa-f];')
 isFieldSep = re.compile(r'(?![HNFSTRE]|X[0-9A-Fa-f]+|Z[^\\]*|C[0-9A-Fa-f]{4}|M[0-9A-Fa-f]{4}|M[0-9A-Fa-f]{6}|\.sp([\d]+)?|\.(br|ce|fi|nf)|\.(in|ti)[-+]?[\d]+|\.sk\d+)\\F\\')
 isCompSep = re.compile(r'(?![HNFSTRE]|X[0-9A-Fa-f]+|Z[^\\]*|C[0-9A-Fa-f]{4}|M[0-9A-Fa-f]{4}|M[0-9A-Fa-f]{6}|\.sp([\d]+)?|\.(br|ce|fi|nf)|\.(in|ti)[-+]?[\d]+|\.sk\d+)\\S\\')
@@ -314,6 +316,7 @@ hl7Tables = None                    # The HL7 and User tables
 fieldLengths = None                 # The maximum length of any field
 datatypeLengths = None              # The maximum length of datatype components
 valueSets = None                    # The value sets for CE, CF, CNE and CWE coded elements
+tableBusinessRules = {}             # The business rules associated with specific tables
 dataTypeBusinessRules = {}          # The business rules associated with specific datatypes
 fieldBusinessRules = {}             # The business rules associated with specific fields
 segmentBusinessRules = {}           # The business rules associated with specific segments
@@ -389,6 +392,8 @@ def getAppendixA(schemaDir):
     for row in tablesData:
         if row['Type'] != '':
             tableType = row['Type']
+            if tableType == 'User':
+                tableType = 'User-defined'
         if row['Table'] == '':
             continue                    # A "Type" only row
         if row['Table'] != tableNumber:
@@ -560,18 +565,52 @@ def getBusinessRules(schemaDir):
     Get the business rules from 'Business Rules.xlsx' and 'Business Rules DMN.xlsx' in the schemaDir folder
     '''
 
-    global dataTypeBusinessRules, fieldBusinessRules, segmentBusinessRules, XPathBusinessRules, rulesEngine, glossary
+    global tableBusinessRules,dataTypeBusinessRules, fieldBusinessRules, segmentBusinessRules, XPathBusinessRules, rulesEngine, glossary
 
     # Check if we have some BusinessRules files - Excel Workbooks of business rules to be tested
     dataTypeBusinessRules = {}
     fieldBusinessRules = {}
     segmentBusinessRules = {}
     XPathBusinessRules = {}
+    tableBusinessRules = {}
     if not os.path.isfile(os.path.join(schemaDir, 'Business Rules.xlsx')):
         return
     
     # Load the Business Rules Excel Workbook
     wb = load_workbook(os.path.join(schemaDir, 'Business Rules.xlsx'), read_only=True, data_only=True)
+
+    # Look for Tables Business Rules
+    if "table rules" not in wb.sheetnames:
+        logger.critical('Missing Worksheet "table rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    ws = wb["table rules"]
+    # Extract the data from the Worksheet and check that it has the required columns
+    data = list(ws.iter_rows(values_only=True))
+    columns = data[0] if data else []
+    data_rows = data[1:] if len(data) > 1 else []
+    if "item" != columns[0]:
+        logger.critical('Missing column "item" in Worksheet "table rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    if "table" != columns[1]:
+        logger.critical('Missing column "table" in Worksheet "table rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logging.shutdown()
+        sys.exit(EX_CONFIG)
+    for row in data_rows:
+        item, table = row[0:2]
+        item = str(item).strip() if item is not None else ''
+        if item == '':
+            break
+        if isUserDefinedTable.match(table) is not None:
+            table = 'HL7' + table[4:]
+        elif isHL7table.match(table) is None:
+            logger.critical('Invalid table "%s" in Worksheet "table rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', table, schemaDir)
+            logging.shutdown()
+            sys.exit(EX_CONFIG)
+        tableBusinessRules[item] = table
+
+    # Look for Datatype Business Rules
     if "datatype rules" not in wb.sheetnames:
         logger.critical('Missing Worksheet "datatype rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
         logging.shutdown()
@@ -641,8 +680,10 @@ def getBusinessRules(schemaDir):
             logging.shutdown()
             sys.exit(EX_CONFIG)
         dataTypeBusinessRules[dataType][groups][segments][rule] = thisSeverity
+
+    # Look for Field Business Rules
     if "field rules" not in wb.sheetnames:
-        logger.critical('Missing Worksheet "fields rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logger.critical('Missing Worksheet "field rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
         logging.shutdown()
         sys.exit(EX_CONFIG)
     ws = wb["field rules"]
@@ -651,7 +692,7 @@ def getBusinessRules(schemaDir):
     columns = data[0] if data else []
     data_rows = data[1:] if len(data) > 1 else []
     if "field(s)" != columns[0]:
-        logger.critical('Missing column "field" in Worksheet "field rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
+        logger.critical('Missing column "field(s)" in Worksheet "field rules" in Excel Workbook "Business Rules.xlsx" in schemaDir folder(%s/xsd)', schemaDir)
         logging.shutdown()
         sys.exit(EX_CONFIG)
     if "group(s)" != columns[1]:
@@ -1431,7 +1472,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
         # Treat this segment as unexpected
         SegmentStatus[segmentNo] = False
         newElement = et.Element(tag)
-        comment= f'{Severity["E"]}:Unexpected Segment, segment {segmentNo + 1:d} - "{Segments[segmentNo]}"'
+        comment= f'{Severity["E"]}:Unexpected Segment, segmentNo {segmentNo + 1:d} - "{Segments[segmentNo]}"'
         ERRrepeats.append(["", segmentNo + 1, 0, comment,"100", "W"])
         print(comment, file=reportFile)
         newElement.append(et.Comment(comment))
@@ -1448,7 +1489,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
     lastGroup = None    # The last group we found - used to count the number of times we have found this group
     while sequenceAt < len(sequenceList):           # Check the next segment
         if not SegmentStatus[segmentNo]:            # Previously found to be an unexpected segment - report it and skip it
-            comment= f'{Severity["E"]}:Unexpected Segment, segment {segmentNo + 1:d}:"{Segments[segmentNo]}"'
+            comment= f'{Severity["E"]}:Unexpected Segment, segmentNo {segmentNo + 1:d}:"{Segments[segmentNo]}"'
             ERRrepeats.append(["", segmentNo + 1, 0, comment,"100", "W"])
             print(comment, file=reportFile)
             if not tagged:
@@ -1595,7 +1636,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
             # Otherwise, treat this segment as 'unexpected'
             restart = True
             SegmentStatus[segmentNo] = False
-            comment= f'{Severity["E"]}:Unexpected Segment, segment {segmentNo + 1:d}:"{Segments[segmentNo]}"'
+            comment= f'{Severity["E"]}:Unexpected Segment, segmentNo {segmentNo + 1:d}:"{Segments[segmentNo]}"'
             ERRrepeats.append(["", segmentNo + 1, 0, comment, "100", "W"])
             print(comment, file=reportFile)
             if not tagged:
@@ -1620,7 +1661,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
             Fields.insert(1, fieldSep)
         seg = Fields[0]
         Fields = Fields[1:]
-        logger.debug(f'Processing segment {seg}, segment {segmentNo + 1:d}, fields {len(Fields)}', extra={'raw_message':True})
+        logger.debug(f'Processing Segment {seg}, segmentNo {segmentNo + 1:d}, fields {len(Fields)}', extra={'raw_message':True})
         logger.debug(f'Fields:{Fields}', extra={'raw_message':True})
         # Get the definition for the current Segment
         xmlSeg = segmentRoot.find("xsd:complexType[@name='" + seg + ".CONTENT']/xsd:sequence", namespaces)
@@ -1698,18 +1739,18 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                 fieldTable = None
             if (i >= len(Fields)) or (field == ''):         # An empty or missing field
                 if (fieldMin is not None) and (fieldMin > 0):
-                    comment = f'{Severity["E"]}:Missing required field [{fieldCode}] in Segment {seg}, segment {segmentNo + 1:d}'
+                    comment = f'{Severity["E"]}:Missing required field [{fieldCode}] in Segment {seg}, segmentNo {segmentNo + 1:d}'
                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "101", "E"])
                     print(comment, file=reportFile)
                     fieldXML.append(et.Comment(comment))
                     segElement.append(fieldXML)
                 continue
-            logger.debug(f'Processing segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, data {field}, fieldRef:{fieldRef}, fieldType:{fieldType}, fieldTable:{fieldTable} ', extra={'raw_message':True})
+            logger.debug(f'Processing Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, data {field}, fieldRef:{fieldRef}, fieldType:{fieldType}, fieldTable:{fieldTable} ', extra={'raw_message':True})
             if (fieldRef is None) or (fieldType is None):
                 if fieldType is None:
-                    comment = f'{Severity["W"]}:Undefined Field in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                    comment = f'{Severity["W"]}:Undefined Field in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
                 else:
-                    comment = f'{Severity["W"]}:Unexpected field in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}-{i + 1:d}, repetition [{j + 1:d}]'
+                    comment = f'{Severity["W"]}:Unexpected field in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}-{i + 1:d}, repetition [{j + 1:d}]'
                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
                 print(comment, file=reportFile)
                 fieldXML.append(et.Comment(comment))
@@ -1718,7 +1759,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                 if len(list(badChars)) > 0:
                     fieldXML.text = XMLclean.sub(field, '')
                     for badChar in badChars:
-                        comment = f'{Severity["W"]}:Illegal character(s) [{repr(field[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                        comment = f'{Severity["W"]}:Illegal character(s) [{repr(field[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "W"])
                         print(comment, file=reportFile)
                         fieldXML.append(et.Comment(comment))
@@ -1726,7 +1767,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                     fieldXML.text = field
                 comment = fixElement(fieldXML, 'ST', None, None, None)
                 if comment is not None:
-                    comment = f'{Severity["E"]}:{comment} in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                    comment = f'{Severity["E"]}:{comment} in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "E"])
                     print(comment, file=reportFile)
                     fieldXML.append(et.Comment(comment))
@@ -1771,7 +1812,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 fieldRulesPassed[rule][groups][thisType] = {"count": fieldBusinessRules[fieldCode][groups][rule][thisType][0], "severity": fieldBusinessRules[fieldCode][groups][rule][thisType][1], "passed": 0}
             # Validate each field repetition of this field and build the XML for each repetition
             for j, thisField in enumerate(fieldReps):
-                logger.debug(f'Processing segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], data {thisField}', extra={'raw_message':True})
+                logger.debug(f'Processing Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], data {thisField}', extra={'raw_message':True})
                 if j > 0:           # For repetitions after the first, we need to create a new XML element for this field repetition
                     if fieldRef is None:
                         fieldXML = et.Element(fieldCode)
@@ -1782,7 +1823,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                 if thisField == '""':
                     continue
                 if (fieldMax is not None) and (fieldMax <= j):
-                    comment = f'{Severity["W"]}:Unexpected field repeat [{j + 1:d}] in segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}]'
+                    comment = f'{Severity["W"]}:Unexpected field repeat [{j + 1:d}] in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}]'
                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
                     print(comment, file=reportFile)
                     fieldXML.append(et.Comment(comment))
@@ -1801,7 +1842,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                     # We can now try and validate the components
                     Components = thisField.split(compSep)
                     for k, component in enumerate(Components):
-                        logger.debug(f'Processing segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{k + 1:d}], data {component}', extra={'raw_message':True})
+                        logger.debug(f'Processing Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{k + 1:d}], data {component}', extra={'raw_message':True})
                         if component == '""':
                             continue
                         componentCode = f'{seg}-{i + 1:d}.{k + 1:d}'
@@ -1831,7 +1872,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             componentTable = None
                         if component == '':
                             if (componentMin is not None) and (componentMin > 0):
-                                comment = f'{Severity["W"]}:Missing required component [{componentCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repeat [{j + 1:d}]'
+                                comment = f'{Severity["W"]}:Missing required component [{componentCode}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repeat [{j + 1:d}]'
                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
@@ -1839,9 +1880,9 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             continue
                         if (componentRef is None) or (componentType is None):
                             if componentRef is None:
-                                comment = f'{Severity["W"]}:Unexpected component in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] - {component}'
+                                comment = f'{Severity["W"]}:Unexpected component in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] - {component}'
                             else:
-                                comment = f'{Severity["W"]}:Undefined component in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{i + 1:d}], component [{componentCode}]'
+                                comment = f'{Severity["W"]}:Undefined component in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{i + 1:d}], component [{componentCode}]'
                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
                             print(comment, file=reportFile)
                             componentXML.append(et.Comment(comment))
@@ -1850,7 +1891,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             if len(list(badChars)) > 0:
                                 componentXML.text = XMLclean.sub(component, '')
                                 for badChar in badChars:
-                                    comment = f'{Severity["W"]}:Illegal character(s) [{repr(component[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                                    comment = f'{Severity["W"]}:Illegal character(s) [{repr(component[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
                                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "W"])
                                     print(comment, file=reportFile)
                                     componentXML.append(et.Comment(comment))
@@ -1858,7 +1899,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 componentXML.text = component
                             comment, rulesData = fixElement(componentXML, 'ST', fieldType, k + 1, fieldXML)
                             if comment is not None:
-                                comment = f'{Severity["E"]}:{comment} in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{i+ 1:d}], component [{componentCode}]'
+                                comment = f'{Severity["E"]}:{comment} in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{i+ 1:d}], component [{componentCode}]'
                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "E"])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
@@ -1869,7 +1910,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         componentXML = et.Element(componentRef)
                         subComponents = []
                         if (componentBits is not None) and (subCompSep != ''):
-                            logger.debug(f'Processing segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponents', extra={'raw_message':True})
+                            logger.debug(f'Processing Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponents', extra={'raw_message':True})
                             subComponents = component.split(subCompSep)
                             for l, subComponent in enumerate(subComponents):
                                 if subComponent == '""':
@@ -1901,7 +1942,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     subCompTable = None
                                 if subComponent == '':
                                     if (subCompMin is not None) and (subCompMin > 0):
-                                        comment = f'{Severity["E"]}:Missing required subcomponent [{subCompCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        comment = f'{Severity["E"]}:Missing required subcomponent [{subCompCode}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "E"])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
@@ -1909,9 +1950,9 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     continue
                                 if (subCompRef is None) or (subCompType is None):
                                     if subCompRef is None:
-                                        comment = f'{Severity["W"]}:Undefined subcomponent [{subCompCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                                        comment = f'{Severity["W"]}:Undefined subcomponent [{subCompCode}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
                                     else:
-                                        comment = f'{Severity["W"]}:Unexpected subcomponent [{subCompCode}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}] - {subComponent}'
+                                        comment = f'{Severity["W"]}:Unexpected subcomponent [{subCompCode}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}] - {subComponent}'
                                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
                                     print(comment, file=reportFile)
                                     subComponentXML.append(et.Comment(comment))
@@ -1920,7 +1961,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     if len(list(badChars)) > 0:
                                         subComponentXML.text = XMLclean.sub(subComponent, '')
                                         for badChar in badChars:
-                                            comment = f'{Severity["W"]}:Illegal character(s) [{repr(subComponent[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                            comment = f'{Severity["W"]}:Illegal character(s) [{repr(subComponent[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "W"])
                                             print(comment, file=reportFile)
                                             subComponentXML.append(et.Comment(comment))
@@ -1929,7 +1970,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     subComponentXML.append(et.Comment(comment))
                                     comment, rulesData = fixElement(subComponentXML, subCompType, componentType, l + 1, componentXML)
                                     if comment is not None:
-                                        comment = f'{Severity["E"]}:{comment} in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        comment = f'{Severity["E"]}:{comment} in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "E"])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
@@ -1941,13 +1982,13 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 if len(list(badChars)) > 0:
                                     subComponentXML.text = XMLclean.sub(subComponent, '')
                                     for badChar in badChars:
-                                        comment = f'{Severity["W"]}:Illegal character(s) [{repr(subComponent[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        comment = f'{Severity["W"]}:Illegal character(s) [{repr(subComponent[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "W"])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
                                 else:
                                     subComponentXML.text = subComponent
-                                logger.debug(f'Adding subcomponent {subComponent} to XML for segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]', extra={'raw_message':True})
+                                logger.debug(f'Adding subcomponent {subComponent} to XML for Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]', extra={'raw_message':True})
                                 XMLcomment, rulesData = fixElement(subComponentXML, subCompType, componentType, l + 1, componentXML)
                                 # Save this subcomponent as field.component.subcomponent data
                                 if seg in glossary:
@@ -1960,15 +2001,20 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                         else:
                                             segData[subCompCode] = rulesData.replace("\\", "\\\\").replace("\"", "\\\"")
                                     else:
-                                        logger.debug(f'Subcomponent {subCompCode} not in glossary for segment {seg}', extra={'raw_message':True})
+                                        logger.debug(f'Subcomponent {subCompCode} not in glossary for Segment {seg}', extra={'raw_message':True})
                                 # Save this subcompoent as datatype data
+                                if fieldType in glossary:
+                                    if f'{fieldType}.{k + 1:d}.{l + 1:d}' in glossary[fieldType]:
+                                        data[f'{fieldType}.{k + 1:d}.{l + 1:d}'] = rulesData.replace('\\', '\\\\').replace('"', '\\"')
+                                    else:
+                                        logger.debug(f'Component {fieldType}.{k + 1:d}.{l + 1:d} not in glossary for datatype {fieldType}', extra={'raw_message':True})
                                 if componentType in glossary:
                                     if f'{componentType}.{l + 1:d}' in glossary[componentType]:
                                         data[f'{componentType}.{l + 1:d}'] = rulesData.replace("\\", "\\\\").replace("\"", "\\\"")
                                     else:
                                         logger.debug(f'Subcomponent {componentType}.{l + 1:d} not in glossary for datatype {componentType}', extra={'raw_message':True})
                                 if XMLcomment is not None:
-                                    comment = f'{Severity["E"]}:{XMLcomment} in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                    comment = f'{Severity["E"]}:{XMLcomment} in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j+ 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "E"])
                                     print(comment, file=reportFile)
                                     subComponentXML.append(et.Comment(comment))
@@ -1978,62 +2024,53 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 # However, if any of the three tables are defined, then this subcomponent isn't in any of them, then we have to report all tables tested.
                                 inTable = None
                                 testedTables = []
-                                logger.debug(f'Checking subcomponent "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}] against subCompTable:{subCompTable}, componentTable:{componentTable}, fieldTable:{fieldTable}', extra={'raw_message':True})
+                                logger.debug(f'Checking subcomponent "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}] against subCompTable:{subCompTable}, componentTable:{componentTable}, fieldTable:{fieldTable}', extra={'raw_message':True})
                                 if (subCompTable is not None) and (hl7Tables is not None):
-                                    if subCompTable in hl7Tables:
-                                        if hl7Tables[subCompTable]["type"] == "User":
-                                            testedTables.append(f'{hl7Tables[subCompTable]["type"]}-defined Table {subCompTable[4:]}')
-                                        else:
+                                    if (subCompCode not in tableBusinessRules) or (subCompTable != tableBusinessRules[subCompCode]):
+                                        if subCompTable in hl7Tables:
                                             testedTables.append(f'{hl7Tables[subCompTable]["type"]} Table {subCompTable[3:]}')
-                                        if rulesData not in hl7Tables[subCompTable]['codes']:
-                                            inTable = False
-                                        else:
+                                            if rulesData not in hl7Tables[subCompTable]['codes']:
+                                                inTable = False
+                                            else:
+                                                inTable = True
+                                        else:                   # If no table definition the subcomponent is considered to be in the table
                                             inTable = True
-                                    else:
-                                        testedTables.append(f'Table {subCompTable}')
-                                        inTable = False
                                 # Check if this is the first subcomponent
                                 if (l == 0) and (componentTable is not None) and (hl7Tables is not None):
-                                    if componentTable in hl7Tables:
-                                        if hl7Tables[componentTable]["type"] == "User":
-                                            testedTables.append(f'{hl7Tables[componentTable]["type"]}-defined Table {componentTable[4:]}')
-                                        else:
+                                    if (componentCode not in tableBusinessRules) or (componentTable != tableBusinessRules[componentCode]):
+                                        if componentTable in hl7Tables:
                                             testedTables.append(f'{hl7Tables[componentTable]["type"]} Table {componentTable[3:]}')
-                                        if rulesData not in hl7Tables[componentTable]['codes']:
-                                            if inTable is None:
-                                                inTable = False
-                                        else:
+                                            if rulesData not in hl7Tables[componentTable]['codes']:
+                                                if inTable is None:
+                                                    inTable = False
+                                            else:
+                                                inTable = True
+                                        else:                   # If no table definition the component is considered to be in the table
                                             inTable = True
-                                    else:
-                                        testedTables.append(f'Table {componentTable}')
-                                        inTable = False
                                 # Check if this is the first subcomponent in the first component
                                 if (l == 0) and (k == 0) and (fieldTable is not None) and (hl7Tables is not None):
-                                    if fieldTable in hl7Tables:
-                                        if hl7Tables[fieldTable]["type"] == "User":
-                                            testedTables.append(f'{hl7Tables[fieldTable]["type"]}-defined Table {fieldTable[4:]}')
-                                        else:
+                                    if (fieldCode not in tableBusinessRules) or (fieldTable != tableBusinessRules[fieldCode]):
+                                        if fieldTable in hl7Tables:
                                             testedTables.append(f'{hl7Tables[fieldTable]["type"]} Table {fieldTable[3:]}')
-                                        if rulesData not in hl7Tables[fieldTable]['codes']:
-                                            if inTable is None:
-                                                inTable = False
-                                        else:
+                                            if rulesData not in hl7Tables[fieldTable]['codes']:
+                                                if inTable is None:
+                                                    inTable = False
+                                            else:
+                                                inTable = True
+                                        else:                   # If no table definition the field is considered to be in the table
                                             inTable = True
-                                    else:
-                                        testedTables.append(f'Table {fieldTable}')
-                                        inTable = False
-                                if inTable is False:
+                                if inTable == False:
                                     if len(testedTables) == 1:
-                                        comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in table {testedTables[0]} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in table {testedTables[0]} in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                     else:
-                                        comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in tables {"/".join(testedTables)} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in tables {"/".join(testedTables)} in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "103", "I"])
                                     print(comment, file=reportFile)
                                     subComponentXML.append(et.Comment(comment))
                                 # Check if there is a subcomponent length
                                 if (datatypeLengths is not None) and (subCompType in datatypeLengths) and (l in datatypeLengths[subCompType]) and (datatypeLengths[subCompType][l] not in [999999, 65536]):
                                     if len(rulesData) > datatypeLengths[subCompType][l]:
-                                        comment = f'{Severity["W"]}:Illegally long subcomponent - "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
+                                        comment = f'{Severity["W"]}:Illegally long subcomponent - "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}], subcomponent [{subCompCode}]'
                                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "104", "W"])
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
@@ -2044,12 +2081,12 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     for group in valueSets[componentCode][rulesData]:
                                         if (group is None) or (group in previousTags) or (group == tag):
                                             if subComponents[l - 2] not in valueSets[componentCode][rulesData][group]:
-                                                comment = f'{Severity["I"]}:Identifier "{subComponents[l - 2]}" not in coding system "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component[{componentCode}]'
+                                                comment = f'{Severity["I"]}:Identifier "{subComponents[l - 2]}" not in coding system "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component[{componentCode}]'
                                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "199", "I"])
                                                 print(comment, file=reportFile)
                                                 subComponentXML.append(et.Comment(comment))
                                             elif (valueSets[componentCode][rulesData][group][subComponents[l - 2]] is not None) and (subComponents[l - 1] not in valueSets[componentCode][rulesData][group][subComponents[l - 2]]):
-                                                comment = f'{Severity["I"]}:Description "{subComponents[l - 1]}" not valid for Identifier "{subComponents[l - 2]}" in coding system "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component[{componentCode}]'
+                                                comment = f'{Severity["I"]}:Description "{subComponents[l - 1]}" not valid for Identifier "{subComponents[l - 2]}" in coding system "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component[{componentCode}]'
                                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "199", "I"])
                                                 print(comment, file=reportFile)
                                                 subComponentXML.append(et.Comment(comment))
@@ -2111,8 +2148,9 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                         else:
                                             Result = newData['Result']
                                         if Result['Passed'] == False:
+                                            logger.debug(f'Business Datatype Rule ({rule}) failed for datatype({subCompType}), group(s)({repr(dataTypeBusinessRules[subCompType])}) in Segment {seg}, segmentNo {segmentNo + 1:d} - Result: {Result}')
                                             for thisGroups, thisSegment, thisSeverity in testRules[rule]:
-                                                comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Datatype Rule ({rule}) for datatype({subCompType}), group(s)({repr(thisGroups)}), segment(s)({repr(thisSegment)})  - Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component {componentCode}, component data ({component})'
+                                                comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Datatype Rule ({rule}) for datatype({subCompType}), group(s)({repr(dataTypeBusinessRules[subCompType])}) in Segment {seg}, segmentNo {segmentNo + 1:d}  - Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component {componentCode}, component data ({component})'
                                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", thisSeverity])
                                                 print(comment, file=reportFile)
                                                 subComponentXML.append(et.Comment(comment))
@@ -2125,13 +2163,13 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             if len(list(badChars)) > 0:
                                 componentXML.text = XMLclean.sub(component, '')
                                 for badChar in badChars:
-                                    comment = f'{Severity["W"]}:Illegal character(s) [{repr(component[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                                    comment = f'{Severity["W"]}:Illegal character(s) [{repr(component[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
                                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "W"])
                                     print(comment, file=reportFile)
                                     componentXML.append(et.Comment(comment))
                             else:
                                 componentXML.text = component
-                            logger.debug(f'Adding component {component} to XML for segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]', extra={'raw_message':True})
+                            logger.debug(f'Adding component {component} to XML for Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]', extra={'raw_message':True})
                             XMLcomment, rulesData = fixElement(componentXML, componentType, fieldType, i + 1, fieldXML)
                             # Save this component as field.component data
                             if seg in glossary:
@@ -2152,7 +2190,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 else:
                                     logger.debug(f'Component {fieldType}.{k + 1:d} not in glossary for datatype {fieldType}', extra={'raw_message':True})
                             if XMLcomment is not None:
-                                comment = f'{Severity["E"]}:{XMLcomment} in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}]'
+                                comment = f'{Severity["E"]}:{XMLcomment} in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}]'
                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "E"])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
@@ -2162,49 +2200,42 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             # However, if any of the two tables are defined, and this component isn't in any of them, then we have to report all tables tested.
                             inTable = None
                             testedTables = []
-                            logger.debug(f'Checking component "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}] against componentTable:{componentTable}, fieldTable:{fieldTable}', extra={'raw_message':True})
+                            logger.debug(f'Checking component "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}] against componentTable:{componentTable}, fieldTable:{fieldTable}', extra={'raw_message':True})
                             # Check this subcomponent
                             if (componentTable is not None) and (hl7Tables is not None):
-                                if componentTable in hl7Tables:
-                                    if hl7Tables[componentTable]["type"] == "User":
-                                        testedTables.append(f'{hl7Tables[componentTable]["type"]}-defined Table {componentTable[4:]}')
-                                    else:
+                                if (componentCode not in tableBusinessRules) or (componentTable != tableBusinessRules[componentCode]):
+                                    if componentTable in hl7Tables:
                                         testedTables.append(f'{hl7Tables[componentTable]["type"]} Table {componentTable[3:]}')
-                                    if rulesData not in hl7Tables[componentTable]['codes']:
-                                        inTable = False
-                                    else:
+                                        if rulesData not in hl7Tables[componentTable]['codes']:
+                                            inTable = False
+                                        else:
+                                            inTable = True
+                                    else:                           # If no table definition the component is considered to be in the table
                                         inTable = True
-                                else:
-                                    testedTables.append(f'Table {componentTable}')
-                                    inTable = False
                             # Check if this is the first subcomponent in the first component
                             if (k == 0) and (fieldTable is not None) and (hl7Tables is not None):
-                                if fieldTable in hl7Tables:
-                                    if hl7Tables[fieldTable]["type"] == "User":
-                                        testedTables.append(f'{hl7Tables[fieldTable]["type"]}-defined Table {fieldTable[4:]}')
-                                    else:
+                                if (fieldCode not in tableBusinessRules) or (fieldTable != tableBusinessRules[fieldCode]):
+                                    if fieldTable in hl7Tables:
                                         testedTables.append(f'{hl7Tables[fieldTable]["type"]} Table {fieldTable[3:]}')
-                                    if rulesData not in hl7Tables[fieldTable]['codes']:
-                                        if inTable is None:
-                                            inTable = False
-                                    else:
+                                        if rulesData not in hl7Tables[fieldTable]['codes']:
+                                            if inTable is None:
+                                                inTable = False
+                                        else:
+                                            inTable = True
+                                    else:                           # If no table definition the field is considered to be in the table
                                         inTable = True
-                                else:
-                                    testedTables.append(f'Table {fieldTable}')
-                                    if inTable is None:
-                                        inTable = False
-                            if inTable is False:
+                            if inTable == False:
                                 if len(testedTables) == 1:
-                                    comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in table {testedTables[0]} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                                    comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in table {testedTables[0]} in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
                                 else:
-                                    comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in tables {"/".join(testedTables)} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                                    comment = f'{Severity["I"]}:Illegal value "{rulesData}" - not in tables {"/".join(testedTables)} in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "103", "I"])
                                 print(comment, file=reportFile)
                                 componentXML.append(et.Comment(comment))
                             # Check the component length                           
                             if (datatypeLengths is not None) and (componentType in datatypeLengths) and (k in datatypeLengths[componentType]) and (datatypeLengths[componentType][k] not in [999999, 65536]):
                                 if len(rulesData) > datatypeLengths[componentType][k]:
-                                    comment = f'{Severity["W"]}:Illegally long component - "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}]'
+                                    comment = f'{Severity["W"]}:Illegally long component - "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}], component [{componentCode}]'
                                     ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "104", "W"])
                                     print(comment, file=reportFile)
                                     componentXML.append(et.Comment(comment))
@@ -2216,12 +2247,12 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 for group in valueSets[fieldCode][rulesData]:
                                     if (group is None) or (group in previousTags) or (group == tag):
                                         if Components[k - 2] not in valueSets[fieldCode][rulesData][group]:
-                                            comment = f'{Severity["I"]}:Identifier "{Components[k - 2]}" not in coding system "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                                            comment = f'{Severity["I"]}:Identifier "{Components[k - 2]}" not in coding system "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
                                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "199", "I"])
                                             print(comment, file=reportFile)
                                             componentXML.append(et.Comment(comment))
                                         elif (valueSets[fieldCode][rulesData][group][Components[k - 2]] is not None) and (Components[k - 1] not in valueSets[fieldCode][rulesData][group][Components[k - 2]]):
-                                            comment = f'{Severity["I"]}:Description "{Components[k - 1]}" not valid for Identifier "{Components[k - 2]}" in coding system "{rulesData}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                                            comment = f'{Severity["I"]}:Description "{Components[k - 1]}" not valid for Identifier "{Components[k - 2]}" in coding system "{rulesData}" in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
                                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "199", "I"])
                                             print(comment, file=reportFile)
                                             componentXML.append(et.Comment(comment))
@@ -2282,8 +2313,9 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 else:
                                     Result = newData['Result']
                                 if Result['Passed'] == False:
+                                    logger.debug(f'Business Datatype Rule ({rule}:{repr(groups)}) failed for datatype({componentType}) in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component {componentCode}, component data ({component}) - Result: {Result}')
                                     for thisGroups, thisSegment, thisSeverity in testRules[rule]:
-                                        comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Datatype Rule ({rule}), dataType({componentType}) - Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component {componentCode}, component data ({component})'
+                                        comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Datatype Rule ({rule}), dataType({componentType}) - Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component {componentCode}, component data ({component})'
                                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", thisSeverity])
                                         print(comment, file=reportFile)
                                         componentXML.append(et.Comment(comment))
@@ -2296,13 +2328,13 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                     if len(list(badChars)) > 0:
                         fieldXML.text = XMLclean.sub(thisField, '')
                         for badChar in badChars:
-                            comment = f'{Severity["W"]}:Illegal character(s) [{repr(thisField[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                            comment = f'{Severity["W"]}:Illegal character(s) [{repr(thisField[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "W"])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
                     else:
                         fieldXML.text = thisField
-                    logger.debug(f'Adding field {thisField} to XML for segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]', extra={'raw_message':True})
+                    logger.debug(f'Adding field {thisField} to XML for Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]', extra={'raw_message':True})
                     if fieldCode not in ['MSH-1', 'MSH-2']:
                         XMLcomment, rulesData = fixElement(fieldXML, fieldType, None, None, None)
                     else:
@@ -2318,27 +2350,23 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         else:
                             segData[fieldCode] = rulesData.replace("\\", "\\\\").replace("\"", "\\\"")
                     if XMLcomment is not None:
-                        comment = f'{Severity["E"]}:{XMLcomment} in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                        comment = f'{Severity["E"]}:{XMLcomment} in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "E"])
                         print(comment, file=reportFile)
                         fieldXML.append(et.Comment(comment))
                     # Check field table and field length
-                    logger.debug(f'Checking field "{thisField}" in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] against fieldTable {fieldTable}', extra={'raw_message':True})
+                    logger.debug(f'Checking field "{thisField}" in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] against fieldTable {fieldTable}', extra={'raw_message':True})
                     if (fieldTable is not None) and (hl7Tables is not None):
-                        if fieldTable in hl7Tables:
-                            if rulesData not in hl7Tables[fieldTable]['codes']:
-                                comment = f'{Severity["W"]}:Illegal value "{rulesData}" - not in table {hl7Tables[fieldTable]["type"]} {fieldTable} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
-                                ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "103", "W"])
-                                print(comment, file=reportFile)
-                                fieldXML.append(et.Comment(comment))
-                        else:
-                            comment = f'{Severity["W"]}:Illegal value "{rulesData}" - not in table {fieldTable} in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
-                            ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "103", "W"])
-                            print(comment, file=reportFile)
-                            fieldXML.append(et.Comment(comment))
+                        if (fieldCode not in tableBusinessRules) or (fieldTable != tableBusinessRules[fieldCode]):
+                            if fieldTable in hl7Tables:
+                                if rulesData not in hl7Tables[fieldTable]['codes']:
+                                    comment = f'{Severity["W"]}:Illegal value "{rulesData}" - not in table {hl7Tables[fieldTable]["type"]} {fieldTable} in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}]'
+                                    ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "103", "W"])
+                                    print(comment, file=reportFile)
+                                    fieldXML.append(et.Comment(comment))
                     if (fieldLengths is not None) and (fieldCode in fieldLengths) and (fieldLengths[fieldCode] not in [999999, 65536]):
                         if len(rulesData) > fieldLengths[fieldCode]:
-                            comment = f'{Severity["W"]}:Illegally long field - "{thisField}" in Segment {seg}, segment {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
+                            comment = f'{Severity["W"]}:Illegally long field - "{thisField}" in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{j + 1:d}]'
                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "104", "W"])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
@@ -2399,8 +2427,9 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         else:
                             Result = newData['Result']
                         if Result['Passed'] == False:
+                            logger.debug(f'Business Datatype Rule ({rule}:{repr(groups)}) failed for segment datatype({fieldType}) in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] - Result: {Result}')
                             for thisGroups, thisSegment, thisSeverity in testRules[rule]:
-                                comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Datatype Rule ({rule}), dataType({fieldType}) - Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], field data ({thisField})'
+                                comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Datatype Rule ({rule}), dataType({fieldType}) - Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], field data ({thisField})'
                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", thisSeverity])
                                 print(comment, file=reportFile)
                                 fieldXML.append(et.Comment(comment))
@@ -2454,8 +2483,9 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                         for thisType in fieldRulesPassed[rule][groups]:
                                             fieldRulesPassed[rule][groups][thisType]['passed'] += 1
                                     elif 'all' in fieldRulesPassed[rule][groups]:
+                                        logger.debug(f'Business Field Rule ({rule}:{repr(groups)}) failed in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}] - Result: {Result}')
                                         thisSeverity = fieldRulesPassed[rule][groups][ 'all' ]['severity']
-                                        comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Field Business Rule ({rule}:{repr(groups)}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], field data ({thisField})'
+                                        comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Field Business Rule ({rule}:{repr(groups)}) Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], field data ({thisField})'
                                         ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "199", thisSeverity])
                                         print(comment, file=reportFile)
                                         fieldXML.append(et.Comment(comment))
@@ -2465,12 +2495,12 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                     for thisType in fieldRulesPassed[rule][groups]:
                         thisSeverity = fieldRulesPassed[rule][groups][thisType]['severity']
                         if (thisType == 'max') and (fieldRulesPassed[rule][groups][thisType]['passed'] > fieldRulesPassed[rule][groups][thisType]['count']):
-                            comment = f'{Severity[thisSeverity]}:Field Business Rule (rule {rule}:ruleType {thisType}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode} - {fieldRulesPassed[rule][groups][thisType]['passed']} valid repetitions > {fieldRulesPassed[rule][groups][thisType]['count']}'
+                            comment = f'{Severity[thisSeverity]}:Field Business Rule (rule {rule}:ruleType {thisType}) Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode} - {fieldRulesPassed[rule][groups][thisType]['passed']} valid repetitions > {fieldRulesPassed[rule][groups][thisType]['count']}'
                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "199", thisSeverity])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
                         elif (thisType == 'min') and (fieldRulesPassed[rule][groups][thisType]['passed'] < fieldRulesPassed[rule][groups][thisType]['count']):
-                            comment = f'{Severity[thisSeverity]}:Field Business Rule (rule {rule}:ruleType {thisType}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}, field {fieldCode} - {fieldRulesPassed[rule][groups][thisType]['passed']} valid repetitions < {fieldRulesPassed[rule][groups][thisType]['count']}'
+                            comment = f'{Severity[thisSeverity]}:Field Business Rule (rule {rule}:ruleType {thisType}) Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode} - {fieldRulesPassed[rule][groups][thisType]['passed']} valid repetitions < {fieldRulesPassed[rule][groups][thisType]['count']}'
                             ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "199", thisSeverity])
                             print(comment, file=reportFile)
                             fieldXML.append(et.Comment(comment))
@@ -2524,7 +2554,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             for thisType in segmentRulesPassed[seg][groups][rule][repeatFields]:
                                 thisSeverity = segmentRulesPassed[seg][groups][rule][repeatFields][thisType]['severity']
                                 if (thisType == 'all') and (Result['Passed'] == False):
-                                    comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Segment Business Rule ({rule}:{repr(groups)}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}'
+                                    logger.debug(f'Business Segment Rule ({rule}:{repr(groups)}) failed for Segment {seg}, segmentNo {segmentNo + 1:d} - Result: {Result}')
+                                    comment = f'{Severity[thisSeverity]}:{Result["Reason"]} - Segment Business Rule ({rule}:{repr(groups)}) Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}'
                                     ERRrepeats.append([seg, segmentNo + 1, 0, comment, "199", thisSeverity])
                                     print(comment, file=reportFile)
                                     segElement.append(et.Comment(comment))
@@ -2560,8 +2591,9 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                     passed = True
                                 else:
                                     if 'all' in segmentRulesPassed[seg][groups][rule][repeatFields]:
+                                        logger.debug(f'Business Segment Rule ({rule}:{repr(groups)}) failed for Segment {seg}, segmentNo {segmentNo + 1:d} - Result: {Result}')
                                         thisSeverity = segmentRulesPassed[seg][groups][rule][repeatFields]['all']['severity']
-                                        comment = f'{Severity[thisSeverity]}: {Result["Reason"]} - Segment Business Rule ({rule}:{repr(groups)}) Testing failure in Segment {seg}, segment {segmentNo + 1:d}'
+                                        comment = f'{Severity[thisSeverity]}: {Result["Reason"]} - Segment Business Rule ({rule}:{repr(groups)}) Testing failure in Segment {seg}, segmentNo {segmentNo + 1:d}'
                                         ERRrepeats.append([seg, segmentNo + 1, 0, comment, "199", "E"])
                                         print(comment, file=reportFile)
                                         segElement.append(et.Comment(comment))

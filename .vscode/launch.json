@@ -145,6 +145,26 @@
             "args": ["-I", "input/ADRM", "-i", "example04.hl7","-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "example04.log", "-v", "4" ]
         },
         {
+            "name": "hl7Validator ADRM good Order",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input/ADRM", "-i", "ADRM_good_Order.hl7","-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM_good_Order.log", "-v", "4" ]
+        },
+        {
+            "name": "hl7Validator ADRM good Results",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-I", "input/ADRM", "-i", "ADRM_good_Results.hl7","-O", "output/ADRM", "-S", "schema/ADRM", "-R", "reports/ADRM", "-L", "logs/ADRM", "-l", "ADRM_good_Results.log", "-v", "4" ]
+        },
+        {
             "name": "hl7Validator MLLP",
             "type": "debugpy",
             "request": "launch",

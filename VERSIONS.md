@@ -1,5 +1,10 @@
 # HL7 Validator
 
+## Version 1.5 - 21-Sep-2026
+
+Change table checking - nolonger report values in undefined tables not being in the table.  
+Added **Table Business Rules** to override default item in HL7/User-defined table checking.
+
 ## Version 1.4 - 18-Sep-2026 [pm]
 
 BUG FIXes:
