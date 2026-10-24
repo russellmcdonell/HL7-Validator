@@ -1820,19 +1820,36 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         fieldXML = et.Element(fieldRef)
                 data = {}       # The data for any Field Business rules for this field repetition
                 data["Repeat Number"] = j + 1
-                if thisField == '""':
-                    continue
-                if (fieldMax is not None) and (fieldMax <= j):
-                    comment = f'{Severity["W"]}:Unexpected field repeat [{j + 1:d}] in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}]'
-                    ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
-                    print(comment, file=reportFile)
-                    fieldXML.append(et.Comment(comment))
-                    continue
                 if fieldType == '*':            # XML Schema representation of 'varies'
                     if (seg == 'OBX') and (fieldRef == 'OBX.5'):
                         fieldType = Fields[1]
                     elif (seg == 'MFE') and (fieldRef == 'MFE.4') and (len(Fields) > 4):
                         fieldType = Fields[4]
+                if (fieldMax is not None) and (fieldMax <= j):
+                    comment = f'{Severity["W"]}:Unexpected field repeat [{j + 1:d}] in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}]'
+                    ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
+                    print(comment, file=reportFile)
+                    # Check for illegal characters in the component and remove and report them
+                    badChars = XMLclean.finditer(thisField)
+                    if len(list(badChars)) > 0:
+                        fieldXML.text = XMLclean.sub(thisField, '')
+                        for badChar in badChars:
+                            comment = f'{Severity["W"]}:Illegal character(s) [{repr(thisField[badChar.start():badChar.end()])}] at [{badChar.start()}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]'
+                            ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "W"])
+                            print(comment, file=reportFile)
+                            componentXML.append(et.Comment(comment))
+                    else:
+                        fieldXML.text = thisField
+                    comment, rulesData = fixElement(fieldXML, 'ST', fieldType, k + 1, fieldXML)
+                    if comment is not None:
+                        comment = f'{Severity["E"]}:{comment} in Segment {seg}, segmentNo {segmentNo + 1:d} in field [{fieldCode}], repetition [{i+ 1:d}], component [{componentCode}]'
+                        ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "102", "E"])
+                        print(comment, file=reportFile)
+                        fieldXML.append(et.Comment(comment))
+                    segElement.append(fieldXML)
+                    continue
+                if thisField == '""':               # Don't validate delete data code
+                    continue
                 # Get the component parts definition for this field
                 dataTypeBits = dataTypeRoot.find("xsd:complexType[@name='" + fieldType + "']/xsd:sequence", namespaces)
                 if fieldType == 'FT':       # FT has a sequence, but not components
@@ -1841,10 +1858,12 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                 if dataTypeBits is not None:
                     # We can now try and validate the components
                     Components = thisField.split(compSep)
-                    for k, component in enumerate(Components):
+                    for k in range(max(len(dataTypeBits), len(Components))):
+                        if k < len(Components):
+                            component = Components[k]
+                        else:
+                            component = ""
                         logger.debug(f'Processing Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{k + 1:d}], data {component}', extra={'raw_message':True})
-                        if component == '""':
-                            continue
                         componentCode = f'{seg}-{i + 1:d}.{k + 1:d}'
                         if (k < len(dataTypeBits)) and ('ref' in dataTypeBits[k].attrib) and ('minOccurs' in dataTypeBits[k].attrib):
                             componentRef = dataTypeBits[k].attrib['ref']
@@ -1870,7 +1889,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             componentXML = et.Element(componentCode)
                             componentType = 'ST'
                             componentTable = None
-                        if component == '':
+                        if component == "":
                             if (componentMin is not None) and (componentMin > 0):
                                 comment = f'{Severity["W"]}:Missing required component [{componentCode}] in Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repeat [{j + 1:d}]'
                                 ERRrepeats.append([seg, segmentNo + 1, i + 1, comment, "198", "W"])
@@ -1905,6 +1924,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                 componentXML.append(et.Comment(comment))
                             fieldXML.append(componentXML)
                             continue
+                        if component == '""':           # Don't validate delete data code
+                            continue
                         # Check if this component has defined subcomponents
                         componentBits = dataTypeRoot.find("xsd:complexType[@name='" + componentType + "']/xsd:sequence", namespaces)
                         componentXML = et.Element(componentRef)
@@ -1912,9 +1933,11 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                         if (componentBits is not None) and (subCompSep != ''):
                             logger.debug(f'Processing Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}], subcomponents', extra={'raw_message':True})
                             subComponents = component.split(subCompSep)
-                            for l, subComponent in enumerate(subComponents):
-                                if subComponent == '""':
-                                    continue
+                            for l in range(max(len(componentBits), len(subComponents))):
+                                if l < len(subComponents):
+                                    subComponent = subComponents[l]
+                                else:
+                                    subComponent = ""
                                 subCompCode = f'{seg}-{i + 1:d}.{k + 1:d}.{l + 1:d}'
                                 if (l < len(componentBits)) and ('ref' in componentBits[l].attrib) and ('minOccurs' in componentBits[l].attrib):
                                     subCompRef = componentBits[l].attrib['ref']
@@ -1975,6 +1998,8 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                                         print(comment, file=reportFile)
                                         subComponentXML.append(et.Comment(comment))
                                     componentXML.append(subComponentXML)
+                                    continue
+                                if subComponent == '""':                # Don't validate the delete character code
                                     continue
                                 # Save this subcomponent for any business rules that may be associated with it
                                 # Check for illegal characters in the subcomponent and remove and report them
@@ -2170,7 +2195,7 @@ def validateXML(sequenceList, tag, previousTags, optional, isChoice, depth):
                             else:
                                 componentXML.text = component
                             logger.debug(f'Adding component {component} to XML for Segment {seg}, segmentNo {segmentNo + 1:d}, field {fieldCode}, repetition [{j + 1:d}], component [{componentCode}]', extra={'raw_message':True})
-                            XMLcomment, rulesData = fixElement(componentXML, componentType, fieldType, i + 1, fieldXML)
+                            XMLcomment, rulesData = fixElement(componentXML, componentType, fieldType, k + 1, fieldXML)
                             # Save this component as field.component data
                             if seg in glossary:
                                 if componentCode in glossary[seg]:
@@ -3905,7 +3930,7 @@ def sendACK(conn, addr, ackChar, delayed):
     ackSeq += 1
     ackSeq %= 1000000
     ackFields[9] = f'{MSH7[0:14]}{ackSeq:06d}'
-    while len(ackFields) < 19:
+    while len(ackFields) < 21:
         ackFields.append('')
     if ackChar == 'C':
         ackFields[11] = f'2.4{compSep}AUS&Australia&ISO3166_1{compSep}HL7AU-OO-ACK-201701{subCompSep}{subCompSep}L'
@@ -3930,7 +3955,9 @@ def sendACK(conn, addr, ackChar, delayed):
     ackFields[16] = 'AUS'
     ackFields[17] = 'ASCII'
     ackFields[18] = 'en^English^ISO639'
-    ackSegs = [fieldSep.join(ackFields[0:19])]
+    ackFields[19] = ''
+    ackFields[20] = 'HL7AUSD-STD-OO-ADRM-2018.1'
+    ackSegs = [fieldSep.join(ackFields[0:21])]
     ackFields = ['MSA']
     if len(ERRrepeats) > 0:
         ackFields.append(f'{ackChar}E')

@@ -175,7 +175,7 @@
             "args": ["-p", "7777", "-A", "localhost", "-a", "7778","-S", "schema/ADRM", "-L", "logs/ADRM", "-l", "MLLP Server.log"]
         },
         {
-            "name": "hl7Validator Web Server",
+            "name": "hl7Validator Web Server (ADRM)",
             "type": "debugpy",
             "request": "launch",
             "program": "hl7Validator.py",
@@ -183,6 +183,16 @@
             "justMyCode": true,
             "cwd": "${workspaceFolder}/.",
             "args": ["-p", "8080", "-s", "-S", "schema/ADRM", "-L", "logs/ADRM", "-l", "Web Server.log"]
+        },
+        {
+            "name": "hl7Validator Web Server (v2.4)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "hl7Validator.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/.",
+            "args": ["-p", "8080", "-s", "-S", "schema/v2.4", "-L", "logs/v2.4", "-l", "Web Server.log"]
         },
         {
             "name": "Test a Business Rule",

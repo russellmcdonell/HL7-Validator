@@ -1,5 +1,12 @@
 # HL7 Validator
 
+## Version 1.6 - 9-Oct-2026
+
+Minor bug fixes
+
+Added HL7AU-00-201701 to facilitate ADRM Conformance Point HL7au:000040.3  
+Minor ADRM Compliance change for XCN datatype (name type code is mandatory)  
+
 ## Version 1.5 - 21-Sep-2026
 
 Change table checking - nolonger report values in undefined tables not being in the table.  

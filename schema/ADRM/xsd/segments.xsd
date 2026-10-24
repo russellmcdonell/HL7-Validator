@@ -1547,7 +1547,7 @@
             <xsd:element ref="OBX.13" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="OBX.14" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="OBX.15" minOccurs="0" maxOccurs="1"/>
-            <xsd:element ref="OBX.16" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="OBX.16" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="OBX.17" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="OBX.18" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="OBX.19" minOccurs="0" maxOccurs="1"/>

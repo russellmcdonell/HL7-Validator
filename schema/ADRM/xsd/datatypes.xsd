@@ -363,7 +363,7 @@
     -->
     <xsd:complexType name="FN">
         <xsd:sequence>
-            <xsd:element ref="FN.1" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="FN.1" minOccurs="1" maxOccurs="1"/>
             <xsd:element ref="FN.2" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="FN.3" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="FN.4" minOccurs="0" maxOccurs="1"/>
@@ -1002,19 +1002,19 @@
     -->
     <xsd:complexType name="XCN">
         <xsd:sequence>
-            <xsd:element ref="XCN.1" minOccurs="0" maxOccurs="1"/>
-            <xsd:element ref="XCN.2" minOccurs="0" maxOccurs="1"/>
-            <xsd:element ref="XCN.3" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="XCN.1" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="XCN.2" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="XCN.3" minOccurs="1" maxOccurs="1"/>
             <xsd:element ref="XCN.4" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="XCN.5" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="XCN.6" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="XCN.7" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="XCN.8" minOccurs="0" maxOccurs="1"/>
-            <xsd:element ref="XCN.9" minOccurs="0" maxOccurs="1"/>
-            <xsd:element ref="XCN.10" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="XCN.9" minOccurs="1" maxOccurs="1"/>
+            <xsd:element ref="XCN.10" minOccurs="1" maxOccurs="1"/>
             <xsd:element ref="XCN.11" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="XCN.12" minOccurs="0" maxOccurs="1"/>
-            <xsd:element ref="XCN.13" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="XCN.13" minOccurs="1" maxOccurs="1"/>
             <xsd:element ref="XCN.14" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="XCN.15" minOccurs="0" maxOccurs="1"/>
             <xsd:element ref="XCN.16" minOccurs="0" maxOccurs="1"/>
