@@ -112,6 +112,7 @@ import pyDMNrules as dmn
 # The external services used by the HL7 Validator
 Services = {
     "csiroUCUM": {"name": "The Australian CSIRO Ontoserver UCUM service", "username": "", "password": "", "APIkey": "", "parameters": 1},
+    "nlmUCUM": {"name": "The US NLM UCUM service", "username": "", "password": "", "APIkey": "", "parameters": 1},
     "healthLink": {"name": "The HealthLink FHIR Provider Directory service", "username": "", "password": "", "APIkey": "", "parameters": 1},
     "IHI": {"name": "The Australian Healthcare Identifiers Individual Healthcare Identifier service", "username": "", "password": "", "APIkey": "", "parameters": 1},
     "HPII": {"name": "The Australian Healthcare Identifiers Healthcare Provider Identifier service", "username": "", "password": "", "APIkey": "", "parameters": 1}
@@ -2808,8 +2809,11 @@ def fixElement(thisElement, textType, parentType, parentSequence, parentXML):
         if reTest is None:
             return f'Illegally formatted date/time "{elementText}"', rulesText
         try:
-            if len(elementText) > 8:
-                du_parser.parse(elementText[0:8]+"T"+elementText[8:])
+            if len(elementText) > 8:                # Date and time [timezone] or date and timezone?
+                if (len(elementText) == 13) and (elementText[-5] in ['+', '-']):        # Check for timezone offset in the format ±HHMM
+                    elementText = elementText[0:8] + "T0000" + elementText[8:]
+                else:
+                    du_parser.parse(elementText[0:8]+"T"+elementText[8:])               # Treat as ISO 8601 datetime, possibly with timezone offset
             else:
                 du_parser.parse(elementText)
         except (ValueError, OverflowError):
@@ -3388,10 +3392,10 @@ def testMessage():
                         for test in list(tests):
                             if test == 'isValid':
                                 try:
-                                    nodeData = ureg.from_ucum(nodeData)
+                                    UCUMnodeData = ureg.from_ucum(nodeData)
                                 except Exception as e:
                                     errorPath, errorSeg, errorSegNo, errorField = XPathTo(thisNode, "", "", 0, "")
-                                    comment = f'{Severity[thisSeverity]}:Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} - UCUM parsing failure - {e}'
+                                    comment = f'{Severity[thisSeverity]}:Parser Business Rule (rule {rule}:xpath {xpath}) at {errorPath} for "{nodeData}" - UCUM parsing failure - {e}'
                                     ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
                                     print(comment, file=reportFile)
                                     hl7XML.append(et.Comment(comment))
@@ -3832,7 +3836,7 @@ def testMessage():
                         answer = response.json()
                     except requests.exceptions.RequestException as e:
                         errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", 0, "")
-                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} - Testing failure - {e}'
+                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} for "{ruleParams[0]}" - Testing failure - {e}'
                         ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
                         print(comment, file=reportFile)
                         hl7XML.append(et.Comment(comment))
@@ -3848,7 +3852,27 @@ def testMessage():
                                         valid = False
                     if not valid:
                         errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", 0, "")
-                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} - Testing failure - {error}'
+                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} for "{ruleParams[0]}" - Testing failure - {error}'
+                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
+                        print(comment, file=reportFile)
+                        hl7XML.append(et.Comment(comment))
+                        continue
+                if service == 'nlmUCUM':
+                    # Perform the specific processing for the nlmUCUM service
+                    try:
+                        response = requests.get(f'https://ucum.nlm.nih.gov/ucum-service/v1/isValidUCUM/{ruleParams[0]}')
+                        response.raise_for_status()
+                        answer = response.text
+                    except requests.exceptions.RequestException as e:
+                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", 0, "")
+                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} for "{ruleParams[0]}" - Testing failure - {e}'
+                        ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
+                        print(comment, file=reportFile)
+                        hl7XML.append(et.Comment(comment))
+                        continue
+                    if answer != 'true':
+                        errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", 0, "")
+                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} for "{ruleParams[0]}" - Testing failure - Invalid UCUM code'
                         ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
                         print(comment, file=reportFile)
                         hl7XML.append(et.Comment(comment))
@@ -3871,7 +3895,7 @@ def testMessage():
                         answer = response.json()
                     except requests.exceptions.RequestException as e:
                         errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", 0, "")
-                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} - Testing failure - {e}'
+                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} for "{ruleParams[0]}" - Testing failure - {e}'
                         ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
                         print(comment, file=reportFile)
                         hl7XML.append(et.Comment(comment))
@@ -3879,14 +3903,14 @@ def testMessage():
                     # The answer should be a Bundle
                     if ('resourceType' not in answer) or (answer['resourceType'] != 'Bundle'):
                         errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", 0, "")
-                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} - Testing failure - Expected a FHIR Bundle but got {answer.get("resourceType", "unknown")}'
+                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} for "{ruleParams[0]}" - Testing failure - Expected a FHIR Bundle but got {answer.get("resourceType", "unknown")}'
                         ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
                         print(comment, file=reportFile)
                         hl7XML.append(et.Comment(comment))
                         continue
                     if ('entry' not in answer) or (len(answer['entry']) == 0):
                         errorPath, errorSeg, errorSegNo, errorField = XPathTo(ruleNode, "", "", 0, "")
-                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} - Testing failure - Invalid HealthLink EDI {params[0]}'
+                        comment = f'{Severity[thisSeverity]}:External Business Rule (rule {rule}:xpath {xpath}) for service {service} at {errorPath} for "{ruleParams[0]}" - Testing failure - Invalid HealthLink EDI {params[0]}'
                         ERRrepeats.append([errorSeg,errorSegNo,errorField[4:],comment,"199",thisSeverity])
                         print(comment, file=reportFile)
                         hl7XML.append(et.Comment(comment))

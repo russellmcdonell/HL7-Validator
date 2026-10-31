@@ -1,5 +1,10 @@
 # HL7 Validator
 
+## Version 1.7 - 17-Oct-2026
+
+Updated the ADRM configuration to latest version of SPIA  
+Added an external validator (nlmUCUM) which used the US National Library of Medicine's API for validating UCUM expressions.  
+
 ## Version 1.6 - 9-Oct-2026
 
 Minor bug fixes
